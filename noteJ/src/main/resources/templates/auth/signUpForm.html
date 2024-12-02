@@ -36,6 +36,12 @@
                             <input type="password" class="form-control" id="password" th:field="*{password}" placeholder="Enter your password">
                             <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
                         </div>
+                        <!-- BlogTitle -->
+                        <div class="mb-3">
+                            <label for="blogTitle" class="form-label">Blog Title</label>
+                            <input type="text" class="form-control" id="blogTitle" th:field="*{blogTitle}" placeholder="Enter your blog title">
+                            <div class="text-danger" th:if="${#fields.hasErrors('blogTitle')}" th:errors="*{blogTitle}"></div>
+                        </div>
                         <!-- Submit Button -->
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary">Sign Up</button>

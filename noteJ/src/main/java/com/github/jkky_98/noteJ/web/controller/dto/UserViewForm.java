@@ -10,5 +10,6 @@ public class UserViewForm {
     private String email;
     private String userDesc;
     private String profilePic;
+    private String blogTitle;
 
 }

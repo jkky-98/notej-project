@@ -1,5 +1,6 @@
 package com.github.jkky_98.noteJ.service;
 
+import com.github.jkky_98.noteJ.domain.user.UserDesc;
 import com.github.jkky_98.noteJ.web.controller.dto.LoginForm;
 import com.github.jkky_98.noteJ.web.controller.dto.SignUpForm;
 import com.github.jkky_98.noteJ.domain.user.User;
@@ -8,6 +9,8 @@ import com.github.jkky_98.noteJ.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 
 @Service
 @RequiredArgsConstructor
@@ -30,12 +33,32 @@ public class AuthSessionService implements AuthService {
     }
 
     @Override
-    public User signUp(SignUpForm signUpForm) {
+    public User signUp(SignUpForm signUpForm, BindingResult bindingResult) {
+        // 중복 체크: username
+        if (userRepository.findByUsername(signUpForm.getUsername()).isPresent()) {
+            bindingResult.rejectValue("username", "error.username", "Username already exists.");
+        }
+
+        // 중복 체크: email
+        if (userRepository.findByEmail(signUpForm.getEmail()).isPresent()) {
+            bindingResult.rejectValue("email", "error.email", "Email already exists.");
+        }
+
+        // 중복이 있으면 바로 반환하여 처리를 중단
+        if (bindingResult.hasErrors()) {
+            return null;
+        }
+
+        UserDesc userDesc = UserDesc.builder()
+                .blogTitle(signUpForm.getBlogTitle())
+                .build();
+
         User signUpUser = User.builder()
                 .username(signUpForm.getUsername())
                 .email(signUpForm.getEmail())
                 .password(signUpForm.getPassword())
                 .userRole(UserRole.USER)
+                .userDesc(userDesc)
                 .build();
 
         return userRepository.save(signUpUser);

@@ -76,7 +76,13 @@ public class AuthController {
             return "auth/signUpForm";
         }
 
-        authService.signUp(form);
+        User signUpUser = authService.signUp(form, bindingResult);
+
+        if (signUpUser == null) {
+            return "auth/signUpForm";
+        }
+
+
         return "redirect:/login";
     }
 

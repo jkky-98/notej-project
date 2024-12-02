@@ -19,6 +19,10 @@ public class UserDesc extends BaseTimeEntity {
 
     private String profilePic;
 
+    private String blogTitle;
+
+    private String theme;
+
     // 연관관계
     @OneToOne(fetch = FetchType.LAZY,
             mappedBy = "userDesc")

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
@@ -22,5 +23,9 @@ public class SignUpForm {
     @NotBlank(message = "Password is required.")
     @Size(min = 8, max = 100, message = "Password must be at least 8 characters long.")
     private String password;
+
+    @NotBlank(message = "BlogTitle is required.")
+    @Size(min = 2, max = 20, message = "Blog title must be between 2 and 20 characters")
+    private String blogTitle;
 
 }
