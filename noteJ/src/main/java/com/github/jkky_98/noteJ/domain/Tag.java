@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 기본 생성자
-@AllArgsConstructor // 빌더와 함께 사용할 모든 필드 생성자
+@AllArgsConstructor(access = AccessLevel.PRIVATE) // 빌더와 함께 사용할 모든 필드 생성자
 public class Tag extends BaseTimeEntity {
 
     @Id
