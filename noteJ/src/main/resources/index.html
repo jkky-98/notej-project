@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Include the header fragment -->
+<head th:replace="fragments/header :: header"></head>
+<body>
+<!-- Include the navigation fragment -->
+<div th:replace="fragments/header :: navigation"></div>
+<div>Home</div>
+
+<!-- Bootstrap JS -->
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

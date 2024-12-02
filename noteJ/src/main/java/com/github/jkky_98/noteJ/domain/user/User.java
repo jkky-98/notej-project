@@ -23,21 +23,14 @@ public class User extends BaseEntity {
     @Column(name = "user_id")
     private Long id;
 
-    @NotBlank(message = "Username is required.")
-    @Size(min = 2, max = 20, message = "Username must be between 2 and 20 characters")
     private String username;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email must be a valid format.")
     @Column(unique = true)
     private String email;
 
-    @NotBlank(message = "Password is required.")
-    @Size(min = 8, max = 100, message = "Password must be at least 8 characters long.")
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "User role is required.")
     private UserRole userRole;
 
     // 연관관계

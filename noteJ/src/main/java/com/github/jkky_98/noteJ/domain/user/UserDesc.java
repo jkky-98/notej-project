@@ -15,8 +15,9 @@ public class UserDesc extends BaseTimeEntity {
     @Column(name = "user_desc_id")
     private Long id;
 
-
     private String description;
+
+    private String profilePic;
 
     // 연관관계
     @OneToOne(fetch = FetchType.LAZY,

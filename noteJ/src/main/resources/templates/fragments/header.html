@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="header">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">Blog Main</title>
+    <!-- Bootstrap CSS -->
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <style>
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .dropdown-menu {
+            right: 0;
+            left: auto;
+        }
+    </style>
+</head>
+
+<body th:fragment="navigation">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <!-- 로고 -->
+        <a class="navbar-brand" href="/">noteJ</a>
+
+        <!-- 메뉴 토글 버튼 (모바일용) -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- 네비게이션 -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/write">새 글 작성</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/notifications">알림</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/search">검색</a>
+                </li>
+
+                <!-- 프로필 메뉴 -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <!-- 세션 존재 & 프로필 사진 존재 -->
+                        <img th:if="${sessionUser != null && sessionUser.profilePic != null}" th:src="@{${sessionUser.profilePic}}" class="profile-pic me-2" alt="Profile">
+
+                        <!-- 세션 존재 & 프로필 사진 없음 -->
+                        <img th:if="${sessionUser != null && sessionUser.profilePic == null}" th:src="@{/img/default-profile.png}" class="profile-pic me-2" alt="Default Profile">
+
+                        <!-- 세션 비존재 -->
+                        <img th:if="${sessionUser == null}" th:src="@{/img/default-profile.png}" class="profile-pic me-2" alt="Default Profile">
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                        <!-- 로그인된 경우 -->
+                        <li th:if="${sessionUser != null}">
+                            <a class="dropdown-item" href="/my-posts">내 블로그</a>
+                        </li>
+                        <li th:if="${sessionUser != null}">
+                            <a class="dropdown-item" href="/drafts">임시 글</a>
+                        </li>
+                        <li th:if="${sessionUser != null}">
+                            <a class="dropdown-item" href="/liked">좋아요</a>
+                        </li>
+                        <li th:if="${sessionUser != null}">
+                            <a class="dropdown-item" href="/settings">설정</a>
+                        </li>
+                        <li th:if="${sessionUser != null}">
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li th:if="${sessionUser != null}">
+                            <a class="dropdown-item text-danger" th:href="@{/logout}">로그아웃</a>
+                        </li>
+
+                        <!-- 로그인되지 않은 경우 -->
+                        <li th:if="${sessionUser == null}">
+                            <a class="dropdown-item" th:href="@{/login}">로그인</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76A2cn38V6T2eWq0gA7FP6oBTXpVf3lq1qot6b5MQvM9j6jDq1Pz8iguVqPbGxK" crossorigin="anonymous"></script>
+</body>
+</html>
