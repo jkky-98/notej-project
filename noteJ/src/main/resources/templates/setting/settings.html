@@ -24,85 +24,55 @@
         }
     </style>
 </div>
-<body>
-<div class="container settings-container">
-    <h1>설정</h1>
+<form th:action="@{/settings/save}" method="post" enctype="multipart/form-data">
+    <div class="container settings-container">
+        <h1>설정</h1>
 
-    <!-- 프로필 섹션 -->
-    <div class="d-flex align-items-center mb-4">
-        <img th:src="@{${sessionUser.profilePic != null ? sessionUser.profilePic : '/img/default-profile.png'}}" class="profile-pic me-3" alt="Profile">
-        <div>
-            <h2 th:text="${sessionUser.username}">사용자 이름</h2>
-            <p th:text="${sessionUser.userDesc}">프로필 설명</p>
+        <!-- 프로필 섹션 -->
+        <div class="d-flex align-items-center mb-4">
+            <img th:src="@{${sessionUser.profilePic != null ? sessionUser.profilePic : '/img/default-profile.png'}}"
+                 class="profile-pic me-3" alt="Profile">
             <div>
-                <button class="btn btn-outline-primary btn-sm">이미지 업로드</button>
-                <button class="btn btn-outline-danger btn-sm">이미지 제거</button>
+                <h2 th:text="${sessionUser.username}">사용자 이름</h2>
+                <p th:text="${sessionUser.userDesc}">프로필 설명</p>
+                <div>
+                    <input type="file" name="profilePic" class="form-control btn btn-outline-primary btn-sm mt-2" id="profilePicInput">
+                </div>
             </div>
         </div>
+
+        <!-- 소셜 정보 -->
+        <div class="mb-3">
+            <div class="section-title">소셜 정보</div>
+            <p>
+                <span class="me-2"><i class="bi bi-envelope"></i></span>
+                <span th:text="${sessionUser.email}">이메일 주소</span>
+            </p>
+            <button class="btn btn-outline-primary btn-sm">수정</button>
+        </div>
+
+        <!-- 이메일 주소 -->
+        <div class="mb-3">
+            <div class="section-title">이메일 주소</div>
+            <p th:text="${sessionUser.email}">이메일</p>
+            <button class="btn btn-outline-primary btn-sm">변경</button>
+        </div>
+
+        <!-- 회원 탈퇴 -->
+        <div class="mb-3">
+            <div class="section-title">회원 탈퇴</div>
+            <p>탈퇴 시 작성하신 포스트 및 댓글이 모두 삭제되며 복구되지 않습니다.</p>
+            <button class="btn btn-outline-danger">회원 탈퇴</button>
+        </div>
+
+        <!-- 설정 적용 버튼 -->
+        <div class="d-grid mt-3">
+            <button type="submit" class="btn btn-outline-success">설정 적용</button>
+        </div>
     </div>
-
-<!--    &lt;!&ndash; 블로그 제목 &ndash;&gt;-->
-<!--    <div class="mb-3">-->
-<!--        <div class="section-title">블로그 제목</div>-->
-<!--        <p th:text="${sessionUser.blogTitle}">coloratura.log</p>-->
-<!--        <button class="btn btn-outline-primary btn-sm">수정</button>-->
-<!--    </div>-->
-
-    <!-- 소셜 정보 -->
-    <div class="mb-3">
-        <div class="section-title">소셜 정보</div>
-        <p>
-            <span class="me-2"><i class="bi bi-envelope"></i></span>
-            <span th:text="${sessionUser.email}">이메일 주소</span>
-        </p>
-<!--        <p>-->
-<!--            <span class="me-2"><i class="bi bi-person"></i></span>-->
-<!--            <span th:text="${sessionUser.socialId}">소셜 아이디</span>-->
-<!--        </p>-->
-        <button class="btn btn-outline-primary btn-sm">수정</button>
-    </div>
-
-    <!-- 이메일 주소 -->
-    <div class="mb-3">
-        <div class="section-title">이메일 주소</div>
-        <p th:text="${sessionUser.email}">이메일</p>
-        <button class="btn btn-outline-primary btn-sm">변경</button>
-    </div>
-
-    <!-- 이메일 수신 설정 -->
-<!--    <div class="mb-3">-->
-<!--        <div class="section-title">이메일 수신 설정</div>-->
-<!--        <div class="form-check form-switch">-->
-<!--            <input class="form-check-input" type="checkbox" id="commentAlert" th:checked="${sessionUser.emailAlerts.comment}">-->
-<!--            <label class="form-check-label" for="commentAlert">댓글 알림</label>-->
-<!--        </div>-->
-<!--        <div class="form-check form-switch">-->
-<!--            <input class="form-check-input" type="checkbox" id="blogUpdateAlert" th:checked="${sessionUser.emailAlerts.blogUpdate}">-->
-<!--            <label class="form-check-label" for="blogUpdateAlert">블로그 업데이트 소식</label>-->
-<!--        </div>-->
-<!--    </div>-->
-
-    <!-- 테마 설정 -->
-<!--    <div class="mb-3">-->
-<!--        <div class="section-title">테마</div>-->
-<!--        <div class="btn-group" role="group">-->
-<!--            <input type="radio" class="btn-check" name="theme" id="lightTheme" autocomplete="off" th:checked="${sessionUser.theme == 'LIGHT'}">-->
-<!--            <label class="btn btn-outline-primary" for="lightTheme"><i class="bi bi-sun"></i></label>-->
-
-<!--            <input type="radio" class="btn-check" name="theme" id="darkTheme" autocomplete="off" th:checked="${sessionUser.theme == 'DARK'}">-->
-<!--            <label class="btn btn-outline-primary" for="darkTheme"><i class="bi bi-moon"></i></label>-->
-<!--        </div>-->
-<!--    </div>-->
-
-    <!-- 회원 탈퇴 -->
-    <div class="mb-3">
-        <div class="section-title">회원 탈퇴</div>
-        <p>탈퇴 시 작성하신 포스트 및 댓글이 모두 삭제되며 복구되지 않습니다.</p>
-        <button class="btn btn-outline-danger">회원 탈퇴</button>
-    </div>
-</div>
+</form>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76A2cn38V6T2eWq0gA7FP6oBTXpVf3lq1qot6b5MQvM9j6jDq1Pz8iguVqPbGxK" crossorigin="anonymous"></script>
 </body>
-</html>
+

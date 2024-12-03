@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -27,6 +29,7 @@ import java.util.List;
 public class AuthController {
 
     private final AuthService authService;
+    private final ApplicationContext applicationContext;
 
     @GetMapping("/login")
     public String loginForm(@ModelAttribute("loginForm") LoginForm form) {
@@ -81,7 +84,8 @@ public class AuthController {
         if (signUpUser == null) {
             return "auth/signUpForm";
         }
-
+        ConfigurableEnvironment environment = (ConfigurableEnvironment) applicationContext.getEnvironment();
+        log.info("정상로직 프로필 : {}", (Object) environment.getActiveProfiles());
 
         return "redirect:/login";
     }

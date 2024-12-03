@@ -21,7 +21,22 @@ public class UserDesc extends BaseTimeEntity {
 
     private String blogTitle;
 
-    private String theme;
+    @Enumerated(EnumType.STRING)
+    private ThemeMode theme;
+
+    private String socialEmail;
+
+    private String socialGitHub;
+
+    private String socialTwitter;
+
+    private String socialFacebook;
+
+    private String socialOther;
+
+    private boolean commentAlarm;
+
+    private boolean noteJAlarm;
 
     // 연관관계
     @OneToOne(fetch = FetchType.LAZY,

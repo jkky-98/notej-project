@@ -1,5 +1,6 @@
 package com.github.jkky_98.noteJ.service;
 
+import com.github.jkky_98.noteJ.domain.user.ThemeMode;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
 import com.github.jkky_98.noteJ.web.controller.dto.LoginForm;
 import com.github.jkky_98.noteJ.web.controller.dto.SignUpForm;
@@ -51,6 +52,10 @@ public class AuthSessionService implements AuthService {
 
         UserDesc userDesc = UserDesc.builder()
                 .blogTitle(signUpForm.getBlogTitle())
+                .socialEmail(signUpForm.getEmail())
+                .commentAlarm(true)
+                .noteJAlarm(true)
+                .theme(ThemeMode.LIGHT)
                 .build();
 
         User signUpUser = User.builder()

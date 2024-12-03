@@ -1,5 +1,8 @@
 package com.github.jkky_98.noteJ;
 
+import com.github.jkky_98.noteJ.domain.base.AuditorAwareImpl;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -17,10 +20,4 @@ public class NoteJApplication {
 		SpringApplication.run(NoteJApplication.class, args);
 	}
 
-
-	//Todo: UUID -> 수정자 체크하도록
-	@Bean
-	public AuditorAware<String> auditorProvider() {
-		return () -> Optional.of(UUID.randomUUID().toString());
-	}
 }
