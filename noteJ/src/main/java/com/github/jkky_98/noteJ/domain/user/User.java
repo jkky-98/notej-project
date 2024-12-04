@@ -38,6 +38,10 @@ public class User extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private UserDesc userDesc;
 
+    public void updateUserDesc(UserDesc userDesc) {
+        this.userDesc = userDesc;
+    }
+
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();

@@ -1,7 +1,7 @@
 package com.github.jkky_98.noteJ.service;
 
-import com.github.jkky_98.noteJ.web.controller.dto.LoginForm;
-import com.github.jkky_98.noteJ.web.controller.dto.SignUpForm;
+import com.github.jkky_98.noteJ.web.controller.form.LoginForm;
+import com.github.jkky_98.noteJ.web.controller.form.SignUpForm;
 import com.github.jkky_98.noteJ.domain.user.User;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.validation.BindingResult;

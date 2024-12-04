@@ -2,13 +2,16 @@ package com.github.jkky_98.noteJ.service;
 
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
+import com.github.jkky_98.noteJ.file.FileStore;
 import com.github.jkky_98.noteJ.repository.UserRepository;
 import com.github.jkky_98.noteJ.web.controller.dto.SettingDto;
+import com.github.jkky_98.noteJ.web.controller.form.UserSettingsForm;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -16,12 +19,40 @@ import java.util.Optional;
 public class SettingService {
 
     private final UserRepository userRepository;
+    private final FileStore fileStore;
+
+    @Transactional
+    public Optional<String> saveSettings(UserSettingsForm form, HttpSession session) throws IOException {
+
+        // 세션에서 사용자 정보 가져오기
+        User sessionUser = (User) session.getAttribute("loginUser");
+        if (sessionUser == null) {
+            return Optional.empty();  // 세션에 사용자 정보가 없으면 비어있는 Optional 반환
+        }
+
+        // 사용자 정보를 조회
+        Optional<User> findSettingUser = userRepository.findById(sessionUser.getId());
+        if (!findSettingUser.isPresent()) {
+            return Optional.empty();  // 사용자가 DB에 없으면 비어있는 Optional 반환
+        }
+
+        // 사용자 정보가 있다면, 해당 사용자의 username 반환
+        User user = findSettingUser.get();
+        UserDesc userDesc = user.getUserDesc();
+
+        //update
+        userDesc.updateSetting(form, fileStore);
+
+        return Optional.of("success");
+    }
 
     @Transactional
     public SettingDto getUserSettingData(HttpSession session) {
         SettingDto settingDto = new SettingDto();
         // 세션에서 "loginUser"로 저장된 User 객체를 가져옵니다.
         User sessionUser = (User) session.getAttribute("loginUser");
+
+        System.out.println(sessionUser.getUsername());
 
         if (sessionUser != null) {
             // userRepository를 통해 사용자의 정보를 조회합니다.
@@ -33,8 +64,10 @@ public class SettingService {
 
                 // SettingForm에 사용자 데이터를 담습니다.
                 settingDto.setCommentAlarm(userDesc.isCommentAlarm());
+                settingDto.setDescription(userDesc.getDescription());
+                settingDto.setBlogTitle(userDesc.getBlogTitle());
                 settingDto.setNoteJAlarm(userDesc.isNoteJAlarm());
-                settingDto.setProfilePic(userDesc.getProfilePic() != null ? userDesc.getProfilePic() : "/img/default-profile.png");
+                settingDto.setProfilePic(userDesc.getProfilePic());
                 settingDto.setTheme(userDesc.getTheme());
                 settingDto.setSocialEmail(userDesc.getSocialEmail());
                 settingDto.setSocialFacebook(userDesc.getSocialFacebook());

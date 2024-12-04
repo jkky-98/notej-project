@@ -51,7 +51,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <!-- 세션 존재 & 프로필 사진 존재 -->
-                        <img th:if="${sessionUser != null && sessionUser.profilePic != null}" th:src="@{${sessionUser.profilePic}}" class="profile-pic me-2" alt="Profile">
+                        <img th:if="${sessionUser != null && sessionUser.profilePic != null}" th:src="|/profileimages/${sessionUser.profilePic}|" class="profile-pic me-2" alt="Profile">
 
                         <!-- 세션 존재 & 프로필 사진 없음 -->
                         <img th:if="${sessionUser != null && sessionUser.profilePic == null}" th:src="@{/img/default-profile.png}" class="profile-pic me-2" alt="Default Profile">
@@ -62,7 +62,7 @@
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                         <!-- 로그인된 경우 -->
                         <li th:if="${sessionUser != null}">
-                            <a class="dropdown-item" href="/my-posts">내 블로그</a>
+                            <a class="dropdown-item" th:href="@{'/@' + ${sessionUser.username} + '/posts'}">내 블로그</a>
                         </li>
                         <li th:if="${sessionUser != null}">
                             <a class="dropdown-item" href="/drafts">임시 글</a>

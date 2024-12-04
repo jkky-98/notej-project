@@ -22,9 +22,6 @@ public class Tag extends BaseTimeEntity {
     @Column(name = "tag_id")
     private Long id;
 
-    @NotBlank(message = "Tag name is required and cannot be blank.")
-    @Size(min = 2, max = 50, message = "Tag name must be between 2 and 50 characters.")
-    @Pattern(regexp = "^[a-zA-Z0-9\\s]+$", message = "Tag name can only contain letters, numbers, and spaces.")
     private String name;
 
     //연관관계

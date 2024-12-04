@@ -3,9 +3,6 @@ package com.github.jkky_98.noteJ.domain;
 import com.github.jkky_98.noteJ.domain.base.BaseEntity;
 import com.github.jkky_98.noteJ.domain.user.User;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -24,18 +21,14 @@ public class Post extends BaseEntity {
     @Column(name = "post_id")
     private Long id;
 
-    @NotBlank(message = "Title is required.")
     @Size(min = 3, max = 255, message = "Title must be between 3 and 255 characters.")
     private String title;
 
-    @NotBlank(message = "Content is required.")
     @Size(min = 10, message = "Content must be at least 10 characters.")
     private String content;
 
-    @Pattern(regexp = "^(http|https)://.*$", message = "Thumbnail must be a valid URL.")
     private String thumbnail;
 
-    @NotNull(message = "Privacy status must be specified.")
     private Boolean is_private;
 
     //연관관계

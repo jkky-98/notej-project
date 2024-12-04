@@ -1,6 +1,5 @@
-package com.github.jkky_98.noteJ.web.controller.dto;
+package com.github.jkky_98.noteJ.web.controller.form;
 
-import com.github.jkky_98.noteJ.domain.user.UserDesc;
 import lombok.Data;
 
 @Data

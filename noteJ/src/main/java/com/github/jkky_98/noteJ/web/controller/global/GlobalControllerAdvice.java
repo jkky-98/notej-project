@@ -3,7 +3,7 @@ package com.github.jkky_98.noteJ.web.controller.global;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
 import com.github.jkky_98.noteJ.repository.UserRepository;
-import com.github.jkky_98.noteJ.web.controller.dto.UserViewForm;
+import com.github.jkky_98.noteJ.web.controller.form.UserViewForm;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ui.Model;

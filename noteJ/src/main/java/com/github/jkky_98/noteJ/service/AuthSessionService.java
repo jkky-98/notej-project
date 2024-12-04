@@ -1,16 +1,16 @@
 package com.github.jkky_98.noteJ.service;
 
+import com.github.jkky_98.noteJ.domain.FileMetadata;
 import com.github.jkky_98.noteJ.domain.user.ThemeMode;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
-import com.github.jkky_98.noteJ.web.controller.dto.LoginForm;
-import com.github.jkky_98.noteJ.web.controller.dto.SignUpForm;
+import com.github.jkky_98.noteJ.web.controller.form.LoginForm;
+import com.github.jkky_98.noteJ.web.controller.form.SignUpForm;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.domain.user.UserRole;
 import com.github.jkky_98.noteJ.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 
 @Service
@@ -49,6 +49,8 @@ public class AuthSessionService implements AuthService {
         if (bindingResult.hasErrors()) {
             return null;
         }
+        FileMetadata fileMetadata = FileMetadata.builder()
+                .build();
 
         UserDesc userDesc = UserDesc.builder()
                 .blogTitle(signUpForm.getBlogTitle())
@@ -56,6 +58,8 @@ public class AuthSessionService implements AuthService {
                 .commentAlarm(true)
                 .noteJAlarm(true)
                 .theme(ThemeMode.LIGHT)
+                .profilePic("img/default-profile.png")
+                .fileMetadata(fileMetadata)
                 .build();
 
         User signUpUser = User.builder()

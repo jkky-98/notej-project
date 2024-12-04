@@ -15,6 +15,10 @@ spring:
         format_sql: true
         default_batch_fetch_size: 100
 
+file:
+  dir: "/Users/jkky/Documents/private/notej-project/noteJ/src/main/resources/static/profileimages/"
+
+
 
 logging.level:
   org.hibernate.SQL: debug

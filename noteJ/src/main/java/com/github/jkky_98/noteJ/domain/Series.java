@@ -23,7 +23,5 @@ public class Series extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @NotBlank(message = "Series name is required.")
-    @Size(min = 1, max = 20, message = "Series name must be between 1 and 20 characters.")
     private String seriesName;
 }

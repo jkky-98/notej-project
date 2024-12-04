@@ -16,6 +16,7 @@ public class Comment extends BaseEntity {
     @Column(name = "comment_id")
     private Long id;
 
+    private String content;
 
     // 연관관계
     @ManyToOne(fetch = FetchType.LAZY)

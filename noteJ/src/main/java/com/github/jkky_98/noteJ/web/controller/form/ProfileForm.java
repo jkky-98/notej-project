@@ -1,18 +1,15 @@
-package com.github.jkky_98.noteJ.web.controller.dto;
+package com.github.jkky_98.noteJ.web.controller.form;
 
-import com.github.jkky_98.noteJ.domain.user.ThemeMode;
 import lombok.Data;
 
 @Data
-public class SettingDto {
+public class ProfileForm {
 
-    private String description;
+    private String username;
 
     private String profilePic;
 
-    private String blogTitle;
-
-    private ThemeMode theme;
+    private String description;
 
     private String socialEmail; // nullable
 
@@ -24,7 +21,7 @@ public class SettingDto {
 
     private String socialOther; // nullable
 
-    private boolean commentAlarm;
+    private int followers;
 
-    private boolean noteJAlarm;
+    private int followings;
 }

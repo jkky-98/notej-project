@@ -1,8 +1,13 @@
 package com.github.jkky_98.noteJ.domain.user;
 
+import com.github.jkky_98.noteJ.domain.FileMetadata;
 import com.github.jkky_98.noteJ.domain.base.BaseTimeEntity;
+import com.github.jkky_98.noteJ.file.FileStore;
+import com.github.jkky_98.noteJ.web.controller.form.UserSettingsForm;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.io.IOException;
 
 @Entity
 @Getter
@@ -42,6 +47,33 @@ public class UserDesc extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY,
             mappedBy = "userDesc")
     private User user;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "file_metadata_id")
+    private FileMetadata fileMetadata;
+
+    public void updateSetting(UserSettingsForm form, FileStore fileStore) throws IOException {
+        if (form.getProfilePic() != null) {
+            FileMetadata updateFile = fileStore.storeFile(form.getProfilePic());
+            if (updateFile != null) {
+                fileMetadata.updateFileMetadata(updateFile);
+                profilePic = fileMetadata.getStoredFileName();
+            }
+        }
+
+        // 다른 필드 업데이트
+        description = form.getDescription();
+        blogTitle = form.getBlogTitle();
+        theme = ThemeMode.valueOf(form.getTheme());
+        socialEmail = form.getSocialEmail();
+        socialGitHub = form.getSocialGitHub();
+        socialFacebook = form.getSocialFacebook();
+        socialTwitter = form.getSocialTwitter();
+        socialOther = form.getSocialOther();
+        commentAlarm = form.isCommentAlarm();
+        noteJAlarm = form.isNoteJAlarm();
+    }
+
 
 }
 

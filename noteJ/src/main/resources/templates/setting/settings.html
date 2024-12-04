@@ -2,13 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <div th:insert="~{fragments/header :: header}">
     <style>
-        .profile-pic {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
         .settings-container {
             max-width: 800px;
             margin: 50px auto;
@@ -24,13 +17,17 @@
         }
     </style>
 </div>
-<form th:action="@{/settings/save}" method="post" enctype="multipart/form-data">
+<body>
+
+<form th:action="@{/settings}" method="post" enctype="multipart/form-data">
+    <div th:insert="~{fragments/header :: navigation}">
+    </div>
     <div class="container settings-container">
         <h1>설정</h1>
 
         <!-- 프로필 섹션 -->
         <div class="d-flex align-items-center mb-4">
-            <img th:src="@{${sessionUser.profilePic != null ? sessionUser.profilePic : '/img/default-profile.png'}}"
+            <img th:src="|/profileimages/${settingDto.profilePic}|" src="/img/default-profile.png"
                  class="profile-pic me-3" alt="Profile">
             <div>
                 <h2 th:text="${sessionUser.username}">사용자 이름</h2>
@@ -40,29 +37,71 @@
                 </div>
             </div>
         </div>
+        <!-- 프로필 설명 섹션 -->
+        <div class="mb-3">
+            <div class="section-title">프로필 설명</div>
+            <textarea name="description" class="form-control" placeholder="프로필 설명을 입력하세요" th:field="${settingDto.description}"></textarea>
+        </div>
+
+        <!-- 블로그 제목 -->
+        <div class="mb-3">
+            <div class="section-title">블로그 제목</div>
+            <input type="text" name="blogTitle" class="form-control" th:value="${settingDto.blogTitle}" placeholder="블로그 제목을 입력하세요">
+        </div>
+
+        <!-- 테마 설정 -->
+        <div class="mb-3">
+            <div class="section-title">테마 설정</div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="theme" id="lightTheme"
+                       th:value="'LIGHT'"
+                       th:checked="${settingDto.theme == T(com.github.jkky_98.noteJ.domain.user.ThemeMode).LIGHT}">
+                <label class="form-check-label" for="lightTheme">
+                    Light Mode
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="theme" id="darkTheme"
+                       th:value="'DARK'"
+                       th:checked="${settingDto.theme == T(com.github.jkky_98.noteJ.domain.user.ThemeMode).DARK}">
+                <label class="form-check-label" for="darkTheme">
+                    Dark Mode
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="theme" id="splitTheme"
+                       th:value="'SPLIT'"
+                       th:checked="${settingDto.theme == T(com.github.jkky_98.noteJ.domain.user.ThemeMode).SPLIT}">
+                <label class="form-check-label" for="splitTheme">
+                    Split Mode
+                </label>
+            </div>
+        </div>
+
 
         <!-- 소셜 정보 -->
         <div class="mb-3">
             <div class="section-title">소셜 정보</div>
-            <p>
-                <span class="me-2"><i class="bi bi-envelope"></i></span>
-                <span th:text="${sessionUser.email}">이메일 주소</span>
-            </p>
-            <button class="btn btn-outline-primary btn-sm">수정</button>
+            <input type="text" name="socialEmail" class="form-control" th:value="${settingDto.socialEmail}" placeholder="소셜 이메일">
+            <input type="text" name="socialGitHub" class="form-control mt-2" th:value="${settingDto.socialGitHub}" placeholder="GitHub">
+            <input type="text" name="socialTwitter" class="form-control mt-2" th:value="${settingDto.socialTwitter}" placeholder="Twitter">
+            <input type="text" name="socialFacebook" class="form-control mt-2" th:value="${settingDto.socialFacebook}" placeholder="Facebook">
+            <input type="text" name="socialOther" class="form-control mt-2" th:value="${settingDto.socialOther}" placeholder="Other">
         </div>
 
-        <!-- 이메일 주소 -->
+        <!-- 알림 설정 -->
         <div class="mb-3">
-            <div class="section-title">이메일 주소</div>
-            <p th:text="${sessionUser.email}">이메일</p>
-            <button class="btn btn-outline-primary btn-sm">변경</button>
-        </div>
-
-        <!-- 회원 탈퇴 -->
-        <div class="mb-3">
-            <div class="section-title">회원 탈퇴</div>
-            <p>탈퇴 시 작성하신 포스트 및 댓글이 모두 삭제되며 복구되지 않습니다.</p>
-            <button class="btn btn-outline-danger">회원 탈퇴</button>
+            <div class="section-title">알림 설정</div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="commentAlarm" th:field="${settingDto.commentAlarm}">
+                <input type="hidden" name="_commentAlarm" value="on"/>
+                <label class="form-check-label" for="commentAlarm">댓글 알림</label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="noteJAlarm" th:field="${settingDto.noteJAlarm}">
+                <input type="hidden" name="_noteJAlarm" value="on"/>
+                <label class="form-check-label" for="noteJAlarm">NoteJ 알림</label>
+            </div>
         </div>
 
         <!-- 설정 적용 버튼 -->
@@ -71,8 +110,6 @@
         </div>
     </div>
 </form>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76A2cn38V6T2eWq0gA7FP6oBTXpVf3lq1qot6b5MQvM9j6jDq1Pz8iguVqPbGxK" crossorigin="anonymous"></script>
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 </body>
-
+</html>

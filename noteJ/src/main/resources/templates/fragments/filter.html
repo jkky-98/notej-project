@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="filter">
+    <style>
+        .filter-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .filter-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .filter-link {
+            margin-right: 15px;
+            text-decoration: none;
+            font-size: 16px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .filter-link.active {
+            text-decoration: underline;
+            color: #000;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-btn {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .dropdown-btn:after {
+            content: '▼';
+            font-size: 10px;
+            margin-left: 5px;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dropdown-item.active {
+            color: #28a745;
+        }
+    </style>
+
+    <div class="filter-container">
+        <!-- Left navigation links -->
+        <div class="filter-links">
+            <a href="/trending" th:classappend="${activeTab != null and activeTab == 'trending' ? 'active' : ''}" class="filter-link">트렌딩</a>
+            <a href="/latest" th:classappend="${activeTab != null and activeTab == 'latest' ? 'active' : ''}" class="filter-link">최신</a>
+            <a href="/feed" th:classappend="${activeTab != null and activeTab == 'feed' ? 'active' : ''}" class="filter-link">피드</a>
+        </div>
+
+        <!-- Dropdown menu -->
+        <div class="dropdown">
+            <button class="dropdown-btn" onclick="toggleDropdown()"
+                    th:text="${filter != null ? (filter == 'today' ? '오늘' : (filter == 'thisWeek' ? '이번 주' : (filter == 'thisMonth' ? '이번 달' : '올해'))) : '이번 주'}">
+                이번 주
+            </button>
+            <ul class="dropdown-menu" id="dropdownMenu">
+                <li th:classappend="${filter != null and filter == 'today' ? 'active' : ''}" class="dropdown-item"
+                    th:onclick="'location.href=\'?filter=today\''">오늘</li>
+                <li th:classappend="${filter != null and filter == 'thisWeek' ? 'active' : ''}" class="dropdown-item"
+                    th:onclick="'location.href=\'?filter=thisWeek\''">이번 주</li>
+                <li th:classappend="${filter != null and filter == 'thisMonth' ? 'active' : ''}" class="dropdown-item"
+                    th:onclick="'location.href=\'?filter=thisMonth\''">이번 달</li>
+                <li th:classappend="${filter != null and filter == 'thisYear' ? 'active' : ''}" class="dropdown-item"
+                    th:onclick="'location.href=\'?filter=thisYear\''">올해</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function toggleDropdown() {
+            const menu = document.getElementById('dropdownMenu');
+            menu.classList.toggle('show');
+        }
+    </script>
+</div>

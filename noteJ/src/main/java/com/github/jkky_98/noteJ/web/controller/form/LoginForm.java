@@ -1,4 +1,4 @@
-package com.github.jkky_98.noteJ.web.controller.dto;
+package com.github.jkky_98.noteJ.web.controller.form;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;

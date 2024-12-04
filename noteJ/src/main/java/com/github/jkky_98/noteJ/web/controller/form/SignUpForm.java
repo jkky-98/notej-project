@@ -1,11 +1,9 @@
-package com.github.jkky_98.noteJ.web.controller.dto;
+package com.github.jkky_98.noteJ.web.controller.form;
 
-import com.github.jkky_98.noteJ.domain.user.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
 import lombok.Data;
 
 @Data

@@ -1,18 +1,18 @@
-package com.github.jkky_98.noteJ.web.controller.dto;
+package com.github.jkky_98.noteJ.web.controller.form;
 
-import com.github.jkky_98.noteJ.domain.user.ThemeMode;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
-public class SettingDto {
+public class UserSettingsForm {
 
-    private String description;
-
-    private String profilePic;
+    private MultipartFile profilePic;  // 파일 업로드를 받기 위해 MultipartFile 사용
 
     private String blogTitle;
 
-    private ThemeMode theme;
+    private String description;
+
+    private String theme; // 'LIGHT', 'DARK', 'HALF'
 
     private String socialEmail; // nullable
 
