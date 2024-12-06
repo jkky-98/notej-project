@@ -4,6 +4,7 @@ import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
 import com.github.jkky_98.noteJ.repository.UserRepository;
 import com.github.jkky_98.noteJ.web.controller.form.ProfileForm;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,18 +17,13 @@ public class ProfileService {
 
     private final UserRepository userRepository;
 
-    public ProfileForm getProfile(HttpSession session) {
+    public ProfileForm getProfile(User sessionUser) {
 
         ProfileForm profileForm = new ProfileForm();
 
-        User sessionUser = (User) session.getAttribute("loginUser");
         // 사용자 정보를 조회
-        Optional<User> findUser = userRepository.findById(sessionUser.getId());
-        if (findUser.isEmpty()) {
-            //todo:예외 처리 필요
-            return null;
-        }
-        User user = findUser.get();
+        Optional<User> byId = userRepository.findById(sessionUser.getId());
+        User user = byId.orElseThrow(() -> new EntityNotFoundException("User not found"));
         UserDesc userDesc = user.getUserDesc();
 
         setProfileForm(profileForm, user, userDesc);

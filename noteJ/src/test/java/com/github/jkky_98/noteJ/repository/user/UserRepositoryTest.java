@@ -225,4 +225,65 @@ public class UserRepositoryTest {
         assertThat(userCount).isEqualTo(2);
     }
 
+    @Test
+    @DisplayName("[UserRepository] findByUsername 메서드 테스트")
+    void findByUsernameTest() {
+        // given
+        User user = User.builder()
+                .username("testuser")
+                .email("test@example.com")
+                .password("password123")
+                .userRole(UserRole.USER)
+                .build();
+        userRepository.save(user);
+
+        // when
+        Optional<User> result = userRepository.findByUsername("testuser");
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get().getUsername()).isEqualTo("testuser");
+        assertThat(result.get().getEmail()).isEqualTo("test@example.com");
+    }
+
+    @Test
+    @DisplayName("[UserRepository] findByEmail 메서드 테스트")
+    void findByEmailTest() {
+        // given
+        User user = User.builder()
+                .username("anotheruser")
+                .email("another@example.com")
+                .password("password456")
+                .userRole(UserRole.USER)
+                .build();
+        userRepository.save(user);
+
+        // when
+        Optional<User> result = userRepository.findByEmail("another@example.com");
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get().getUsername()).isEqualTo("anotheruser");
+        assertThat(result.get().getEmail()).isEqualTo("another@example.com");
+    }
+
+    @Test
+    @DisplayName("[UserRepository] findByUsername 없는 경우 테스트")
+    void findByUsernameNotFoundTest() {
+        // when
+        Optional<User> result = userRepository.findByUsername("nonexistentuser");
+
+        // then
+        assertThat(result).isNotPresent();
+    }
+
+    @Test
+    @DisplayName("[UserRepository] findByEmail 없는 경우 테스트")
+    void findByEmailNotFoundTest() {
+        // when
+        Optional<User> result = userRepository.findByEmail("nonexistent@example.com");
+
+        // then
+        assertThat(result).isNotPresent();
+    }
 }

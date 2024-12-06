@@ -38,14 +38,14 @@ public class UserCascadeTest {
                 .title("Post 1")
                 .content("Content of Post 1")
                 .user(user)
-                .is_private(false)
+                .writable(false)
                 .build();
 
         Post post2 = Post.builder()
                 .title("Post 2")
                 .content("Content of Post 2")
                 .user(user)
-                .is_private(true)
+                .writable(true)
                 .build();
 
         user.getPosts().add(post1);
@@ -76,7 +76,7 @@ public class UserCascadeTest {
                 .title("Post 1")
                 .content("Content of Post 1")
                 .user(user)
-                .is_private(false)
+                .writable(false)
                 .build();
 
         user.getPosts().add(post1);
@@ -106,14 +106,14 @@ public class UserCascadeTest {
                 .title("Post 1")
                 .content("Content of Post 1")
                 .user(user)
-                .is_private(false)
+                .writable(false)
                 .build();
 
         Post post2 = Post.builder()
                 .title("Post 2")
                 .content("Content of Post 2")
                 .user(user)
-                .is_private(true)
+                .writable(true)
                 .build();
 
         user.getPosts().add(post1);

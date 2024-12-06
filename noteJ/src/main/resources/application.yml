@@ -1,4 +1,14 @@
 spring:
+  devtools:
+    livereload:
+      enabled: true
+  resources:
+    static-locations: file:src/main/resources/static
+  thymeleaf:
+    cache: false
+    prefix: file:src/main/resources/templates/
+  # 위는 개발용 설정
+
   profiles:
     active: temp
   datasource:

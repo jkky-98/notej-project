@@ -1,10 +1,14 @@
 package com.github.jkky_98.noteJ.repository.init;
 
 import com.github.jkky_98.noteJ.domain.FileMetadata;
+import com.github.jkky_98.noteJ.domain.Post;
+import com.github.jkky_98.noteJ.domain.Series;
 import com.github.jkky_98.noteJ.domain.user.ThemeMode;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
 import com.github.jkky_98.noteJ.domain.user.UserRole;
+import com.github.jkky_98.noteJ.repository.PostRepository;
+import com.github.jkky_98.noteJ.repository.SeriesRepository;
 import com.github.jkky_98.noteJ.repository.UserDescRepository;
 import com.github.jkky_98.noteJ.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
@@ -17,6 +21,8 @@ import org.springframework.stereotype.Component;
 public class DataInitializer {
 
     private final UserRepository userRepository;
+    private final PostRepository postRepository;
+    private final SeriesRepository seriesRepository;
 
     @PostConstruct
     public void init() {
@@ -43,7 +49,32 @@ public class DataInitializer {
                     .userDesc(initUserDesc)
                     .build();
 
+            Series initSeries = Series.builder()
+                    .seriesName("스프링 프로젝트 테스트")
+                    .user(initSignUpUser)
+                    .build();
+
+            Post initPost1 = Post.builder()
+                    .title("testPost1")
+                    .content("testContent")
+                    .writable(false)
+                    .series(initSeries)
+                    .build();
+
+            Post initPost2 = Post.builder()
+                    .title("testPost2")
+                    .content("testContent22")
+                    .writable(false)
+                    .series(initSeries)
+                    .build();
+
+
             userRepository.save(initSignUpUser);
+
+            seriesRepository.save(initSeries);
+
+            postRepository.save(initPost1);
+            postRepository.save(initPost2);
         }
 
     }

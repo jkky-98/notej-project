@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="postsMain">
+    <div class="container mt-4">
+        <div class="row">
+            <!-- 태그 목록 -->
+            <!-- 태그 목록 -->
+            <div class="col-md-2 tag-list">
+                <h5 class="mb-3">태그 목록</h5>
+                <div class="list-group">
+                    <!-- 전체보기 -->
+                    <a th:href="@{/tags/all}"
+                       class="list-group-item list-group-item-action active"
+                       aria-current="true">
+                        전체보기
+                    </a>
+                    <!-- 각 태그 반복 -->
+                    <a th:each="tag : ${tags}"
+                       th:href="@{'/tags/' + ${tag.tagName}}"
+                       class="list-group-item list-group-item-action">
+                        <span th:text="${tag.tagName}"></span>
+                        <span class="badge bg-secondary float-end" th:text="${tag.count}"></span>
+                    </a>
+                </div>
+            </div>
+
+
+            <!-- 중앙 컨텐츠 -->
+            <div class="col-md-9">
+                <!-- 검색 및 탭 -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <!-- 네비게이션 탭 -->
+                    <div>
+                        <a href="/posts" th:classappend="${activeTab == 'posts' ? 'fw-bold' : ''}">글</a>
+                        |
+                        <a href="/series" th:classappend="${activeTab == 'series' ? 'fw-bold' : ''}">시리즈</a>
+                    </div>
+
+                    <!-- 검색창 -->
+                    <form th:action="@{/search}" method="get" class="search-bar">
+                        <input type="text" name="query" class="form-control form-control-sm" placeholder="검색어를 입력하세요" th:value="${searchQuery}">
+                    </form>
+                </div>
+
+                <!-- Post 목록 -->
+                <section>
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div th:each="post : ${posts}">
+                                <!-- 카드 전체를 클릭 가능하게 -->
+                                <a th:href="@{'/posts/1'}" class="card posts-style my-5 text-decoration-none">
+                                    <!-- 포스트 썸네일 -->
+                                    <img th:src="${post.thumbnail}" class="card-img-top thumbnail-posts-img" alt="Thumbnail">
+
+                                    <!-- 포스트 제목 -->
+                                    <div class="card-body my-2 mx-2">
+                                        <h3 class="card-title" th:text="${post.title}">
+                                            Post Title
+                                        </h3>
+                                        <p class="card-text" th:text="${post.postSummary}">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
+                                    </div>
+                                    <div class="card-footer">
+                                        <small class="text-muted" th:text="${#temporals.format(post.createByDt, 'yyyy-MM-dd')}">Last updated 3 mins ago</small>
+                                        <small class="text-muted"> . </small>
+                                        <small class="text-muted" th:text="${post.commentCount} + '개의 댓글'"></small>
+                                        <small class="text-muted"> . </small>
+                                        <small class="text-muted" th:text="'♥' + ${post.likeCount}"></small>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

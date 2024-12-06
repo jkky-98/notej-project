@@ -18,6 +18,45 @@
             right: 0;
             left: auto;
         }
+        .card.posts-style {
+            transition: all 0.3s ease;
+            border: none;
+            background: linear-gradient(145deg, #ffffff, #f5f5f5);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .card.posts-style:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            position: relative;
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            transform: rotate(15deg);
+        }
+
+        .btn.posts-style {
+            border: none;
+            padding: 12px 30px;
+            transition: all 0.3s ease;
+        }
+
+        .btn.posts-style:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+        }
+        .thumbnail-posts-img {
+            width: 100%;
+            max-height: 300px; /* 최대 높이 설정 */
+            object-fit: cover;
+        }
     </style>
 </head>
 

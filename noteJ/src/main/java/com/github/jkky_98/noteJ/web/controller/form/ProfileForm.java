@@ -24,4 +24,6 @@ public class ProfileForm {
     private int followers;
 
     private int followings;
+
+
 }

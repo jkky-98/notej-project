@@ -21,7 +21,7 @@ class PostTest {
                 .title(title)
                 .content(content)
                 .thumbnail(thumbnail)
-                .is_private(isPrivate)
+                .writable(isPrivate)
                 .build();
 
         // then
@@ -29,7 +29,7 @@ class PostTest {
         assertThat(post.getTitle()).isEqualTo(title);
         assertThat(post.getContent()).isEqualTo(content);
         assertThat(post.getThumbnail()).isEqualTo(thumbnail);
-        assertThat(post.getIs_private()).isEqualTo(isPrivate);
+        assertThat(post.getWritable()).isEqualTo(isPrivate);
         assertThat(post.getSeries()).isNull(); // 연관관계는 설정하지 않았으므로 null
         assertThat(post.getUser()).isNull();
     }
@@ -45,7 +45,7 @@ class PostTest {
         assertThat(post.getTitle()).isNull();
         assertThat(post.getContent()).isNull();
         assertThat(post.getThumbnail()).isNull();
-        assertThat(post.getIs_private()).isNull();
+        assertThat(post.getWritable()).isNull();
         assertThat(post.getSeries()).isNull();
         assertThat(post.getUser()).isNull();
         assertThat(post.getComments()).isNotNull();

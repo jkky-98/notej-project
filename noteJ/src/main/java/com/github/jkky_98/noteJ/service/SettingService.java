@@ -21,6 +21,7 @@ public class SettingService {
     private final UserRepository userRepository;
     private final FileStore fileStore;
 
+    //toDo: 세션 객체 의존 없애기 컨트롤러에서 처리(어차피 바꿀 인증시스템이므로 의존도를 깊게 내리지 말자)
     @Transactional
     public Optional<String> saveSettings(UserSettingsForm form, HttpSession session) throws IOException {
 

@@ -27,9 +27,14 @@ public class Post extends BaseEntity {
     @Size(min = 10, message = "Content must be at least 10 characters.")
     private String content;
 
+    private String postSummary;
+
+    private String postUrl;
+
     private String thumbnail;
 
-    private Boolean is_private;
+    private Boolean writable;
+
 
     //연관관계
     @ManyToOne(fetch = FetchType.LAZY)
