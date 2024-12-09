@@ -15,7 +15,4 @@ public class WriteForm {
     private boolean open;
     private String url;
     private String series;
-
-
-
 }

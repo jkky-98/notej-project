@@ -23,4 +23,12 @@ public class PostTag extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id")
     private Tag tag;
+
+    public void updateTag(Tag tag) {
+        this.tag = tag;
+    }
+
+    public void updatePost(Post post) {
+        this.post = post;
+    }
 }

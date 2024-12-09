@@ -1,10 +1,8 @@
 package com.github.jkky_98.noteJ.service;
 
-import com.github.jkky_98.noteJ.domain.Post;
-import com.github.jkky_98.noteJ.domain.PostTag;
-import com.github.jkky_98.noteJ.domain.Series;
-import com.github.jkky_98.noteJ.domain.Tag;
+import com.github.jkky_98.noteJ.domain.*;
 import com.github.jkky_98.noteJ.domain.user.User;
+import com.github.jkky_98.noteJ.file.FileStore;
 import com.github.jkky_98.noteJ.repository.*;
 import com.github.jkky_98.noteJ.web.controller.dto.WriteDto;
 import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
@@ -12,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +26,7 @@ public class WriteService {
     private final SeriesRepository seriesRepository;
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
+    private final FileStore fileStore;
 
     public List<String> getWrite(User sessionUser) {
         // 사용자 정보를 조회
@@ -49,11 +49,17 @@ public class WriteService {
     }
 
     //toDo: 썸네일 사진 파일 저장 처리 필요
-    public void saveWrite(WriteForm form, User sessionUser) {
+    public void saveWrite(WriteForm form, User sessionUser) throws IOException {
 
         // 사용자 정보를 조회
         Optional<User> byId = userRepository.findById(getSessionUser(sessionUser).getId());
         User user = byId.orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        FileMetadata updateFile = null;
+
+        if (form.getThumbnail() != null) {
+            updateFile = fileStore.storeFile(form.getThumbnail());
+        }
 
         Series series = seriesRepository.findBySeriesName(form.getSeries()).orElse(null);
 
@@ -64,6 +70,7 @@ public class WriteService {
                 .postSummary(form.getPostSummary())
                 .postUrl(form.getUrl())
                 .series(series)
+                .thumbnail(updateFile != null ? updateFile.getStoredFileName() : "/img/default_post.png")
                 .user(user)
                 .build();
 

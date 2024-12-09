@@ -31,4 +31,7 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "parent_id") // Self-referencing Foreign Key
     private Comment parent;
 
+    public void updatePost(Post post) {
+        this.post = post;
+    }
 }

@@ -75,5 +75,12 @@ public class UserDesc extends BaseTimeEntity {
     }
 
 
+    public void updateDescription(String updatedDescription) {
+        description = updatedDescription;
+    }
+
+    public void updateProfilePic(String updatedProfilePic) {
+        profilePic = updatedProfilePic;
+    }
 }
 

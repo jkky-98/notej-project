@@ -53,4 +53,11 @@ public class PostsService {
 
         return userRepository.findTagsByUser(userFind.getUsername());
     }
+
+    public PostDto getPost(User user, String postUrl) {
+        User userFind = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        return null;
+    }
+
 }

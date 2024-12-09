@@ -66,5 +66,10 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Follow> followerList = new ArrayList<>(); // 나를 팔로우한 사용자들
 
+    public void addPost(Post post) {
+        this.posts.add(post);
+        post.updateUser(this);
+    }
+
 
 }

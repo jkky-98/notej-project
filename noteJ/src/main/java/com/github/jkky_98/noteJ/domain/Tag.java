@@ -26,6 +26,17 @@ public class Tag extends BaseTimeEntity {
 
     //연관관계
     @Builder.Default
-    @OneToMany(mappedBy = "tag")
+    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostTag> postTags = new ArrayList<>();
+
+    // 연관 관계 편의 메서드
+    public void addPostTag(PostTag postTag) {
+        this.postTags.add(postTag);
+        postTag.updateTag(this); // 주인 쪽에도 관계 설정
+    }
+
+    public void removePostTag(PostTag postTag) {
+        this.postTags.remove(postTag);
+        postTag.updateTag(null); // 주인 쪽 관계 해제
+    }
 }

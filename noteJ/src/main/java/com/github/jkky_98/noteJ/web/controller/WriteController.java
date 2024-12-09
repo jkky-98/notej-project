@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +31,7 @@ public class WriteController {
     }
 
     @PostMapping("/write")
-    public String write(@ModelAttribute WriteForm form, HttpSession session) {
+    public String write(@ModelAttribute WriteForm form, HttpSession session) throws IOException {
         User sessionUser = (User) session.getAttribute("loginUser");
         writeService.saveWrite(form, sessionUser);
         return "redirect:/";

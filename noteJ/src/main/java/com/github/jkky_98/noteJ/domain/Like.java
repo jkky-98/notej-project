@@ -27,4 +27,7 @@ public class Like extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
+    public void updatePost(Post post) {
+        this.post = post;
+    }
 }

@@ -9,15 +9,15 @@ import com.github.jkky_98.noteJ.domain.user.UserDesc;
 import com.github.jkky_98.noteJ.domain.user.UserRole;
 import com.github.jkky_98.noteJ.repository.PostRepository;
 import com.github.jkky_98.noteJ.repository.SeriesRepository;
-import com.github.jkky_98.noteJ.repository.UserDescRepository;
 import com.github.jkky_98.noteJ.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
+@Profile("temp")
 public class DataInitializer {
 
     private final UserRepository userRepository;
@@ -59,6 +59,7 @@ public class DataInitializer {
                     .content("testContent")
                     .writable(false)
                     .series(initSeries)
+                    .user(initSignUpUser)
                     .build();
 
             Post initPost2 = Post.builder()
@@ -66,6 +67,7 @@ public class DataInitializer {
                     .content("testContent22")
                     .writable(false)
                     .series(initSeries)
+                    .user(initSignUpUser)
                     .build();
 
 
