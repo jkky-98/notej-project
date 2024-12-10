@@ -4,11 +4,10 @@
     <div class="container mt-4">
         <div class="row">
             <nav class="nav nav-tabs nav-pills">
-                <a class="nav-link active" aria-current="page" th:href="@{'/@' + ${username} + '/posts'}">글</a>
-                <a class="nav-link" th:href="@{'/@' + ${username} + '/posts/series'}">시리즈</a>
-                <a class="nav-link" th:href="@{'/@' + ${username} + '/posts/desc'}">자기소개</a>
+                <a class="nav-link" id="postsTab" th:href="@{'/@' + ${username} + '/posts'}">글</a>
+                <a class="nav-link" id="seriesTab" th:href="@{'/@' + ${username} + '/posts/series'}">시리즈</a>
+                <a class="nav-link" id="descTab" th:href="@{'/@' + ${username} + '/posts/desc'}">자기소개</a>
             </nav>
         </div>
     </div>
-</div>
 </html>
