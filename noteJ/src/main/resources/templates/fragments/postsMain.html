@@ -16,7 +16,7 @@
                     </a>
                     <!-- 각 태그 반복 -->
                     <a th:each="tag : ${tags}"
-                       th:href="@{'/@' + ${sessionUser.username}(tagName=${tag.tagName})}"
+                       th:href="@{'/@' + ${posts.username}(tagName=${tag.tagName})}"
                        class="list-group-item list-group-item-action">
                         <span th:text="${tag.tagName}"></span>
                         <span class="badge bg-secondary float-end" th:text="${tag.count}"></span>
@@ -24,17 +24,10 @@
                 </div>
             </div>
 
-
             <!-- 중앙 컨텐츠 -->
             <div class="col-md-9">
-                <!-- 검색 및 탭 -->
+                <!-- 검색 탭 -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <!-- 네비게이션 탭 -->
-                    <div>
-                        <a href="/posts" th:classappend="${activeTab == 'posts' ? 'fw-bold' : ''}">글</a>
-                        |
-                        <a href="/series" th:classappend="${activeTab == 'series' ? 'fw-bold' : ''}">시리즈</a>
-                    </div>
 
                     <!-- 검색창 -->
                     <form th:action="@{/search}" method="get" class="search-bar">

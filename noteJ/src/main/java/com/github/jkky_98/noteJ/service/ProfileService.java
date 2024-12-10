@@ -17,13 +17,13 @@ public class ProfileService {
 
     private final UserRepository userRepository;
 
-    public ProfileForm getProfile(User sessionUser) {
+    public ProfileForm getProfile(String username) {
 
         ProfileForm profileForm = new ProfileForm();
 
         // 사용자 정보를 조회
-        Optional<User> byId = userRepository.findById(sessionUser.getId());
-        User user = byId.orElseThrow(() -> new EntityNotFoundException("User not found"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found"));
+
         UserDesc userDesc = user.getUserDesc();
 
         setProfileForm(profileForm, user, userDesc);

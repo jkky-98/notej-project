@@ -23,6 +23,7 @@ public class PostDtoTest {
         int commentCount = 10;
         int likeCount = 25;
         LocalDateTime createByDt = LocalDateTime.now();
+        String username = "username";
 
         // when
         PostDto postDto = new PostDto();
@@ -46,6 +47,7 @@ public class PostDtoTest {
         assertThat(postDto.getCommentCount()).isEqualTo(commentCount);
         assertThat(postDto.getLikeCount()).isEqualTo(likeCount);
         assertThat(postDto.getCreateByDt()).isEqualTo(createByDt);
+        assertThat(postDto.getUsername()).isEqualTo(username);
     }
 
     @Test
@@ -62,6 +64,7 @@ public class PostDtoTest {
         postDto1.setCommentCount(10);
         postDto1.setLikeCount(25);
         postDto1.setCreateByDt(LocalDateTime.now());
+        postDto1.setUsername("username");
 
         PostDto postDto2 = new PostDto();
         postDto2.setTitle("Test Title");
@@ -73,6 +76,7 @@ public class PostDtoTest {
         postDto2.setCommentCount(10);
         postDto2.setLikeCount(25);
         postDto2.setCreateByDt(postDto1.getCreateByDt()); // 동일한 시간 설정
+        postDto2.setUsername("username");
 
         // then
         assertThat(postDto1).isEqualTo(postDto2);
@@ -95,5 +99,6 @@ public class PostDtoTest {
         assertThat(postDto.getCommentCount()).isZero();
         assertThat(postDto.getLikeCount()).isZero();
         assertThat(postDto.getCreateByDt()).isNull();
+        assertThat(postDto.getUsername()).isNull();
     }
 }

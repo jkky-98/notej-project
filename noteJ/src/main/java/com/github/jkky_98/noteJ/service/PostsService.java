@@ -20,8 +20,8 @@ public class PostsService {
 
     private final UserRepository userRepository;
 
-    public List<PostDto> getPosts(User user) {
-        User userFind = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    public List<PostDto> getPosts(String username) {
+        User userFind = userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         List<Post> posts = userFind.getPosts();
         List<PostDto> postDtos = new ArrayList<>();
@@ -33,6 +33,7 @@ public class PostsService {
             postDto.setThumbnail(post.getThumbnail());
             postDto.setWritable(post.getWritable());
             postDto.setCreateByDt(post.getCreateDt());
+            postDto.setUsername(username);
 
             List<PostTag> postTags = post.getPostTags();
             for (PostTag postTag : postTags) {
@@ -48,16 +49,10 @@ public class PostsService {
         return postDtos;
     }
 
-    public List<TagCountDto> getAllTag(User user) {
-        User userFind = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    public List<TagCountDto> getAllTag(String username) {
+        User userFind = userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         return userRepository.findTagsByUser(userFind.getUsername());
-    }
-
-    public PostDto getPost(User user, String postUrl) {
-        User userFind = userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        return null;
     }
 
 }

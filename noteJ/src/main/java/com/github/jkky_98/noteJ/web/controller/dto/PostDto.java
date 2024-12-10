@@ -17,4 +17,5 @@ public class PostDto {
     private int commentCount;
     private int likeCount;
     private LocalDateTime createByDt;
+    private String username;
 }
