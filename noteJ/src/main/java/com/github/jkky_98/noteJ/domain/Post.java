@@ -33,7 +33,6 @@ public class Post extends BaseEntity {
 
     private Boolean writable;
 
-
     //연관관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "series_id")
