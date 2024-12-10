@@ -45,7 +45,7 @@ class LoginFormTest {
         // given
         LoginForm loginForm = new LoginForm();
         loginForm.setUsername("testuser");
-        loginForm.setPassword("password123");
+        loginForm.setPassword("password@123");
 
         // when
         Set<ConstraintViolation<LoginForm>> violations = validator.validate(loginForm);
@@ -72,5 +72,45 @@ class LoginFormTest {
         assertThat(violations)
                 .extracting(violation -> violation.getPropertyPath().toString())
                 .containsExactlyInAnyOrder("username", "password");
+    }
+
+    @Test
+    @DisplayName("[LoginForm] 유효성 검증 테스트 - 실패 (특수문자 없음)")
+    void loginFormValidationFailureNoSpecialCharacterTest() {
+        // given
+        LoginForm loginForm = new LoginForm();
+        loginForm.setUsername("testuser");
+        loginForm.setPassword("Password123"); // 특수문자가 없는 비밀번호
+
+        // when
+        Set<ConstraintViolation<LoginForm>> violations = validator.validate(loginForm);
+
+        // then
+        assertThat(violations).hasSize(1);
+
+        // 검증 메시지 확인
+        assertThat(violations)
+                .extracting(ConstraintViolation::getMessage)
+                .contains("Password must contain at least one special character.");
+    }
+
+    @Test
+    @DisplayName("[LoginForm] 유효성 검증 테스트 - 실패 (길이 조건 미충족)")
+    void loginFormValidationFailureShortPasswordTest() {
+        // given
+        LoginForm loginForm = new LoginForm();
+        loginForm.setUsername("testuser");
+        loginForm.setPassword("P@1"); // 너무 짧은 비밀번호
+
+        // when
+        Set<ConstraintViolation<LoginForm>> violations = validator.validate(loginForm);
+
+        // then
+        assertThat(violations).hasSize(1);
+
+        // 검증 메시지 확인
+        assertThat(violations)
+                .extracting(ConstraintViolation::getMessage)
+                .contains("Password must be at least 8 characters long.");
     }
 }
