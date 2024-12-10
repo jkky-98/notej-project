@@ -60,6 +60,7 @@ public class DataInitializer {
                     .writable(false)
                     .series(initSeries)
                     .user(initSignUpUser)
+                    .thumbnail("/img/default_post.png")
                     .build();
 
             Post initPost2 = Post.builder()
@@ -68,6 +69,7 @@ public class DataInitializer {
                     .writable(false)
                     .series(initSeries)
                     .user(initSignUpUser)
+                    .thumbnail("/img/default_post.png")
                     .build();
 
 
