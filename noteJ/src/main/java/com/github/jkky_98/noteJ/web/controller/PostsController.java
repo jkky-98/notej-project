@@ -6,6 +6,7 @@ import com.github.jkky_98.noteJ.service.ProfileService;
 import com.github.jkky_98.noteJ.web.controller.dto.PostDto;
 import com.github.jkky_98.noteJ.web.controller.dto.TagCountDto;
 import com.github.jkky_98.noteJ.web.controller.form.ProfileForm;
+import com.github.jkky_98.noteJ.web.controller.form.SeriesViewForm;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -59,6 +60,9 @@ public class PostsController {
         model.addAttribute("username", username);
 
         model.addAttribute("currentUri", request.getRequestURI());
+
+        List<SeriesViewForm> series = postsService.getSeries(username);
+        model.addAttribute("seriesList", series);
 
         // 현재 활성화된 탭
         model.addAttribute("activeTab", "posts");

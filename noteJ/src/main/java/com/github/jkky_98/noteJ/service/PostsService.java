@@ -2,10 +2,12 @@ package com.github.jkky_98.noteJ.service;
 
 import com.github.jkky_98.noteJ.domain.Post;
 import com.github.jkky_98.noteJ.domain.PostTag;
+import com.github.jkky_98.noteJ.domain.Series;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.UserRepository;
 import com.github.jkky_98.noteJ.web.controller.dto.PostDto;
 import com.github.jkky_98.noteJ.web.controller.dto.TagCountDto;
+import com.github.jkky_98.noteJ.web.controller.form.SeriesViewForm;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -55,4 +57,25 @@ public class PostsService {
         return userRepository.findTagsByUser(userFind.getUsername());
     }
 
+    public List<SeriesViewForm> getSeries(String username) {
+        User userFind = userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        // User의 Series 목록 가져오기
+        List<Series> seriesList = userFind.getSeriesList();
+
+        // Series 데이터를 SeriesViewForm으로 변환
+        List<SeriesViewForm> seriesViewForms = new ArrayList<>();
+        for (Series series : seriesList) {
+            int count = series.getPosts().size(); // Series에 포함된 글 개수
+            SeriesViewForm seriesViewForm = new SeriesViewForm(
+                    series.getSeriesName(),
+                    count,
+                    series.getPosts().get(0).getLastModifiedDt()
+            );
+            seriesViewForms.add(seriesViewForm);
+        }
+        return seriesViewForms;
+
+    }
 }
