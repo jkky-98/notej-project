@@ -78,4 +78,36 @@ public class PostsService {
         return seriesViewForms;
 
     }
+
+    public List<PostDto> getPostsForSeries(String username, String seriesName) {
+        User userFind = userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        List<Post> posts = userFind.getPosts();
+        List<PostDto> postDtos = new ArrayList<>();
+
+        for (Post post : posts) {
+            if (post.getSeries().getSeriesName().equals(seriesName)) {
+                PostDto postDto = new PostDto();
+                postDto.setTitle(post.getTitle());
+                postDto.setPostSummary(post.getPostSummary());
+                postDto.setPostUrl(post.getPostUrl());
+                postDto.setThumbnail(post.getThumbnail());
+                postDto.setWritable(post.getWritable());
+                postDto.setCreateByDt(post.getCreateDt());
+                postDto.setUsername(username);
+
+                List<PostTag> postTags = post.getPostTags();
+                for (PostTag postTag : postTags) {
+                    postDto.getTags().add(postTag.getTag().getName());
+                }
+
+                postDto.setCommentCount(post.getComments().size());
+                postDto.setLikeCount(post.getLikes().size());
+
+                postDtos.add(postDto);
+            }
+        }
+
+        return postDtos;
+    }
 }

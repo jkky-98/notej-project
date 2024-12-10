@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -27,13 +28,24 @@ public class PostsController {
     private final PostsService postsService;
 
     @GetMapping("/@{username}/posts")
-    public String posts(@PathVariable("username") String username, Model model, HttpServletRequest request) {
+    public String posts(@PathVariable("username") String username,
+                        @RequestParam(value = "seriesName", required = false) String seriesName,
+                        Model model,
+                        HttpServletRequest request
+                        ) {
 
         ProfileForm profileForm = profileService.getProfile(username);
         model.addAttribute("profileForm", profileForm);
 
-        List<PostDto> postDtos = postsService.getPosts(username);
-        model.addAttribute("posts", postDtos);
+        //toDO: 검색조건 더 많아질 시 Querydsl도입
+        if (seriesName == null) {
+            List<PostDto> postDtos = postsService.getPosts(username);
+            model.addAttribute("posts", postDtos);
+        } else {
+            List<PostDto> postDtos = postsService.getPostsForSeries(username, seriesName);
+            model.addAttribute("posts", postDtos);
+        }
+
 
         List<TagCountDto> tagAlls = postsService.getAllTag(username);
         model.addAttribute("tags", tagAlls);

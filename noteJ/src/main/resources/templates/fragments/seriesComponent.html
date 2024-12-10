@@ -16,7 +16,7 @@
                     <div class="card-footer text-end">
                         <small style="color: black;" th:text="@{${series.count} + '개의 포스트'}"></small>
                         <small class="text-muted" th:text="@{' . 최근 수정일: ' + ${#temporals.format(series.lastUpdateDt, 'yyyy-MM-dd')} }"></small>
-                        <a th:href="@{'/series/' + ${series.seriesName}}" class="btn btn-primary btn-sm">View More</a>
+                        <a th:href="@{'/@' + ${username} + '/posts'(seriesName=${series.seriesName})}" class="btn btn-primary btn-sm">View More</a>
                     </div>
                 </div>
             </div>
