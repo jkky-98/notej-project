@@ -39,4 +39,31 @@ class CommentTest {
         assertThat(comment.getUser()).isNull();
         assertThat(comment.getParent()).isNull();
     }
+
+    @Test
+    @DisplayName("[Comment] updatePost 메서드 테스트")
+    void updatePostTest() {
+        // given
+        Post oldPost = Post.builder()
+                .title("Old Post")
+                .content("Content of old post")
+                .build();
+
+        Post newPost = Post.builder()
+                .title("New Post")
+                .content("Content of new post")
+                .build();
+
+        Comment comment = Comment.builder()
+                .content("This is a test comment")
+                .post(oldPost)
+                .build();
+
+        // when
+        comment.updatePost(newPost);
+
+        // then
+        // comment의 post 필드가 newPost로 업데이트되었는지 확인
+        assertThat(comment.getPost()).isEqualTo(newPost);
+    }
 }
