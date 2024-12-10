@@ -18,7 +18,7 @@ public class UserRepositoryDuplicationTest {
     private UserRepository userRepository;
 
     @Test
-    @DisplayName("이메일 중복 시나리오 테스트 (DB레벨)")
+    @DisplayName("[UserRepository] 이메일 중복 시나리오 테스트 (DB레벨)")
     public void testDuplicateEmailNotAllowed() {
         // Given
         User user1 = User.builder()

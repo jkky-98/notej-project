@@ -55,6 +55,7 @@ public class UserDesc extends BaseTimeEntity {
     public void updateSetting(UserSettingsForm form, FileStore fileStore) throws IOException {
         if (form.getProfilePic() != null) {
             FileMetadata updateFile = fileStore.storeFile(form.getProfilePic());
+            fileMetadata = updateFile;
             if (updateFile != null) {
                 fileMetadata.updateFileMetadata(updateFile);
                 profilePic = fileMetadata.getStoredFileName();
