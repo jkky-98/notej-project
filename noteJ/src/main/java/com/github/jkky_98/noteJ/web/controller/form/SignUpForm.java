@@ -3,6 +3,7 @@ package com.github.jkky_98.noteJ.web.controller.form;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -20,6 +21,7 @@ public class SignUpForm {
 
     @NotBlank(message = "Password is required.")
     @Size(min = 8, max = 100, message = "Password must be at least 8 characters long.")
+    @Pattern(regexp = ".*[!@#$%^&*(),.?\":{}|<>].*", message = "Password must contain at least one special character.")
     private String password;
 
     @NotBlank(message = "BlogTitle is required.")
