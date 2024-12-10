@@ -26,11 +26,19 @@ public class AuthSessionService implements AuthService {
     }
 
     @Override
-    public User login(LoginForm form) {
+    public User login(LoginForm form, BindingResult bindingResult) {
         String loginId = form.getUsername();
         String loginPassword = form.getPassword();
-        return userRepository.findByUsername(loginId).filter(m -> m.getPassword().equals(loginPassword))
+
+        User loginUser = userRepository.findByUsername(loginId)
+                .filter(user -> user.getPassword().equals(loginPassword))
                 .orElse(null);
+
+        if (loginUser == null) {
+            bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
+        }
+
+        return loginUser;
     }
 
     @Override

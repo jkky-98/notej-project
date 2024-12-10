@@ -42,24 +42,20 @@ public class AuthController {
                             @RequestParam(defaultValue = "/") String redirectURL,
                             HttpServletRequest request) {
         if (bindingResult.hasErrors()) {
-            log.info("LogIn error");
-            List<ObjectError> allErrors = bindingResult.getAllErrors();
-            for (ObjectError allError : allErrors) {
-                log.info("Error : {}", allError);
-            }
+            log.info("로그인 입력 에러");
             return "auth/loginForm";
         }
 
-        User loginUser = authService.login(form);
+        // 서비스 계층에 로그인 로직 위임
+        User loginUser = authService.login(form, bindingResult);
 
-        if (loginUser == null) {
-            bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
+        if (bindingResult.hasErrors()) {
+            // 로그인 실패 시 처리
             return "auth/loginForm";
         }
 
-        // 성공 로직
+        // 성공 시 세션 생성
         HttpSession session = request.getSession();
-
         session.setAttribute(SessionConst.LOGIN_USER, loginUser);
 
         return "redirect:" + redirectURL;
