@@ -9,6 +9,7 @@ import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,6 +50,7 @@ public class WriteService {
     }
 
     //toDo: 썸네일 사진 파일 저장 처리 필요
+    @Transactional
     public void saveWrite(WriteForm form, User sessionUser) throws IOException {
 
         // 사용자 정보를 조회
@@ -62,6 +64,9 @@ public class WriteService {
         }
 
         Series series = seriesRepository.findBySeriesName(form.getSeries()).orElse(null);
+
+        urlProvider(form); // url 설정
+        System.out.println("fdasfasdf " + form.getUrl());
 
         Post post = Post.builder()
                 .title(form.getTitle())
@@ -112,5 +117,11 @@ public class WriteService {
         }
 
         return returnTagList;
+    }
+
+    private void urlProvider(WriteForm form) {
+        if (form.getUrl().isEmpty()) {
+            form.setUrl("/" + form.getTitle());
+        }
     }
 }
