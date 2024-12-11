@@ -4,6 +4,7 @@ import com.github.jkky_98.noteJ.domain.Post;
 import com.github.jkky_98.noteJ.domain.PostTag;
 import com.github.jkky_98.noteJ.domain.Series;
 import com.github.jkky_98.noteJ.domain.user.User;
+import com.github.jkky_98.noteJ.repository.SeriesRepository;
 import com.github.jkky_98.noteJ.repository.UserRepository;
 import com.github.jkky_98.noteJ.web.controller.dto.PostDto;
 import com.github.jkky_98.noteJ.web.controller.dto.TagCountDto;
@@ -21,6 +22,7 @@ import java.util.Map;
 public class PostsService {
 
     private final UserRepository userRepository;
+    private final SeriesRepository seriesRepository;
 
     public List<PostDto> getPosts(String username) {
         User userFind = userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -109,5 +111,17 @@ public class PostsService {
         }
 
         return postDtos;
+    }
+
+    public Series saveSeries(User user, String seriesName) {
+        User userFind = userRepository.findById(user.getId()).orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        Series newSeries = Series.builder()
+                .seriesName(seriesName)
+                .build();
+
+        userFind.addSeries(newSeries);
+
+        return seriesRepository.save(newSeries);
     }
 }

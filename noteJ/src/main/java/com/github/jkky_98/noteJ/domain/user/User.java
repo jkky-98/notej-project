@@ -71,5 +71,10 @@ public class User extends BaseEntity {
         post.updateUser(this);
     }
 
+    public void addSeries(Series series) {
+        this.seriesList.add(series);
+        series.updateUser(this);
+    }
+
 
 }

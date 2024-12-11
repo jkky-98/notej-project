@@ -16,7 +16,7 @@
                     </a>
                     <!-- 각 태그 반복 -->
                     <a th:each="tag : ${tags}"
-                       th:href="@{'/@' + ${posts.username}(tagName=${tag.tagName})}"
+                       th:href="@{'/@' + ${username}(tagName=${tag.tagName})}"
                        class="list-group-item list-group-item-action">
                         <span th:text="${tag.tagName}"></span>
                         <span class="badge bg-secondary float-end" th:text="${tag.count}"></span>

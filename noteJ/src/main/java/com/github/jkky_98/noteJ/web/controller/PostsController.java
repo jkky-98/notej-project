@@ -1,5 +1,6 @@
 package com.github.jkky_98.noteJ.web.controller;
 
+import com.github.jkky_98.noteJ.domain.Series;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.service.PostsService;
 import com.github.jkky_98.noteJ.service.ProfileService;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -83,6 +85,14 @@ public class PostsController {
         model.addAttribute("searchQuery", "");
 
         return "series";
+    }
+
+    @PostMapping("/@{username}/posts/series")
+    public String postsSeriesAddSeries(@RequestParam String seriesName, HttpSession session) {
+        User sessionUser = (User) session.getAttribute("loginUser");
+
+        Series series = postsService.saveSeries(sessionUser, seriesName);
+        return "redirect:/";
     }
 
     @GetMapping("/@{username}/posts/desc")

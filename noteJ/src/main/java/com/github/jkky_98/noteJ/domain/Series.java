@@ -30,4 +30,8 @@ public class Series extends BaseEntity {
     private List<Post> posts = new ArrayList<>();
 
     private String seriesName;
+
+    public void updateUser(User user) {
+        this.user = user;
+    }
 }
