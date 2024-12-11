@@ -91,6 +91,10 @@ public class PostsController {
     public String postsSeriesAddSeries(@RequestParam String seriesName, HttpSession session) {
         User sessionUser = (User) session.getAttribute("loginUser");
 
+        if (sessionUser == null) {
+            return "redirect:/login";
+        }
+
         Series series = postsService.saveSeries(sessionUser, seriesName);
         return "redirect:/";
     }

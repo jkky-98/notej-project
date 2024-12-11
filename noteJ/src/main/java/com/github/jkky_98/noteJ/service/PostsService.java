@@ -13,6 +13,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -70,10 +71,15 @@ public class PostsService {
         List<SeriesViewForm> seriesViewForms = new ArrayList<>();
         for (Series series : seriesList) {
             int count = series.getPosts().size(); // Series에 포함된 글 개수
+            // 글이 없는 경우 null 할당
+            LocalDateTime lastModifiedDt = series.getPosts().isEmpty()
+                    ? null
+                    : series.getPosts().get(0).getLastModifiedDt();
+
             SeriesViewForm seriesViewForm = new SeriesViewForm(
                     series.getSeriesName(),
                     count,
-                    series.getPosts().get(0).getLastModifiedDt()
+                    lastModifiedDt
             );
             seriesViewForms.add(seriesViewForm);
         }
