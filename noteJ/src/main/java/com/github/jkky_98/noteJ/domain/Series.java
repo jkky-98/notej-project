@@ -26,6 +26,7 @@ public class Series extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Builder.Default
     @OneToMany(mappedBy = "series")
     private List<Post> posts = new ArrayList<>();
 

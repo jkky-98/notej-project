@@ -102,8 +102,8 @@
         <!-- 에디터를 적용할 요소 (컨테이너) -->
         <!-- toDo: 내용 -> content 바인딩 필요 -->
         <div id="editor">
-
         </div>
+        <input type="textarea" name="content" id="editor-content-provider" hidden style="display: block;">
         <section class="container mt-5">
             <div class="row mb-5">
                 <!-- 포스트 미리보기 -->
@@ -189,6 +189,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>
 <!-- TUI 에디터 JS CDN -->
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
 <script>
     const editor = new toastui.Editor({
         el: document.querySelector('#editor'), // 에디터를 적용할 요소 (컨테이너)
@@ -228,6 +229,15 @@
         }
 
     });
+    document.querySelector('form').addEventListener('submit', function (event) {
+    // 에디터에서 작성된 내용을 가져옵니다.
+    const content = editor.getMarkdown();
+    console.log(content)
+
+    // 숨겨진 input 태그에 값을 넣습니다.
+    document.querySelector('#editor-content-provider').value = content;
+    });
 </script>
+
 </body>
 </html>
