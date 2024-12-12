@@ -232,10 +232,11 @@
     document.querySelector('form').addEventListener('submit', function (event) {
     // 에디터에서 작성된 내용을 가져옵니다.
     const content = editor.getMarkdown();
-    console.log(content)
+
+    const encodedContent = encodeURIComponent(content);
 
     // 숨겨진 input 태그에 값을 넣습니다.
-    document.querySelector('#editor-content-provider').value = content;
+    document.querySelector('#editor-content-provider').value = encodedContent;
     });
 </script>
 

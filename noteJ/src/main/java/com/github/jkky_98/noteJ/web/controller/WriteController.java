@@ -1,9 +1,7 @@
 package com.github.jkky_98.noteJ.web.controller;
 
 import com.github.jkky_98.noteJ.domain.user.User;
-import com.github.jkky_98.noteJ.repository.UserRepository;
 import com.github.jkky_98.noteJ.service.WriteService;
-import com.github.jkky_98.noteJ.web.controller.dto.WriteDto;
 import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +12,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor

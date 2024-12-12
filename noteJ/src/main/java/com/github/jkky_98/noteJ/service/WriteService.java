@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -66,11 +68,12 @@ public class WriteService {
         Series series = seriesRepository.findBySeriesName(form.getSeries()).orElse(null);
 
         urlProvider(form); // url 설정
-        System.out.println("fdasfasdf " + form.getUrl());
+
+        String encodedContent = URLDecoder.decode(form.getContent(), StandardCharsets.UTF_8);
 
         Post post = Post.builder()
                 .title(form.getTitle())
-                .content(form.getContent())
+                .content(encodedContent)
                 .writable(!form.isOpen())
                 .postSummary(form.getPostSummary())
                 .postUrl(form.getUrl())
@@ -121,7 +124,7 @@ public class WriteService {
 
     private void urlProvider(WriteForm form) {
         if (form.getUrl().isEmpty()) {
-            form.setUrl("/" + form.getTitle());
+            form.setUrl(form.getTitle());
         }
     }
 }

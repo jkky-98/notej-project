@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.css" />
+    <style>
+        .post-view-container {
+            max-width: 65%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        .post-header {
+            font-size: 3rem;
+            font-weight: bold;
+            line-height: 1.5;
+        }
+
+        .post-meta {
+            font-size: 0.9rem;
+            color: gray;
+        }
+
+        .tags {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px; /* 버튼 간의 간격 */
+        }
+
+        .tag-btn {
+            padding: 5px 15px; /* 내부 여백 */
+            font-size: 0.9rem; /* 글꼴 크기 조정 */
+            border-radius: 30px !important; /* 라운드 모서리 강조 */
+        }
+
+        .post-content {
+            margin-top: 20px;
+            font-size: 1rem;
+            line-height: 1.6;
+            border: 1px solid #f0f0f0;
+            border-radius: 10px;
+            padding: 15px;
+            background-color: #f9fafb;
+        }
+
+        .bookmark {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .bookmark span {
+            margin-left: 5px;
+        }
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 1rem;
+            color: #4a5568;
+        }
+
+        .actions svg {
+            width: 24px;
+            height: 24px;
+            fill: #9ca3af;
+        }
+    </style>
+
+</head>
+<!-- Include the header fragment -->
+<div th:insert="~{fragments/header :: header}"></div>
+<body>
+<!-- Include the navigation fragment -->
+<div th:insert="~{fragments/header :: navigation}"></div>
+<div class="post-view-container">
+    <div class="row justify-content-center">
+        <div class="post">
+            <!-- Post Title -->
+            <div class="post-header" th:text="${postViewDto.title}">title</div>
+
+            <!-- Post Meta -->
+            <div class="post-meta">
+                <span th:text="${postViewDto.username}">username</span>
+                <span> · </span>
+                <span th:text="@{'작성일 : ' + ${#temporals.format(postViewDto.createByDt, 'yyyy-MM-dd')} }">약 23시간 전</span>
+            </div>
+
+            <!-- Tags -->
+            <div class="tags">
+                <a th:each="tag : ${postViewDto.tags}" type="button" class="btn btn-outline-primary btn-sm rounded-pill tag-btn" th:text="${tag}"></a>
+            </div>
+
+            <!-- Bookmark and Actions -->
+            <div class="bookmark">
+                <span>통계</span> | <span>수정</span> | <span>삭제</span>
+            </div>
+
+<!--            &lt;!&ndash; Post Content &ndash;&gt;-->
+<!--            <div class="post-content">-->
+<!--                Java-->
+<!--                <div>📄 목록 보기</div>-->
+<!--            </div>-->
+
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div id="viewer"></div>
+    </div>
+</div><!-- Bootstrap JS -->
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.js"></script>
+<script th:inline="javascript">
+    // Thymeleaf를 통해 서버에서 전달된 content 데이터를 가져옵니다.
+    const postContent = /*<![CDATA[*/ [[${postViewDto.content}]] /*]]*/;
+
+    // ToastUI Editor 초기화
+    const viewer = new toastui.Editor({
+        el: document.querySelector('#viewer'),
+        height: 'auto',
+        initialValue: '', // 초기값 없이 시작
+        toolbarItems: [],
+    });
+
+
+    // 서버에서 받은 content 데이터를 에디터에 설정
+    viewer.setMarkdown(postContent);
+</script>
+</body>
+</html>
