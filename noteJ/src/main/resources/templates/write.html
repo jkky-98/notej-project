@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <title>글 작성</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
     <style>
         .write-container {
-            max-width: 800px;
+            max-width: 95%;
             margin: 0 auto;
             padding: 20px;
         }
@@ -98,24 +99,11 @@
         <small class="text-muted">태그를 입력하세요</small>
         <input type="text" th:field="*{tags}" class="form-control mb-3" placeholder="예: Java, Spring, Thymeleaf">
 
-        <!-- 에디터 툴바 -->
-        <div class="editor-toolbar">
-            <i class="bi bi-type-h1" title="Header 1"></i>
-            <i class="bi bi-type-h2" title="Header 2"></i>
-            <i class="bi bi-type-h3" title="Header 3"></i>
-            <i class="bi bi-type-bold" title="Bold"></i>
-            <i class="bi bi-type-italic" title="Italic"></i>
-            <i class="bi bi-justify-left" title="Align Left"></i>
-            <i class="bi bi-justify-center" title="Align Center"></i>
-            <i class="bi bi-justify-right" title="Align Right"></i>
-            <i class="bi bi-link" title="Insert Link"></i>
-            <i class="bi bi-image" title="Insert Image"></i>
-            <i class="bi bi-code" title="Code Block"></i>
+        <!-- 에디터를 적용할 요소 (컨테이너) -->
+        <!-- toDo: 내용 -> content 바인딩 필요 -->
+        <div id="editor">
+
         </div>
-
-        <!-- 본문 입력 -->
-        <textarea th:field="*{content}" class="form-control editor-textarea" placeholder="당신의 이야기를 적어보세요..." th:text="${post?.content}"></textarea>
-
         <section class="container mt-5">
             <div class="row mb-5">
                 <!-- 포스트 미리보기 -->
@@ -199,5 +187,47 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- TUI 에디터 JS CDN -->
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<script>
+    const editor = new toastui.Editor({
+        el: document.querySelector('#editor'), // 에디터를 적용할 요소 (컨테이너)
+        height: 'auto',                        // 에디터 영역의 높이 값 (OOOpx || auto)
+        initialEditType: 'markdown',            // 최초로 보여줄 에디터 타입 (markdown || wysiwyg)
+        initialValue: '',                       // 내용의 초기 값으로, 반드시 마크다운 문자열 형태여야 함
+        previewStyle: 'vertical',               // 마크다운 프리뷰 스타일 (tab || vertical)
+        placeholder: '내용을 입력해 주세요.',
+        hooks: {
+            async addImageBlobHook(blob, callback) { // 이미지 업로드 로직 커스텀
+                try {
+                    /*
+                     * 1. 에디터에 업로드한 이미지를 FormData 객체에 저장
+                     *    (이때, 컨트롤러 uploadEditorImage 메서드의 파라미터인 'image'와 formData에 append 하는 key('image')값은 동일해야 함)
+                     */
+                    const formData = new FormData();
+                    formData.append('image', blob);
+
+                    // 2. FileApiController - uploadEditorImage 메서드 호출
+                    const response = await fetch('/editor/image-upload', {
+                        method : 'POST',
+                        body : formData,
+                    });
+
+                    // 3. 컨트롤러에서 전달받은 디스크에 저장된 파일명
+                    const filename = await response.text();
+                    console.log('서버에 저장된 파일명 : ', filename);
+
+                    // 4. addImageBlobHook의 callback 함수를 통해, 디스크에 저장된 이미지를 에디터에 렌더링
+                    const imageUrl = `/editor/image-print?filename=${filename}`;
+                    callback(imageUrl, 'image alt attribute');
+
+                } catch (error) {
+                    console.error('업로드 실패 : ', error);
+                }
+            }
+        }
+
+    });
+</script>
 </body>
 </html>
