@@ -15,4 +15,5 @@ public class PostViewDto {
     private List<String> tags = new ArrayList<>();
     private String content;
     private int likeCount;
+    private List<CommentsDto> comments = new ArrayList<>();
 }

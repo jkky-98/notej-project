@@ -14,10 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -123,8 +120,10 @@ public class WriteService {
     }
 
     private void urlProvider(WriteForm form) {
-        if (form.getUrl().isEmpty()) {
-            form.setUrl(form.getTitle());
+        if (form.getUrl() == null || form.getUrl().isEmpty()) {
+            // UUID를 생성하고 제목과 결합
+            String uniqueUrl = form.getTitle() + "-" + UUID.randomUUID();
+            form.setUrl(uniqueUrl);
         }
     }
 }

@@ -4,6 +4,7 @@ import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
 import com.github.jkky_98.noteJ.repository.UserRepository;
 import com.github.jkky_98.noteJ.web.controller.form.UserViewForm;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ui.Model;
@@ -15,6 +16,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 public class GlobalControllerAdvice {
 
     private final UserRepository userRepository;
+
+    @ModelAttribute("currentUrl")
+    public String currentUrl(HttpServletRequest request) {
+        String queryString = request.getQueryString();
+        return request.getRequestURI() + (queryString != null ? "?" + queryString : "");
+    }
+
     @ModelAttribute
     public void addSessionUserToModel(HttpSession session, Model model) {
         // 세션에서 사용자 ID 가져오기

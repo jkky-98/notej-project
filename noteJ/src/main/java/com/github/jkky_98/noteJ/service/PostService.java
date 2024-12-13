@@ -1,5 +1,6 @@
 package com.github.jkky_98.noteJ.service;
 
+import com.github.jkky_98.noteJ.domain.Comment;
 import com.github.jkky_98.noteJ.domain.Post;
 import com.github.jkky_98.noteJ.domain.PostTag;
 import com.github.jkky_98.noteJ.domain.Tag;
@@ -8,6 +9,7 @@ import com.github.jkky_98.noteJ.repository.PostRepository;
 import com.github.jkky_98.noteJ.repository.PostTagRepository;
 import com.github.jkky_98.noteJ.repository.TagRepository;
 import com.github.jkky_98.noteJ.repository.UserRepository;
+import com.github.jkky_98.noteJ.web.controller.dto.CommentsDto;
 import com.github.jkky_98.noteJ.web.controller.dto.PostDto;
 import com.github.jkky_98.noteJ.web.controller.dto.PostViewDto;
 import jakarta.persistence.EntityNotFoundException;
@@ -42,17 +44,37 @@ public class PostService {
                 postViewDto.setTitle(post.getTitle());
                 postViewDto.setUsername(username);
                 postViewDto.setContent(post.getContent());
-                System.out.println(post.getContent());
                 postViewDto.setCreateByDt(post.getCreateDt());
                 postViewDto.setLikeCount(post.getLikes().size());
 
                 List<String> tags = getTags(post);
                 postViewDto.setTags(tags);
+
+                List<CommentsDto> comments = getComments(post);
+                postViewDto.setComments(comments);
                 return postViewDto;
             }
         }
 
         throw new EntityNotFoundException("Post not Found");
+    }
+    private static List<CommentsDto> getComments(Post post) {
+
+        List<CommentsDto> returnCommentsDto = new ArrayList<>();
+
+        List<Comment> comments = post.getComments();
+        for (Comment comment : comments) {
+            CommentsDto commentsDto = new CommentsDto();
+            commentsDto.setCreateBy(comment.getCreateBy());
+            commentsDto.setCreateByDt(comment.getCreateDt());
+            commentsDto.setContent(comment.getContent());
+            commentsDto.setId(comment.getId());
+            commentsDto.setParentsId(comment.getParent() != null ? comment.getParent().getId() : null);
+
+            returnCommentsDto.add(commentsDto);
+        }
+
+        return returnCommentsDto;
     }
 
     private static List<String> getTags(Post post) {
