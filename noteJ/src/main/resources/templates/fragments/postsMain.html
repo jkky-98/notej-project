@@ -16,7 +16,7 @@
                     </a>
                     <!-- 각 태그 반복 -->
                     <a th:each="tag : ${tags}"
-                       th:href="@{'/@' + ${username}(tagName=${tag.tagName})}"
+                       th:href="@{${currentUri}(tagName=${tag.tagName})}"
                        class="list-group-item list-group-item-action">
                         <span th:text="${tag.tagName}"></span>
                         <span class="badge bg-secondary float-end" th:text="${tag.count}"></span>
@@ -30,8 +30,8 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
 
                     <!-- 검색창 -->
-                    <form th:action="@{/search}" method="get" class="search-bar">
-                        <input type="text" name="query" class="form-control form-control-sm" placeholder="검색어를 입력하세요" th:value="${searchQuery}">
+                    <form th:action="@{${currentUri}(search=${postsConditionForm.search})}" method="get" class="search-bar">
+                        <input type="text" name="search" class="form-control form-control-sm" placeholder="검색어를 입력하세요" th:value="${postsConditionForm.search}">
                     </form>
                 </div>
 

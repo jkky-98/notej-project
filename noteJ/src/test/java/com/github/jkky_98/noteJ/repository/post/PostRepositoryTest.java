@@ -174,7 +174,7 @@ class PostRepositoryTest {
         PostsConditionForm searchCondition1 = new PostsConditionForm();
         searchCondition1.setSearch("Querydsl");
 
-        List<Post> result1 = postRepository.searchPost(searchCondition1);
+        List<Post> result1 = postRepository.searchPosts(searchCondition1, "testUser");
 
         assertThat(result1).hasSize(1);
         assertThat(result1.get(0).getTitle()).isEqualTo("Querydsl Guide");
@@ -183,7 +183,7 @@ class PostRepositoryTest {
         PostsConditionForm searchCondition2 = new PostsConditionForm();
         searchCondition2.setTagName("Java");
 
-        List<Post> result2 = postRepository.searchPost(searchCondition2);
+        List<Post> result2 = postRepository.searchPosts(searchCondition2, "testUser");
         assertThat(result2).hasSize(1);
         assertThat(result2.get(0).getTitle()).isEqualTo("Spring Boot Guide");
 
@@ -191,7 +191,7 @@ class PostRepositoryTest {
         PostsConditionForm searchCondition3 = new PostsConditionForm();
         searchCondition3.setSeriesName("Backend Development");
 
-        List<Post> result3 = postRepository.searchPost(searchCondition3);
+        List<Post> result3 = postRepository.searchPosts(searchCondition3, "testUser");
         assertThat(result3).hasSize(2);
 
         // 4. Title + TagName 복합 검색 테스트
@@ -199,16 +199,20 @@ class PostRepositoryTest {
         searchCondition4.setSearch("Spring");
         searchCondition4.setTagName("Java");
 
-        List<Post> result4 = postRepository.searchPost(searchCondition4);
+        List<Post> result4 = postRepository.searchPosts(searchCondition4, "testUser");
         assertThat(result4).hasSize(1);
         assertThat(result4.get(0).getTitle()).isEqualTo("Spring Boot Guide");
+
+        // 5. user 검색 테스트
     }
 
     private void createTestData() {
         // Series
         Series backendSeries = Series.builder()
+                .user(testUser)
                 .seriesName("Backend Development").build();
         Series frontendSeries = Series.builder()
+                .user(testUser)
                 .seriesName("Frontend Development").build();
 
         em.persist(backendSeries);
@@ -227,16 +231,19 @@ class PostRepositoryTest {
                 .title("Spring Boot Guide")
                 .content("Spring Boot content")
                 .series(backendSeries)
+                .user(testUser)
                 .build();
         Post post2 = Post.builder()
                 .title("Querydsl Guide")
                 .content("Querydsl content")
                 .series(backendSeries)
+                .user(testUser)
                 .build();
         Post post3 = Post.builder()
                 .title("React Basics")
                 .content("React content")
                 .series(frontendSeries)
+                .user(testUser)
                 .build();
 
         em.persist(post1);

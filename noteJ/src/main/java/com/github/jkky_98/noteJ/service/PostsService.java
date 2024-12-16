@@ -4,6 +4,7 @@ import com.github.jkky_98.noteJ.domain.Post;
 import com.github.jkky_98.noteJ.domain.PostTag;
 import com.github.jkky_98.noteJ.domain.Series;
 import com.github.jkky_98.noteJ.domain.user.User;
+import com.github.jkky_98.noteJ.repository.PostRepository;
 import com.github.jkky_98.noteJ.repository.SeriesRepository;
 import com.github.jkky_98.noteJ.repository.UserRepository;
 import com.github.jkky_98.noteJ.web.controller.dto.PostDto;
@@ -25,13 +26,13 @@ public class PostsService {
 
     private final UserRepository userRepository;
     private final SeriesRepository seriesRepository;
+    private final PostRepository postRepository;
 
     public List<PostDto> getPosts(String username, PostsConditionForm cond) {
         User userFind = userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found"));
 
+        List<Post> posts = postRepository.searchPosts(cond, username);
 
-
-        List<Post> posts = userFind.getPosts();
         List<PostDto> postDtos = new ArrayList<>();
         for (Post post : posts) {
             PostDto postDto = new PostDto();
@@ -53,6 +54,8 @@ public class PostsService {
 
             postDtos.add(postDto);
         }
+
+        System.out.println(postDtos);
 
         return postDtos;
     }

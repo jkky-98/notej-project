@@ -29,7 +29,7 @@ public class PostsController {
 
     @GetMapping("/@{username}/posts")
     public String posts(@PathVariable("username") String username,
-                        @ModelAttribute PostsConditionForm cond,
+                        @ModelAttribute PostsConditionForm postsConditionForm,
                         Model model,
                         HttpServletRequest request
                         ) {
@@ -37,8 +37,9 @@ public class PostsController {
         ProfileForm profileForm = profileService.getProfile(username);
         model.addAttribute("profileForm", profileForm);
 
-        postsService.getPosts(username, cond);
+        List<PostDto> posts = postsService.getPosts(username, postsConditionForm);
 
+        model.addAttribute("posts", posts);
 
         List<TagCountDto> tagAlls = postsService.getAllTag(username);
         model.addAttribute("tags", tagAlls);

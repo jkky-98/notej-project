@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface PostRepositoryCustom {
 
-    List<Post> searchPost(PostsConditionForm form);
+    List<Post> searchPosts(PostsConditionForm form, String username);
 }

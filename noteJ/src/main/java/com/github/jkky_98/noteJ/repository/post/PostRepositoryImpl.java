@@ -1,6 +1,7 @@
 package com.github.jkky_98.noteJ.repository.post;
 
 import com.github.jkky_98.noteJ.domain.*;
+import com.github.jkky_98.noteJ.domain.user.QUser;
 import com.github.jkky_98.noteJ.web.controller.form.PostsConditionForm;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -18,26 +19,35 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<Post> searchPost(PostsConditionForm form) {
+    public List<Post> searchPosts(PostsConditionForm form, String username) {
 
         QPost p = new QPost("p");
         QPostTag pt =  new QPostTag("pt");
         QTag t = new QTag("t");
         QSeries s = new QSeries("s");
+        QUser u = new QUser("u");
 
         return queryFactory
                 .select(p)
                 .from(p)
+                .innerJoin(p.user, u).fetchJoin()
                 .leftJoin(p.postTags, pt).fetchJoin()
                 .leftJoin(pt.tag, t).fetchJoin()
                 .leftJoin(p.series, s).fetchJoin()
                 .where(
                         searchCondition(form.getSearch(), p),
                         tagCondition(form.getTagName(), p, pt, t),
-                        seriesCondition(form.getSeriesName(), p, s)
+                        seriesCondition(form.getSeriesName(), p, s),
+                        userCondition(username, u)
                 )
                 .distinct()
                 .fetch();
+    }
+
+    private BooleanExpression userCondition(String username, QUser u) {
+        return username != null && !username.isEmpty()
+                ? u.username.eq(username)
+                : null;
     }
 
     private BooleanExpression searchCondition(String search, QPost p) {
