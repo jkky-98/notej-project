@@ -32,12 +32,6 @@ public class Post extends BaseEntity {
 
     private Boolean writable;
 
-    //조회수
-    //toDo: testCode 필요
-    @Column(nullable = false)
-    @Builder.Default
-    private Long views = 0L;
-
     //연관관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "series_id")
@@ -58,6 +52,10 @@ public class Post extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostTag> postTags = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<PostHits> postHits = new ArrayList<>(); // 조회 기록
 
     public void updateUser(User user) {
         this.user = user;
@@ -94,8 +92,4 @@ public class Post extends BaseEntity {
         like.updatePost(null); // 연관 관계 해제
     }
 
-    // toDo: testCode 필요
-    public void incrementViews() {
-        this.views++;
-    }
 }
