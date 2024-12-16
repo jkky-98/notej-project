@@ -27,9 +27,16 @@ public class WriteController {
     }
 
     @PostMapping("/write")
-    public String write(@ModelAttribute WriteForm form, HttpSession session) throws IOException {
+    public String writeSave(@ModelAttribute WriteForm form, HttpSession session) throws IOException {
         User sessionUser = (User) session.getAttribute("loginUser");
-        writeService.saveWrite(form, sessionUser);
+        writeService.saveWrite(form, sessionUser, false);
         return "redirect:/";
     }
+
+//    @PostMapping("/write/savetemp")
+//    public String writeSaveTemp(@ModelAttribute WriteForm form, HttpSession session) throws IOException {
+//        User sessionUser = (User) session.getAttribute("loginUser");
+//        writeService.saveWrite(form, sessionUser, true);
+//        return "redirect:/";
+//    }
 }

@@ -3,9 +3,7 @@ package com.github.jkky_98.noteJ.domain;
 import com.github.jkky_98.noteJ.domain.base.BaseEntity;
 import com.github.jkky_98.noteJ.domain.user.User;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +31,12 @@ public class Post extends BaseEntity {
     private String thumbnail;
 
     private Boolean writable;
+
+    //조회수
+    //toDo: testCode 필요
+    @Column(nullable = false)
+    @Builder.Default
+    private Long views = 0L;
 
     //연관관계
     @ManyToOne(fetch = FetchType.LAZY)
@@ -88,5 +92,10 @@ public class Post extends BaseEntity {
     public void removeLike(Like like) {
         this.likes.remove(like);
         like.updatePost(null); // 연관 관계 해제
+    }
+
+    // toDo: testCode 필요
+    public void incrementViews() {
+        this.views++;
     }
 }

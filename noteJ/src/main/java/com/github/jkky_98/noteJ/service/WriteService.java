@@ -50,7 +50,7 @@ public class WriteService {
 
     //toDo: 썸네일 사진 파일 저장 처리 필요
     @Transactional
-    public void saveWrite(WriteForm form, User sessionUser) throws IOException {
+    public void saveWrite(WriteForm form, User sessionUser, boolean isTemp) throws IOException {
 
         // 사용자 정보를 조회
         Optional<User> byId = userRepository.findById(getSessionUser(sessionUser).getId());

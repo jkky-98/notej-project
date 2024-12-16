@@ -99,9 +99,11 @@
                 <a th:each="tag : ${postViewDto.tags}" type="button" class="btn btn-outline-primary btn-sm rounded-pill tag-btn" th:text="${tag}"></a>
             </div>
 
-            <!-- Bookmark and Actions -->
-            <div class="bookmark">
-                <span>통계</span> | <span>수정</span> | <span>삭제</span>
+            <div class="bookmark" th:if="${sessionUser != null and sessionUser.username == postViewDto.username}">
+                <a th:href="@{${currentUrl} + '/stats'}" class="btn btn-link">통계</a> |
+                <a th:href="@{${currentUrl} + '/edit'}" class="btn btn-link">수정</a> |
+                <a th:href="@{${currentUrl} + '/delete'}" class="btn btn-link"
+                   onclick="return confirm('삭제하시겠습니까?')">삭제</a>
             </div>
 
 <!--            &lt;!&ndash; Post Content &ndash;&gt;-->
