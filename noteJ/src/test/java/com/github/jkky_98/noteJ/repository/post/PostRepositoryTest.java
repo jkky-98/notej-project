@@ -6,6 +6,8 @@ import com.github.jkky_98.noteJ.repository.PostRepository;
 import com.github.jkky_98.noteJ.repository.PostTagRepository;
 import com.github.jkky_98.noteJ.repository.TagRepository;
 import com.github.jkky_98.noteJ.repository.UserRepository;
+import com.github.jkky_98.noteJ.web.controller.form.PostsConditionForm;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +32,9 @@ class PostRepositoryTest {
 
     @Autowired
     private PostTagRepository postTagRepository;
+
+    @Autowired
+    EntityManager em;
 
     private User testUser;
 
@@ -160,5 +165,91 @@ class PostRepositoryTest {
         assertThat(foundPost.getLikes()).hasSize(1);
     }
 
+    @Test
+    void searchPost_withVariousConditions() {
+        // Given: 테스트 데이터 준비
+        createTestData();
 
+        // 1. Title 검색 테스트
+        PostsConditionForm searchCondition1 = new PostsConditionForm();
+        searchCondition1.setSearch("Querydsl");
+
+        List<Post> result1 = postRepository.searchPost(searchCondition1);
+
+        assertThat(result1).hasSize(1);
+        assertThat(result1.get(0).getTitle()).isEqualTo("Querydsl Guide");
+
+        // 2. TagName 검색 테스트
+        PostsConditionForm searchCondition2 = new PostsConditionForm();
+        searchCondition2.setTagName("Java");
+
+        List<Post> result2 = postRepository.searchPost(searchCondition2);
+        assertThat(result2).hasSize(1);
+        assertThat(result2.get(0).getTitle()).isEqualTo("Spring Boot Guide");
+
+        // 3. SeriesName 검색 테스트
+        PostsConditionForm searchCondition3 = new PostsConditionForm();
+        searchCondition3.setSeriesName("Backend Development");
+
+        List<Post> result3 = postRepository.searchPost(searchCondition3);
+        assertThat(result3).hasSize(2);
+
+        // 4. Title + TagName 복합 검색 테스트
+        PostsConditionForm searchCondition4 = new PostsConditionForm();
+        searchCondition4.setSearch("Spring");
+        searchCondition4.setTagName("Java");
+
+        List<Post> result4 = postRepository.searchPost(searchCondition4);
+        assertThat(result4).hasSize(1);
+        assertThat(result4.get(0).getTitle()).isEqualTo("Spring Boot Guide");
+    }
+
+    private void createTestData() {
+        // Series
+        Series backendSeries = Series.builder()
+                .seriesName("Backend Development").build();
+        Series frontendSeries = Series.builder()
+                .seriesName("Frontend Development").build();
+
+        em.persist(backendSeries);
+        em.persist(frontendSeries);
+
+        // Tags
+        Tag javaTag = Tag.builder()
+                .name("Java").build();
+        Tag reactTag = Tag.builder()
+                .name("React").build();
+        em.persist(javaTag);
+        em.persist(reactTag);
+
+        // Posts
+        Post post1 = Post.builder()
+                .title("Spring Boot Guide")
+                .content("Spring Boot content")
+                .series(backendSeries)
+                .build();
+        Post post2 = Post.builder()
+                .title("Querydsl Guide")
+                .content("Querydsl content")
+                .series(backendSeries)
+                .build();
+        Post post3 = Post.builder()
+                .title("React Basics")
+                .content("React content")
+                .series(frontendSeries)
+                .build();
+
+        em.persist(post1);
+        em.persist(post2);
+        em.persist(post3);
+
+        // PostTags
+        PostTag postTag1 = PostTag.builder().post(post1).tag(javaTag).build();
+        PostTag postTag2 = PostTag.builder().post(post3).tag(reactTag).build();
+        em.persist(postTag1);
+        em.persist(postTag2);
+
+        em.flush();
+        em.clear();
+    }
 }

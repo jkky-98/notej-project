@@ -198,7 +198,7 @@
                                 </div>
                                 <div class="comment-actions mt-3">
                                     <!-- 삭제 버튼 -->
-                                    <a href="#" class="text-danger small"
+                                    <a href="#" class="btn btn-outline-danger btn-sm"
                                        th:if="${sessionUser.username == reply.createBy}"
                                        th:href="@{/comments/delete/{id}(id=${reply.id})}">삭제</a>
                                 </div>

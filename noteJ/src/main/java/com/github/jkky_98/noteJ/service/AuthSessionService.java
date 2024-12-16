@@ -43,20 +43,13 @@ public class AuthSessionService implements AuthService {
 
     @Override
     public User signUp(SignUpForm signUpForm, BindingResult bindingResult) {
-        // 중복 체크: username
-        if (userRepository.findByUsername(signUpForm.getUsername()).isPresent()) {
-            bindingResult.rejectValue("username", "error.username", "Username already exists.");
-        }
-
-        // 중복 체크: email
-        if (userRepository.findByEmail(signUpForm.getEmail()).isPresent()) {
-            bindingResult.rejectValue("email", "error.email", "Email already exists.");
-        }
+        validSignUpForm(signUpForm, bindingResult);
 
         // 중복이 있으면 바로 반환하여 처리를 중단
         if (bindingResult.hasErrors()) {
             return null;
         }
+
         FileMetadata fileMetadata = FileMetadata.builder()
                 .build();
 
@@ -79,5 +72,17 @@ public class AuthSessionService implements AuthService {
                 .build();
 
         return userRepository.save(signUpUser);
+    }
+
+    private void validSignUpForm(SignUpForm signUpForm, BindingResult bindingResult) {
+        // 중복 체크: username
+        if (userRepository.findByUsername(signUpForm.getUsername()).isPresent()) {
+            bindingResult.rejectValue("username", "error.username", "Username already exists.");
+        }
+
+        // 중복 체크: email
+        if (userRepository.findByEmail(signUpForm.getEmail()).isPresent()) {
+            bindingResult.rejectValue("email", "error.email", "Email already exists.");
+        }
     }
 }

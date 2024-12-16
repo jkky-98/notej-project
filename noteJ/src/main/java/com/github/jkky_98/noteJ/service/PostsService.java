@@ -8,6 +8,7 @@ import com.github.jkky_98.noteJ.repository.SeriesRepository;
 import com.github.jkky_98.noteJ.repository.UserRepository;
 import com.github.jkky_98.noteJ.web.controller.dto.PostDto;
 import com.github.jkky_98.noteJ.web.controller.dto.TagCountDto;
+import com.github.jkky_98.noteJ.web.controller.form.PostsConditionForm;
 import com.github.jkky_98.noteJ.web.controller.form.SeriesViewForm;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +26,10 @@ public class PostsService {
     private final UserRepository userRepository;
     private final SeriesRepository seriesRepository;
 
-    public List<PostDto> getPosts(String username) {
+    public List<PostDto> getPosts(String username, PostsConditionForm cond) {
         User userFind = userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+
 
         List<Post> posts = userFind.getPosts();
         List<PostDto> postDtos = new ArrayList<>();

@@ -80,8 +80,6 @@ public class AuthController {
         if (signUpUser == null) {
             return "auth/signUpForm";
         }
-        ConfigurableEnvironment environment = (ConfigurableEnvironment) applicationContext.getEnvironment();
-        log.info("정상로직 프로필 : {}", (Object) environment.getActiveProfiles());
 
         return "redirect:/login";
     }

@@ -6,6 +6,7 @@ import com.github.jkky_98.noteJ.service.PostsService;
 import com.github.jkky_98.noteJ.service.ProfileService;
 import com.github.jkky_98.noteJ.web.controller.dto.PostDto;
 import com.github.jkky_98.noteJ.web.controller.dto.TagCountDto;
+import com.github.jkky_98.noteJ.web.controller.form.PostsConditionForm;
 import com.github.jkky_98.noteJ.web.controller.form.ProfileForm;
 import com.github.jkky_98.noteJ.web.controller.form.SeriesViewForm;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,10 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,7 +29,7 @@ public class PostsController {
 
     @GetMapping("/@{username}/posts")
     public String posts(@PathVariable("username") String username,
-                        @RequestParam(value = "seriesName", required = false) String seriesName,
+                        @ModelAttribute PostsConditionForm cond,
                         Model model,
                         HttpServletRequest request
                         ) {
@@ -39,14 +37,7 @@ public class PostsController {
         ProfileForm profileForm = profileService.getProfile(username);
         model.addAttribute("profileForm", profileForm);
 
-        //toDO: 검색조건 더 많아질 시 Querydsl도입
-        if (seriesName == null) {
-            List<PostDto> postDtos = postsService.getPosts(username);
-            model.addAttribute("posts", postDtos);
-        } else {
-            List<PostDto> postDtos = postsService.getPostsForSeries(username, seriesName);
-            model.addAttribute("posts", postDtos);
-        }
+        postsService.getPosts(username, cond);
 
 
         List<TagCountDto> tagAlls = postsService.getAllTag(username);
