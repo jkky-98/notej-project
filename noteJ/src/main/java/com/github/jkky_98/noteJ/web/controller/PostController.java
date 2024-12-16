@@ -24,7 +24,6 @@ public class PostController {
         PostViewDto postViewDto = postService.getPost(username, postUrl);
 
         model.addAttribute("postViewDto", postViewDto);
-        model.addAttribute("username", username);
         return "postView";
     }
 }

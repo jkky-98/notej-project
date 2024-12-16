@@ -30,8 +30,7 @@ public class PostsController {
     @GetMapping("/@{username}/posts")
     public String posts(@PathVariable("username") String username,
                         @ModelAttribute PostsConditionForm postsConditionForm,
-                        Model model,
-                        HttpServletRequest request
+                        Model model
                         ) {
 
         ProfileForm profileForm = profileService.getProfile(username);
@@ -46,13 +45,8 @@ public class PostsController {
 
         model.addAttribute("username", username);
 
-        model.addAttribute("currentUri", request.getRequestURI());
-
         // 현재 활성화된 탭
         model.addAttribute("activeTab", "posts");
-
-        // 검색어 초기값 (없을 시 빈 값)
-        model.addAttribute("searchQuery", "");
 
         return "posts";
     }
