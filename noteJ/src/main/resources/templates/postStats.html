@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Include the header fragment -->
+<div th:insert="~{fragments/header :: header}"></div>
+<body>
+<!-- Include the navigation fragment -->
+<div th:insert="~{fragments/header :: navigation}"></div>
+<div class="container my-3">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="d-flex flex-column align-items-start">
+                <!-- 전체 조회수 -->
+                <div class="mb-3">
+                    <span class="fw-bold text-secondary">전체</span>
+                    <span class="ms-2 text-dark" th:text="${postStats.totalViews}">0</span>
+                </div>
+
+                <!-- 오늘 조회수 -->
+                <div class="mb-3">
+                    <span class="fw-bold text-secondary">오늘</span>
+                    <span class="ms-2 text-dark" th:text="${postStats.todayViews}">0</span>
+                </div>
+
+                <!-- 어제 조회수 -->
+                <div>
+                    <span class="fw-bold text-secondary">어제</span>
+                    <span class="ms-2 text-dark" th:text="${postStats.yesterdayViews}">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap JS -->
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

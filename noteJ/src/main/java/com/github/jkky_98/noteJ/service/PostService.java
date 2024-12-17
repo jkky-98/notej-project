@@ -25,7 +25,7 @@ public class PostService {
     private final PostRepository postRepository;
 
     private final TagRepository tagRepository;
-    
+
     private final PostHitsRepository postHitsRepository;
 
     private final UserRepository userRepository;
@@ -65,6 +65,11 @@ public class PostService {
         Optional<User> sessionUser = SessionUtils.getSessionUser(request);
         sessionUser.ifPresentOrElse(
                 user -> {
+                    // sessionUser.getUsername()과 입력된 username 비교
+                    if (user.getUsername().equals(username)) {
+                        return; // 값이 같으면 아무 작업도 하지 않음
+                    }
+
                     // 값이 있을 경우: sessionUser 기반으로 PostHits 생성
                     User userFind = userRepository.findById(user.getId()).orElseThrow(() -> new EntityNotFoundException("User not Found"));
                     Post postFind = postRepository.findByUserUsernameAndPostUrl(username, postUrl).orElseThrow(() -> new EntityNotFoundException("Post not Found"));
