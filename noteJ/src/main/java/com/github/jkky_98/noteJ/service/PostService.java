@@ -1,24 +1,22 @@
 package com.github.jkky_98.noteJ.service;
 
-import com.github.jkky_98.noteJ.domain.Comment;
-import com.github.jkky_98.noteJ.domain.Post;
-import com.github.jkky_98.noteJ.domain.PostTag;
-import com.github.jkky_98.noteJ.domain.Tag;
+import com.github.jkky_98.noteJ.domain.*;
 import com.github.jkky_98.noteJ.domain.user.User;
-import com.github.jkky_98.noteJ.repository.PostRepository;
-import com.github.jkky_98.noteJ.repository.PostTagRepository;
-import com.github.jkky_98.noteJ.repository.TagRepository;
-import com.github.jkky_98.noteJ.repository.UserRepository;
+import com.github.jkky_98.noteJ.repository.*;
+import com.github.jkky_98.noteJ.web.ClientUtils;
 import com.github.jkky_98.noteJ.web.controller.dto.CommentsDto;
-import com.github.jkky_98.noteJ.web.controller.dto.PostDto;
 import com.github.jkky_98.noteJ.web.controller.dto.PostViewDto;
+import com.github.jkky_98.noteJ.web.session.SessionUtils;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,13 +25,17 @@ public class PostService {
     private final PostRepository postRepository;
 
     private final TagRepository tagRepository;
-
-    private final PostTagRepository postTagRepository;
+    
+    private final PostHitsRepository postHitsRepository;
 
     private final UserRepository userRepository;
 
     @Transactional
-    public PostViewDto getPost(String username, String postUrl) {
+    public PostViewDto getPost(String username, String postUrl, HttpServletRequest request) {
+
+        // 포스트 조회수 증가 로직
+        savePostHits(username, postUrl, request);
+
         User user = userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         List<Post> posts = user.getPosts();
@@ -58,6 +60,39 @@ public class PostService {
 
         throw new EntityNotFoundException("Post not Found");
     }
+
+    private void savePostHits(String username, String postUrl, HttpServletRequest request) {
+        Optional<User> sessionUser = SessionUtils.getSessionUser(request);
+        sessionUser.ifPresentOrElse(
+                user -> {
+                    // 값이 있을 경우: sessionUser 기반으로 PostHits 생성
+                    User userFind = userRepository.findById(user.getId()).orElseThrow(() -> new EntityNotFoundException("User not Found"));
+                    Post postFind = postRepository.findByUserUsernameAndPostUrl(username, postUrl).orElseThrow(() -> new EntityNotFoundException("Post not Found"));
+
+                    PostHits postHits = PostHits.builder()
+                            .ipAddress(ClientUtils.getRemoteIP(request))
+                            .viewedAt(LocalDateTime.now())
+                            .user(userFind)
+                            .post(postFind)
+                            .build();
+
+                    postHitsRepository.save(postHits);
+                },
+                () -> {
+                    // 값이 없을 경우: 기본 PostHits 생성
+                    Post postFind = postRepository.findByUserUsernameAndPostUrl(username, postUrl).orElseThrow(() -> new EntityNotFoundException("Post not Found"));
+
+                    PostHits postHits = PostHits.builder()
+                            .ipAddress(ClientUtils.getRemoteIP(request))
+                            .viewedAt(LocalDateTime.now())
+                            .post(postFind)
+                            .build();
+
+                    postHitsRepository.save(postHits);
+                }
+        );
+    }
+
     private static List<CommentsDto> getComments(Post post) {
 
         List<CommentsDto> returnCommentsDto = new ArrayList<>();

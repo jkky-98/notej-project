@@ -48,7 +48,6 @@ public class WriteService {
         return findUser.orElse(null);
     }
 
-    //toDo: 썸네일 사진 파일 저장 처리 필요
     @Transactional
     public void saveWrite(WriteForm form, User sessionUser, boolean isTemp) throws IOException {
 
