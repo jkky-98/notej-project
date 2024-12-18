@@ -40,6 +40,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         seriesCondition(form.getSeriesName(), p, s),
                         userCondition(username, u)
                 )
+                .orderBy(p.createDt.desc()) // 최신 날짜 순으로 정렬
                 .distinct()
                 .fetch();
     }
