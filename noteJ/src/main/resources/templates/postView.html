@@ -73,6 +73,15 @@
             height: 24px;
             fill: #9ca3af;
         }
+
+        textarea.is-invalid {
+            border-color: red;
+            background-color: #ffe6e6; /* 연한 빨간 배경 */
+        }
+
+        textarea::placeholder {
+            color: red; /* placeholder 텍스트 색상 변경 */
+        }
     </style>
 
 </head>
@@ -83,7 +92,7 @@
 <div th:insert="~{fragments/header :: navigation}"></div>
 <div class="post-view-container">
     <div class="row justify-content-center">
-        <div class="post">
+        <div class="post" th:object="${postViewDto}">
             <!-- Post Title -->
             <div class="post-header" th:text="${postViewDto.title}">title</div>
 
@@ -123,10 +132,24 @@
         <div class="comments-container">
             <h3>댓글</h3>
             <!-- Comment Form -->
-            <form th:action="@{ ${currentUrl} + '/comments'}" method="post" class="mb-4" th:if="${sessionUser != null}">
+            <form th:action="@{${currentUrl}}" th:method="post" class="mb-4"
+                  th:object="${commentForm}" th:if="${sessionUser != null}">
+
                 <!-- URL 정보를 숨겨진 input 필드에 담기 -->
-                <input type="hidden" name="reqeustUrl" th:value="${currentUrl}" />
-                <textarea class="form-control mb-2" name="content" rows="3" placeholder="댓글을 입력하세요..."></textarea>
+                <input type="hidden" name="requestUrl" th:value="${currentUrl}" />
+
+                <!-- 숨겨진 에러 메시지 -->
+                <input type="hidden" id="contentErrorMessage-normal"
+                       th:if="${#fields.hasErrors('content')}"
+                       th:value="${#fields.errors('content')[0]}">
+
+                <!-- content 필드 바인딩 -->
+                <textarea class="form-control mb-2"
+                          th:field="*{content}"
+                          rows="3"
+                          placeholder="댓글을 입력하세요...">
+                </textarea>
+
                 <button type="submit" class="btn btn-primary btn-sm">댓글 작성</button>
             </form>
 
@@ -170,9 +193,22 @@
                                     <div class="col">
                                         <div class="collapse multi-collapse" th:id="'collapse-' + ${comment.id}">
                                             <div class="card card-body">
-                                                <form th:action="@{ ${currentUrl} + '/comments'(parentId=${comment.id})}" method="post">
-                                                    <input type="hidden" name="parentsId" th:value="${comment.id}" />
-                                                    <textarea class="form-control mb-2" name="content" rows="3" placeholder="대댓글을 입력하세요..."></textarea>
+                                                <form th:action="@{${currentUrl}}"
+                                                      th:object="${commentForm}" th:method="post">
+
+                                                    <input type="hidden" th:field="*{parentsId}" th:value="${comment.id}" />
+
+                                                    <!-- 숨겨진 에러 메시지 -->
+                                                    <input type="hidden" id="contentErrorMessage-${comment.id}"
+                                                           th:if="${#fields.hasErrors('content')}"
+                                                           th:value="${#fields.errors('content')[0]}">
+
+                                                    <textarea class="form-control mb-2"
+                                                              th:field="*{content}"
+                                                              rows="3"
+                                                              placeholder="댓글을 입력하세요...">
+                                                    </textarea>
+
                                                     <button type="submit" class="btn btn-primary btn-sm">작성</button>
                                                 </form>
                                             </div>
@@ -231,6 +267,26 @@
 
     // 서버에서 받은 content 데이터를 에디터에 설정
     viewer.setMarkdown(postContent);
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // 모든 숨겨진 에러 메시지 가져오기
+        const errorMessages = document.querySelectorAll("[id^='contentErrorMessage-']");
+
+        // 중복 제거: 에러 메시지 중 첫 번째 값만 사용
+        const uniqueErrorMessages = new Set();
+        errorMessages.forEach(function (errorElement) {
+            const errorMessage = errorElement.value; // 숨겨진 필드의 값
+            if (errorMessage) {
+                uniqueErrorMessages.add(errorMessage); // Set을 사용해 중복 메시지 제거
+            }
+        });
+
+        // 첫 번째 에러 메시지만 팝업으로 표시
+        if (uniqueErrorMessages.size > 0) {
+            alert([...uniqueErrorMessages][0]); // 첫 번째 메시지만 알림
+        }
+    });
 </script>
 </body>
 </html>
