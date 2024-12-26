@@ -27,8 +27,8 @@ jobs:
       - name: Build with Gradle
         working-directory: ./noteJ
         run: |
-          chmod +x ./noteJ/gradlew
-          ./noteJ/gradlew clean build -x test
+          chmod +x gradlew
+          ./gradlew clean build -x test
 
       - name: Login to DockerHub
         uses: docker/login-action@v1
