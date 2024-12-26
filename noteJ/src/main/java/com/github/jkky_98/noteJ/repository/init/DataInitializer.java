@@ -15,7 +15,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-@Profile("temp")
+@Profile("local")
 public class DataInitializer {
 
     private final UserRepository userRepository;

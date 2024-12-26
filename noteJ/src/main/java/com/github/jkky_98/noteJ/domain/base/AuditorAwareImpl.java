@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-@Profile("!temp")
+@Profile("!local")
 public class AuditorAwareImpl implements AuditorAware<String> {
 
     private final HttpSession httpSession;

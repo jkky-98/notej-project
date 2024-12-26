@@ -1,4 +1,47 @@
 spring:
+  profiles:
+    active: local
+    group:
+      local: local, common, secret
+      blue: blue, common, secret
+      green: green, common, secret
+
+server:
+  env: blue
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: blue
+
+
+server:
+  port: 8080
+  serverAddress: 54.180.200.80
+
+serverName: blue_server
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: green
+
+server:
+  port: 8081
+  serverAddress: 54.180.200.80
+
+serverName: green_server
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
   devtools:
     livereload:
       enabled: true
@@ -8,9 +51,6 @@ spring:
     cache: false
     prefix: file:src/main/resources/templates/
   # 위는 개발용 설정
-
-  profiles:
-    active: temp
   datasource:
     url: jdbc:h2:tcp://localhost/~/notej
     username: sa
@@ -26,11 +66,18 @@ spring:
         format_sql: true
         default_batch_fetch_size: 100
 
-file:
-  dir: "/Users/jkky/Documents/private/notej-project/noteJ/src/main/resources/static/profileimages/"
-
-
 
 logging.level:
   org.hibernate.SQL: debug
   org.hibernate.orm.jdbc.bind: trace #스프링 부트 3.x, hibernate6
+
+file:
+  dir: "/Users/jkky/Documents/private/notej-project/noteJ/src/main/resources/static/profileimages/"
+
+server:
+  port: 8080
+  serverAddress: localhost
+
+serverName: local_server
+
+---

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-@Profile("temp")
+@Profile("local")
 public class TempAuditorAwareImpl implements AuditorAware<String> {
 
     @Override
