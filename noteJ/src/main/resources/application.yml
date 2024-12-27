@@ -14,11 +14,32 @@ spring:
   config:
     activate:
       on-profile: blue
-
+  datasource:
+    url: jdbc:mysql://${RDS_ENDPOINT}:3306/${RDS_NAME}
+    username: ${RDS_USERNAME}
+    password: ${RDS_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10 # 커넥션 풀 크기 설정 (필요시 조정)
+      connection-timeout: 30000 # 연결 대기 시간 설정
+      idle-timeout: 600000 # 유휴 연결 시간 설정
+      max-lifetime: 1800000 # 연결 최대 수명 설정
+    # 기타 JDBC 설정을 추가할 수 있습니다.
+    jpa:
+      hibernate:
+        ddl-auto: none # 자동 테이블 생성 비활성화 (Flyway 또는 Liquibase를 사용할 경우)
+      properties:
+        hibernate:
+          format_sql: false
+          default_batch_fetch_size: 100
+      flyway:
+        enabled: true
+        locations: classpath:db/migration
+        baseline-on-migrate: true
 
 server:
   port: 8080
-  serverAddress: 54.180.200.80
+  serverAddress: ${LIVE_SERVER_IP}
 
 serverName: blue_server
 
@@ -28,10 +49,32 @@ spring:
   config:
     activate:
       on-profile: green
+  datasource:
+    url: jdbc:mysql://${RDS_ENDPOINT}:3306/${RDS_NAME}
+    username: ${RDS_USERNAME}
+    password: ${RDS_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10 # 커넥션 풀 크기 설정 (필요시 조정)
+      connection-timeout: 30000 # 연결 대기 시간 설정
+      idle-timeout: 600000 # 유휴 연결 시간 설정
+      max-lifetime: 1800000 # 연결 최대 수명 설정
+    # 기타 JDBC 설정을 추가할 수 있습니다.
+    jpa:
+      hibernate:
+        ddl-auto: none # 자동 테이블 생성 비활성화 (Flyway 또는 Liquibase를 사용할 경우)
+      properties:
+        hibernate:
+          format_sql: false
+          default_batch_fetch_size: 100
+      flyway:
+        enabled: true
+        locations: classpath:db/migration
+        baseline-on-migrate: true
 
 server:
   port: 8081
-  serverAddress: 54.180.200.80
+  serverAddress: ${LIVE_SERVER_IP}
 
 serverName: green_server
 
