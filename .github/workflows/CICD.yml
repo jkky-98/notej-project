@@ -74,7 +74,18 @@ jobs:
           script_stop: true
           script: |
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/live_server:latest
-            sudo docker-compose -f docker-compose-${{env.TARGET_UPSTREAM}}.yml up -d
+
+            export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            export AWS_REGION=${{ secrets.AWS_REGION }}
+            export S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}
+            export RDS_ENDPOINT=${{ secrets.RDS_ENDPOINT }}
+            export RDS_NAME=${{ secrets.RDS_NAME }}
+            export RDS_PASSWORD=${{ secrets.RDS_PASSWORD }}
+            export RDS_USERNAME=${{ secrets.RDS_USERNAME }}
+            export LIVE_SERVER_IP=${{ secrets.LIVE_SERVER_IP }}
+            
+            sudo docker-compose -f docker-compose-${{env.TARGET_UPSTREAM}}.yml up -d     
       
       - name: Check deploy server URL
         uses: jtalk/url-health-check-action@v3
@@ -104,25 +115,3 @@ jobs:
             sudo docker stop ${{env.CURRENT_UPSTREAM}}
             sudo docker rm ${{env.CURRENT_UPSTREAM}}
             
-      - name: Set S3 Config Environment Variables
-        run: |
-          echo "S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" >> $GITHUB_ENV
-          echo "S3_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
-          echo "S3_SECRET_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-          echo "S3_REGION=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
-
-      - name: Deploy with S3 config
-        uses: appleboy/ssh-action@master
-        with:
-          username: ubuntu
-          host: ${{ secrets.LIVE_SERVER_IP }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script_stop: true
-          script: |
-            # Export S3 settings as environment variables on the EC2 instance
-            echo "export S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" >> ~/.bashrc
-            echo "export S3_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.bashrc
-            echo "export S3_SECRET_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.bashrc
-            echo "export S3_REGION=${{ secrets.AWS_REGION }}" >> ~/.bashrc
-            source ~/.bashrc
-            sudo docker-compose -f docker-compose-${{env.TARGET_UPSTREAM}}.yml up -d
