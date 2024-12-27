@@ -14,4 +14,6 @@ public interface FileStore {
      * @throws IOException 예외 처리
      */
     FileMetadata storeFile(MultipartFile file) throws IOException;
+
+    String getFullPath(String fileName);
 }

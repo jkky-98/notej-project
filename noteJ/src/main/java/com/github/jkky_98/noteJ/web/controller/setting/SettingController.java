@@ -1,6 +1,7 @@
 package com.github.jkky_98.noteJ.web.controller.setting;
 
 import com.github.jkky_98.noteJ.domain.user.User;
+import com.github.jkky_98.noteJ.file.FileStore;
 import com.github.jkky_98.noteJ.file.FileStoreLocal;
 import com.github.jkky_98.noteJ.service.SettingService;
 import com.github.jkky_98.noteJ.web.controller.dto.SettingDto;
@@ -21,7 +22,7 @@ import java.net.MalformedURLException;
 public class SettingController {
 
     private final SettingService settingService;
-    private final FileStoreLocal fileStoreLocal;
+    private final FileStore fileStore;
 
     @GetMapping("/settings")
     public String settings(Model model, HttpSession session) {
@@ -35,11 +36,4 @@ public class SettingController {
         settingService.saveSettings(form, sessionUser);
         return "redirect:/";
     }
-
-    @ResponseBody
-    @GetMapping("/profileimages/{filename}")
-    public Resource downloadImage(@PathVariable String filename) throws MalformedURLException {
-        return new UrlResource("file:" + fileStoreLocal.getFullPath(filename));
-    }
-
 }

@@ -47,6 +47,11 @@ public class FileStoreS3 implements FileStore {
         return fileMetadata;
     }
 
+    @Override
+    public String getFullPath(String fileName) {
+        return "";
+    }
+
     /**
      * S3에 파일을 업로드
      */
