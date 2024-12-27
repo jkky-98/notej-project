@@ -75,17 +75,17 @@ jobs:
           script: |
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/live_server:latest
 
-            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
-            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-            echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
-            echo "S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }}" >> $GITHUB_ENV
-            echo "RDS_ENDPOINT=${{ secrets.RDS_ENDPOINT }}" >> $GITHUB_ENV
-            echo "RDS_NAME=${{ secrets.RDS_NAME }}" >> $GITHUB_ENV
-            echo "RDS_PASSWORD=${{ secrets.RDS_PASSWORD }}" >> $GITHUB_ENV
-            echo "RDS_USERNAME=${{ secrets.RDS_USERNAME }}" >> $GITHUB_ENV
-            echo "LIVE_SERVER_IP=${{ secrets.LIVE_SERVER_IP }}" >> $GITHUB_ENV
-            
-            sudo docker-compose -f docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d    
+            # 환경 변수를 직접 docker-compose 실행 시 전달
+            sudo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+                 AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+                 AWS_REGION=${{ secrets.AWS_REGION }} \
+                 S3_BUCKET_NAME=${{ secrets.S3_BUCKET_NAME }} \
+                 RDS_ENDPOINT=${{ secrets.RDS_ENDPOINT }} \
+                 RDS_NAME=${{ secrets.RDS_NAME }} \
+                 RDS_PASSWORD=${{ secrets.RDS_PASSWORD }} \
+                 RDS_USERNAME=${{ secrets.RDS_USERNAME }} \
+                 LIVE_SERVER_IP=${{ secrets.LIVE_SERVER_IP }} \
+                 docker-compose -f docker-compose-${{ env.TARGET_UPSTREAM }}.yml up -d    
       
       - name: Check deploy server URL
         uses: jtalk/url-health-check-action@v3
