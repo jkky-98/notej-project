@@ -1,6 +1,7 @@
 package com.github.jkky_98.noteJ.web.controller;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +14,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/editor")
+@Profile("local")
 public class FileApiController {
 
     // 파일 업로드 경로

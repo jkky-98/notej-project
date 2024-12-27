@@ -2,7 +2,7 @@ package com.github.jkky_98.noteJ.domain.user;
 
 import com.github.jkky_98.noteJ.domain.FileMetadata;
 import com.github.jkky_98.noteJ.domain.base.BaseTimeEntity;
-import com.github.jkky_98.noteJ.file.FileStore;
+import com.github.jkky_98.noteJ.file.FileStoreLocal;
 import com.github.jkky_98.noteJ.web.controller.form.UserSettingsForm;
 import jakarta.persistence.*;
 import lombok.*;
@@ -52,9 +52,9 @@ public class UserDesc extends BaseTimeEntity {
     @JoinColumn(name = "file_metadata_id")
     private FileMetadata fileMetadata;
 
-    public void updateSetting(UserSettingsForm form, FileStore fileStore) throws IOException {
+    public void updateSetting(UserSettingsForm form, FileStoreLocal fileStoreLocal) throws IOException {
         if (form.getProfilePic() != null) {
-            FileMetadata updateFile = fileStore.storeFile(form.getProfilePic());
+            FileMetadata updateFile = fileStoreLocal.storeFile(form.getProfilePic());
             fileMetadata = updateFile;
             if (updateFile != null) {
                 fileMetadata.updateFileMetadata(updateFile);

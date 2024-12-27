@@ -2,9 +2,8 @@ package com.github.jkky_98.noteJ.service;
 
 import com.github.jkky_98.noteJ.domain.*;
 import com.github.jkky_98.noteJ.domain.user.User;
-import com.github.jkky_98.noteJ.file.FileStore;
+import com.github.jkky_98.noteJ.file.FileStoreLocal;
 import com.github.jkky_98.noteJ.repository.*;
-import com.github.jkky_98.noteJ.web.controller.dto.WriteDto;
 import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +24,7 @@ public class WriteService {
     private final SeriesRepository seriesRepository;
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
-    private final FileStore fileStore;
+    private final FileStoreLocal fileStoreLocal;
 
     public List<String> getWrite(User sessionUser) {
         // 사용자 정보를 조회
@@ -58,7 +56,7 @@ public class WriteService {
         FileMetadata updateFile = null;
 
         if (form.getThumbnail() != null) {
-            updateFile = fileStore.storeFile(form.getThumbnail());
+            updateFile = fileStoreLocal.storeFile(form.getThumbnail());
         }
 
         Series series = seriesRepository.findBySeriesName(form.getSeries()).orElse(null);

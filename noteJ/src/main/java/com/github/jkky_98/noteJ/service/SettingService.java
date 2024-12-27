@@ -2,7 +2,7 @@ package com.github.jkky_98.noteJ.service;
 
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
-import com.github.jkky_98.noteJ.file.FileStore;
+import com.github.jkky_98.noteJ.file.FileStoreLocal;
 import com.github.jkky_98.noteJ.repository.UserRepository;
 import com.github.jkky_98.noteJ.web.controller.dto.SettingDto;
 import com.github.jkky_98.noteJ.web.controller.form.UserSettingsForm;
@@ -19,17 +19,11 @@ import java.util.Optional;
 public class SettingService {
 
     private final UserRepository userRepository;
-    private final FileStore fileStore;
+    private final FileStoreLocal fileStoreLocal;
 
     //toDo: 세션 객체 의존 없애기 컨트롤러에서 처리(어차피 바꿀 인증시스템이므로 의존도를 깊게 내리지 말자)
     @Transactional
-    public Optional<String> saveSettings(UserSettingsForm form, HttpSession session) throws IOException {
-
-        // 세션에서 사용자 정보 가져오기
-        User sessionUser = (User) session.getAttribute("loginUser");
-        if (sessionUser == null) {
-            return Optional.empty();  // 세션에 사용자 정보가 없으면 비어있는 Optional 반환
-        }
+    public Optional<String> saveSettings(UserSettingsForm form, User sessionUser) throws IOException {
 
         // 사용자 정보를 조회
         Optional<User> findSettingUser = userRepository.findById(sessionUser.getId());
@@ -42,7 +36,7 @@ public class SettingService {
         UserDesc userDesc = user.getUserDesc();
 
         //update
-        userDesc.updateSetting(form, fileStore);
+        userDesc.updateSetting(form, fileStoreLocal);
 
         return Optional.of("success");
     }

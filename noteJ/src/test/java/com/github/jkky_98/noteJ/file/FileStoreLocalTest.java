@@ -14,20 +14,20 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-class FileStoreTest {
+class FileStoreLocalTest {
 
     @Value("${file.dir}")
     private String fileDir;
 
     @Autowired
-    private FileStore fileStore;
+    private FileStoreLocal fileStoreLocal;
 
     @Test
     @DisplayName("[FileStore] getFullPath 성공 테스트")
     void getFullPath() {
     	// given
         // when
-        String testPath = fileStore.getFullPath("test");
+        String testPath = fileStoreLocal.getFullPath("test");
 
     	// then
         assertThat(testPath).isEqualTo(fileDir + "test");
@@ -46,7 +46,7 @@ class FileStoreTest {
         );
 
         // when
-        FileMetadata fileMetadata = fileStore.storeFile(mockFile);
+        FileMetadata fileMetadata = fileStoreLocal.storeFile(mockFile);
 
         // then
         assertThat(fileMetadata).isNotNull();
@@ -56,7 +56,7 @@ class FileStoreTest {
         assertThat(fileMetadata.getStoredFileName()).matches("^[a-f0-9\\-]+\\.txt$");
 
         // 파일이 실제로 저장되었는지 확인
-        File storedFile = new File(fileStore.getFullPath(fileMetadata.getStoredFileName()));
+        File storedFile = new File(fileStoreLocal.getFullPath(fileMetadata.getStoredFileName()));
         assertThat(storedFile).exists();
 
         // 저장된 파일 삭제
@@ -75,7 +75,7 @@ class FileStoreTest {
         );
 
         // when
-        FileMetadata fileMetadata = fileStore.storeFile(emptyFile);
+        FileMetadata fileMetadata = fileStoreLocal.storeFile(emptyFile);
 
         // then
         assertThat(fileMetadata).isNull();

@@ -2,7 +2,7 @@ package com.github.jkky_98.noteJ.repository.userdesc;
 import com.github.jkky_98.noteJ.domain.FileMetadata;
 import com.github.jkky_98.noteJ.domain.user.ThemeMode;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
-import com.github.jkky_98.noteJ.file.FileStore;
+import com.github.jkky_98.noteJ.file.FileStoreLocal;
 import com.github.jkky_98.noteJ.web.controller.form.UserSettingsForm;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
 public class UserDescUpdateSettingTest {
 
     private UserDesc userDesc;
-    private FileStore fileStore;
+    private FileStoreLocal fileStoreLocal;
 
     @BeforeEach
     void setup() {
@@ -41,7 +41,7 @@ public class UserDescUpdateSettingTest {
                 .build();
 
         // Mock FileStore
-        fileStore = Mockito.mock(FileStore.class);
+        fileStoreLocal = Mockito.mock(FileStoreLocal.class);
     }
 
     @Test
@@ -52,7 +52,7 @@ public class UserDescUpdateSettingTest {
                 .storedFileName("new-pic.png")
                 .build();
 
-        when(fileStore.storeFile(any())).thenReturn(mockFileMetadata);
+        when(fileStoreLocal.storeFile(any())).thenReturn(mockFileMetadata);
 
         // 준비된 입력 데이터
         UserSettingsForm form = new UserSettingsForm();
@@ -69,7 +69,7 @@ public class UserDescUpdateSettingTest {
         form.setNoteJAlarm(false);
 
         // 메서드 실행
-        userDesc.updateSetting(form, fileStore);
+        userDesc.updateSetting(form, fileStoreLocal);
 
         // 검증
         assertThat(userDesc.getProfilePic()).isEqualTo("new-pic.png");
@@ -85,7 +85,7 @@ public class UserDescUpdateSettingTest {
         assertThat(userDesc.isNoteJAlarm()).isFalse();
 
         // Mock 메서드 호출 검증
-        verify(fileStore, times(1)).storeFile(any());
+        verify(fileStoreLocal, times(1)).storeFile(any());
     }
 
     @Test
@@ -106,7 +106,7 @@ public class UserDescUpdateSettingTest {
         form.setNoteJAlarm(false);
 
         // 메서드 실행
-        userDesc.updateSetting(form, fileStore);
+        userDesc.updateSetting(form, fileStoreLocal);
 
         // 검증
         assertThat(userDesc.getProfilePic()).isEqualTo("old-pic.png");  // 기존 프로필 사진 유지
@@ -122,6 +122,6 @@ public class UserDescUpdateSettingTest {
         assertThat(userDesc.isNoteJAlarm()).isFalse();
 
         // Mock 메서드 호출 검증
-        verify(fileStore, times(0)).storeFile(any());  // 파일 저장 메서드 호출되지 않음
+        verify(fileStoreLocal, times(0)).storeFile(any());  // 파일 저장 메서드 호출되지 않음
     }
 }

@@ -8,7 +8,6 @@ spring:
 
 server:
   env: blue
-
 ---
 
 spring:
