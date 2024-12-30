@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
+@ActiveProfiles("local")
 class FileStoreLocalTest {
 
     @Value("${file.dir}")
@@ -23,7 +25,7 @@ class FileStoreLocalTest {
     private FileStoreLocal fileStoreLocal;
 
     @Test
-    @DisplayName("[FileStore] getFullPath 성공 테스트")
+    @DisplayName("[FileStoreLocal] getFullPath 성공 테스트")
     void getFullPath() {
     	// given
         // when
@@ -35,7 +37,7 @@ class FileStoreLocalTest {
 
 
     @Test
-    @DisplayName("[FileStore] storeFile 성공 테스트")
+    @DisplayName("[FileStoreLocal] storeFile 성공 테스트")
     void storeFileSuccessTest() throws IOException {
         // given
         MockMultipartFile mockFile = new MockMultipartFile(
@@ -64,7 +66,7 @@ class FileStoreLocalTest {
     }
 
     @Test
-    @DisplayName("[FileStore] storeFile 빈 파일 테스트")
+    @DisplayName("[FileStoreLocal] storeFile 빈 파일 테스트")
     void storeFileEmptyFileTest() throws IOException {
         // given
         MockMultipartFile emptyFile = new MockMultipartFile(

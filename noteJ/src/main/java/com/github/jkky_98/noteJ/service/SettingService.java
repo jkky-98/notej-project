@@ -2,7 +2,7 @@ package com.github.jkky_98.noteJ.service;
 
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
-import com.github.jkky_98.noteJ.file.FileStoreLocal;
+import com.github.jkky_98.noteJ.file.FileStore;
 import com.github.jkky_98.noteJ.repository.UserRepository;
 import com.github.jkky_98.noteJ.web.controller.dto.SettingDto;
 import com.github.jkky_98.noteJ.web.controller.form.UserSettingsForm;
@@ -19,7 +19,7 @@ import java.util.Optional;
 public class SettingService {
 
     private final UserRepository userRepository;
-    private final FileStoreLocal fileStoreLocal;
+    private final FileStore fileStore;
 
     //toDo: 세션 객체 의존 없애기 컨트롤러에서 처리(어차피 바꿀 인증시스템이므로 의존도를 깊게 내리지 말자)
     @Transactional
@@ -36,7 +36,7 @@ public class SettingService {
         UserDesc userDesc = user.getUserDesc();
 
         //update
-        userDesc.updateSetting(form, fileStoreLocal);
+        userDesc.updateSetting(form, fileStore);
 
         return Optional.of("success");
     }

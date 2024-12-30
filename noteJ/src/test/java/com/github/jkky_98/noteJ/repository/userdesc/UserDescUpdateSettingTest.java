@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.*;
 
 @DataJpaTest
 @DisplayName("[UserDescRepository] UserDesc updateSetting 테스트")
+@ActiveProfiles("local")
 public class UserDescUpdateSettingTest {
 
     private UserDesc userDesc;
