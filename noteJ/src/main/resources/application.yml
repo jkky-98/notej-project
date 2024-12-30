@@ -15,7 +15,7 @@ spring:
     activate:
       on-profile: blue
   datasource:
-    url: jdbc:mysql://${RDS_ENDPOINT}:3306/${RDS_NAME}
+    url: jdbc:mysql://${RDS_ENDPOINT}:3306/${RDS_NAME}?createDatabaseIfNotExist=true&useSSL=false
     username: ${RDS_USERNAME}
     password: ${RDS_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -25,13 +25,13 @@ spring:
       idle-timeout: 600000 # 유휴 연결 시간 설정
       max-lifetime: 1800000 # 연결 최대 수명 설정
     # 기타 JDBC 설정을 추가할 수 있습니다.
-    jpa:
+  jpa:
+    hibernate:
+      ddl-auto: create # 자동 테이블 생성 비활성화 (Flyway 또는 Liquibase를 사용할 경우)
+    properties:
       hibernate:
-        ddl-auto: create # 자동 테이블 생성 비활성화 (Flyway 또는 Liquibase를 사용할 경우)
-      properties:
-        hibernate:
-          format_sql: true
-          default_batch_fetch_size: 100
+        format_sql: true
+        default_batch_fetch_size: 100
 #      flyway:
 #        enabled: true
 #        locations: classpath:db/migration
@@ -54,7 +54,7 @@ spring:
     activate:
       on-profile: green
   datasource:
-    url: jdbc:mysql://${RDS_ENDPOINT}:3306/${RDS_NAME}
+    url: jdbc:mysql://${RDS_ENDPOINT}:3306/${RDS_NAME}?createDatabaseIfNotExist=true&useSSL=false
     username: ${RDS_USERNAME}
     password: ${RDS_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -64,13 +64,13 @@ spring:
       idle-timeout: 600000 # 유휴 연결 시간 설정
       max-lifetime: 1800000 # 연결 최대 수명 설정
     # 기타 JDBC 설정을 추가할 수 있습니다.
-    jpa:
+  jpa:
+    hibernate:
+      ddl-auto: create # 자동 테이블 생성 비활성화 (Flyway 또는 Liquibase를 사용할 경우)
+    properties:
       hibernate:
-        ddl-auto: create # 자동 테이블 생성 비활성화 (Flyway 또는 Liquibase를 사용할 경우)
-      properties:
-        hibernate:
-          format_sql: true
-          default_batch_fetch_size: 100
+        format_sql: true
+        default_batch_fetch_size: 100
 #      flyway:
 #        enabled: true
 #        locations: classpath:db/migration
