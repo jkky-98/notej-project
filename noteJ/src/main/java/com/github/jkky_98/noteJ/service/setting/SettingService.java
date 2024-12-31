@@ -1,5 +1,7 @@
-package com.github.jkky_98.noteJ.service;
+package com.github.jkky_98.noteJ.service.setting;
 
+import com.amazonaws.services.s3.model.S3Object;
+import com.github.jkky_98.noteJ.domain.FileMetadata;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
 import com.github.jkky_98.noteJ.file.FileStore;
@@ -8,6 +10,8 @@ import com.github.jkky_98.noteJ.web.controller.dto.SettingDto;
 import com.github.jkky_98.noteJ.web.controller.form.UserSettingsForm;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,12 +20,13 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class SettingService {
+@Profile("local")
+@Slf4j
+public class SettingService implements SettingServiceInterface{
 
     private final UserRepository userRepository;
     private final FileStore fileStore;
 
-    //toDo: 세션 객체 의존 없애기 컨트롤러에서 처리(어차피 바꿀 인증시스템이므로 의존도를 깊게 내리지 말자)
     @Transactional
     public Optional<String> saveSettings(UserSettingsForm form, User sessionUser) throws IOException {
 
@@ -35,19 +40,29 @@ public class SettingService {
         User user = findSettingUser.get();
         UserDesc userDesc = user.getUserDesc();
 
-        //update
-        userDesc.updateSetting(form, fileStore);
+        // ProfilePic 저장 FileStore 이용
+        String newProfilePicPath = null;
+
+        if (form.getProfilePic() != null && !form.getProfilePic().isEmpty()) {
+            try {
+                FileMetadata profilePicMetadata = fileStore.storeFile(form.getProfilePic());
+                newProfilePicPath = profilePicMetadata.getStoredFileName();
+            } catch (IOException e) {
+                // 예외 처리: 파일 저장 실패 시 로그 출력 및 적절한 처리
+                log.error("Profile picture in Setting upload failed", e);
+                // 필요 시, 사용자에게 실패 메시지 반환
+            }
+        }
+
+        //엔티티 update
+        userDesc.updateSetting(form, newProfilePicPath);
 
         return Optional.of("success");
     }
 
     @Transactional
-    public SettingDto getUserSettingData(HttpSession session) {
+    public SettingDto getUserSettingData(User sessionUser) {
         SettingDto settingDto = new SettingDto();
-        // 세션에서 "loginUser"로 저장된 User 객체를 가져옵니다.
-        User sessionUser = (User) session.getAttribute("loginUser");
-
-        System.out.println(sessionUser.getUsername());
 
         if (sessionUser != null) {
             // userRepository를 통해 사용자의 정보를 조회합니다.

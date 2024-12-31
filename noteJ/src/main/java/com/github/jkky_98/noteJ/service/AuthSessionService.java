@@ -59,7 +59,6 @@ public class AuthSessionService implements AuthService {
                 .commentAlarm(true)
                 .noteJAlarm(true)
                 .theme(ThemeMode.LIGHT)
-                .profilePic("img/default-profile.png")
                 .fileMetadata(fileMetadata)
                 .build();
 

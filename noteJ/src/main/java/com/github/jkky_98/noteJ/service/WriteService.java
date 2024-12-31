@@ -72,7 +72,7 @@ public class WriteService {
                 .postSummary(form.getPostSummary())
                 .postUrl(form.getUrl())
                 .series(series)
-                .thumbnail(updateFile != null ? updateFile.getStoredFileName() : "/img/default_post.png")
+                .thumbnail(updateFile != null ? updateFile.getStoredFileName() : null)
                 .user(user)
                 .build();
 

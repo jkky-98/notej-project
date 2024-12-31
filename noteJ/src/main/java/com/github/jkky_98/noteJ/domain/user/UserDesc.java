@@ -52,20 +52,12 @@ public class UserDesc extends BaseTimeEntity {
     @JoinColumn(name = "file_metadata_id")
     private FileMetadata fileMetadata;
 
-    public void updateSetting(UserSettingsForm form, FileStore fileStore) throws IOException {
-        if (form.getProfilePic() != null) {
-            FileMetadata updateFile = fileStore.storeFile(form.getProfilePic());
-            fileMetadata = updateFile;
-            if (updateFile != null) {
-                fileMetadata.updateFileMetadata(updateFile);
-                profilePic = fileMetadata.getStoredFileName();
-            }
-        }
-
+    public void updateSetting(UserSettingsForm form, String newProfilePicPath) {
         // 다른 필드 업데이트
         description = form.getDescription();
         blogTitle = form.getBlogTitle();
         theme = ThemeMode.valueOf(form.getTheme());
+        profilePic = newProfilePicPath;
         socialEmail = form.getSocialEmail();
         socialGitHub = form.getSocialGitHub();
         socialFacebook = form.getSocialFacebook();

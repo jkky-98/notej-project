@@ -57,7 +57,7 @@
     </style>
     <div class="profile-container">
         <!-- 프로필 이미지 -->
-        <img th:src="|/profileimages/${profileForm.profilePic}|" alt="Profile Picture" class="profile-avatar" th:field="*{profileForm.profilePic}">
+        <img th:src="|${profileForm.profilePic != null ? '/storage/'+ profileForm.profilePic : '/storage/default/default-profile.png'}|" alt="Profile Picture" class="profile-avatar" th:field="*{profileForm.profilePic}">
 
         <!-- 사용자 이름 -->
         <div class="profile-username" th:text="${profileForm.username}" th:field="*{profileForm.username}">사용자 이름</div>

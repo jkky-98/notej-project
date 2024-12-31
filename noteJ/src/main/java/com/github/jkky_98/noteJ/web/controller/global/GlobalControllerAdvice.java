@@ -54,7 +54,7 @@ public class GlobalControllerAdvice {
         userViewForm.setEmail(fullyInitializedUser.getEmail());
         userViewForm.setProfilePic(userDesc != null && userDesc.getProfilePic() != null
                 ? userDesc.getProfilePic()
-                : "/img/default-profile.png"); // 기본 프로필 이미지
+                : null); // 기본 프로필 이미지
         userViewForm.setUserDesc(userDesc != null && userDesc.getDescription() != null
                 ? userDesc.getDescription()
                 : "No description available"); // 기본 설명

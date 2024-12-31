@@ -2,7 +2,7 @@ spring:
   profiles:
     active: local
     group:
-      local: local, common, secret
+      local: local, common
       blue: blue, common, secret
       green: green, common, secret
 
@@ -31,7 +31,7 @@ spring:
     driver-class-name: org.h2.Driver
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
       default_batch_fetch_size: 100
     properties:
       hibernate:
@@ -45,11 +45,21 @@ logging.level:
   org.hibernate.orm.jdbc.bind: trace #스프링 부트 3.x, hibernate6
 
 file:
-  dir: "/Users/jkky/Documents/private/notej-project/noteJ/src/main/resources/static/profileimages/"
+  dir: "/Users/jkky/Documents/private/noteJ-storage/"
 
 server:
   port: 8080
   serverAddress: localhost
+
+cloud:
+  aws:
+    credentials:
+      access-key: localNoKey
+      secret-key: localSecretNoKey
+    region:
+      static: localNoRegion
+    s3:
+      bucket: localNoBucket
 
 serverName: local_server
 
@@ -113,7 +123,7 @@ spring:
     # 기타 JDBC 설정을 추가할 수 있습니다.
   jpa:
     hibernate:
-      ddl-auto: create # 자동 테이블 생성 비활성화 (Flyway 또는 Liquibase를 사용할 경우)
+      ddl-auto: none # 자동 테이블 생성 비활성화 (Flyway 또는 Liquibase를 사용할 경우)
     properties:
       hibernate:
         format_sql: true

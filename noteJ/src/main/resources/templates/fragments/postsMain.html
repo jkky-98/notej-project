@@ -43,8 +43,7 @@
                                 <!-- 카드 전체를 클릭 가능하게 -->
                                 <a th:href="@{'/@' + ${post.username} + '/post/' + ${post.postUrl}}" class="card posts-style my-5 text-decoration-none">
                                     <!-- 포스트 썸네일 -->
-                                    <img th:src="|/profileimages/${post.thumbnail}|" class="card-img-top thumbnail-posts-img" alt="Thumbnail">
-
+                                    <img th:src="|${post.thumbnail != null ? '/storage/'+ post.thumbnail : '/storage/default/default_post.png'}|" class="card-img-top thumbnail-posts-img" alt="Post Thumbnail" />
                                     <!-- 포스트 제목 -->
                                     <div class="card-body my-2 mx-2">
                                         <h3 class="card-title" th:text="${post.title}">

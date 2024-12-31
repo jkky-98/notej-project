@@ -37,7 +37,6 @@ public class DataInitializer {
                     .commentAlarm(true)
                     .noteJAlarm(true)
                     .theme(ThemeMode.LIGHT)
-                    .profilePic("img/default-profile.png")
                     .fileMetadata(initFileMetadata)
                     .build();
 
@@ -70,7 +69,6 @@ public class DataInitializer {
                     .writable(false)
                     .series(initSeries)
                     .user(initSignUpUser)
-                    .thumbnail("/img/default_post.png")
                     .postUrl("testPost1")
                     .build();
 
@@ -116,7 +114,6 @@ public class DataInitializer {
                     .writable(false)
                     .series(initSeries2)
                     .user(initSignUpUser)
-                    .thumbnail("/img/default_post.png")
                     .postUrl("testPost2")
                     .build();
 

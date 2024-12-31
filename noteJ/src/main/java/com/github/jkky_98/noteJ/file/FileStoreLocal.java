@@ -34,8 +34,15 @@ public class FileStoreLocal implements FileStore{
                 .filePath(fileDir)
                 .fileSize(file.getSize())
                 .build();
-
+        // 파일 저장
         file.transferTo(new File(getFullPath(buildFile.getStoredFileName())));
+
+        // 파일이 저장된 후 경로가 제대로 반영되도록 확인 (캐시 관련 문제 해결)
+        File savedFile = new File(getFullPath(buildFile.getStoredFileName()));
+        if (savedFile.exists()) {
+            // 서버에서 파일을 서빙할 수 있는지 체크
+            System.out.println("File saved: " + savedFile.getAbsolutePath());
+        }
         return buildFile;
     }
 
