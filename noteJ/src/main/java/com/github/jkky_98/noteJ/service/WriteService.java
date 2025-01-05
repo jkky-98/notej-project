@@ -41,9 +41,38 @@ public class WriteService {
         return returnSeriesList;
     }
 
-    private User getSessionUser(User sessionUser) {
-        Optional<User> findUser = userRepository.findById(sessionUser.getId());
-        return findUser.orElse(null);
+    public WriteForm getWriteEdit(User sessionUser, String postTitle) {
+        // sessionUser <-> title 검증
+        User user = userRepository.findById(sessionUser.getId()).orElseThrow(() -> new EntityNotFoundException("User 엔티티 호출 실패"));
+
+        WriteForm writeForm = new WriteForm();
+        Post postEdit = postRepository.findByUserUsernameAndPostUrl(user.getUsername(), postTitle).orElseThrow(() -> new EntityNotFoundException("Post 엔티티 호출 실패"));
+
+        // tag 가져오기
+        writeForm.setTitle(postEdit.getTitle());
+        writeForm.setTags(getTagsStringforForm(postEdit));
+        writeForm.setContent(postEdit.getContent());
+        writeForm.setPostSummary(postEdit.getPostSummary());
+        writeForm.setOpen(postEdit.getWritable());
+        writeForm.setUrl(postEdit.getPostUrl());
+        writeForm.setSeries(postEdit.getSeries().getSeriesName());
+
+        return writeForm;
+    }
+
+    private static String getTagsStringforForm(Post postEdit) {
+        StringBuilder sb = new StringBuilder();
+        int count = 0;
+        for (PostTag postTag : postEdit.getPostTags()) {
+            String tagName = postTag.getTag().getName();
+            if (count != 0) {
+                sb.append(",");
+            }
+            count++;
+            sb.append(tagName);
+        }
+
+        return sb.toString();
     }
 
     @Transactional
@@ -94,6 +123,11 @@ public class WriteService {
 
         postTagRepository.saveAll(postTagsForBulkSave);
 
+    }
+
+    private User getSessionUser(User sessionUser) {
+        Optional<User> findUser = userRepository.findById(sessionUser.getId());
+        return findUser.orElse(null);
     }
 
     private List<Tag> tagProvider(String tags) {
