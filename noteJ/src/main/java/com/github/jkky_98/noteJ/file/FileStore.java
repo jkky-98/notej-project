@@ -1,6 +1,5 @@
 package com.github.jkky_98.noteJ.file;
 
-import com.github.jkky_98.noteJ.domain.FileMetadata;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -13,7 +12,9 @@ public interface FileStore {
      * @return 저장된 파일의 메타데이터
      * @throws IOException 예외 처리
      */
-    FileMetadata storeFile(MultipartFile file) throws IOException;
+    String storeFile(MultipartFile file) throws IOException;
 
     String getFullPath(String fileName);
+
+    String deleteFile(String thumbnailDeleted);
 }

@@ -2,7 +2,6 @@ package com.github.jkky_98.noteJ.service.setting;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3Object;
-import com.github.jkky_98.noteJ.domain.FileMetadata;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
 import com.github.jkky_98.noteJ.file.FileStore;
@@ -54,8 +53,8 @@ public class SettingProdService implements SettingServiceInterface{
 
         if (form.getProfilePic() != null) {
             try {
-                FileMetadata profilePicMetadata = fileStore.storeFile(form.getProfilePic());
-                newProfilePicPath = profilePicMetadata.getFilePath() + profilePicMetadata.getStoredFileName();
+                String profilePicMetadata = fileStore.storeFile(form.getProfilePic());
+                newProfilePicPath = profilePicMetadata;
             } catch (IOException e) {
                 // 예외 처리: 파일 저장 실패 시 로그 출력 및 적절한 처리
                 log.error("Profile picture in Setting upload failed", e);

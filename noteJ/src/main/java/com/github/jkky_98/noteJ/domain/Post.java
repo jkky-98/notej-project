@@ -2,6 +2,7 @@ package com.github.jkky_98.noteJ.domain;
 
 import com.github.jkky_98.noteJ.domain.base.BaseEntity;
 import com.github.jkky_98.noteJ.domain.user.User;
+import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.ArrayList;
@@ -92,4 +93,22 @@ public class Post extends BaseEntity {
         like.updatePost(null); // 연관 관계 해제
     }
 
+    public void updateSeries(Series series) {
+        this.series = series;
+        series.getPosts().add(this);
+    }
+
+    // updateThumbnail 따로 필요
+    // updateSeries 따로 필요
+    public void updatePostWithoutThumbnailAndSeries(WriteForm form) {
+        title = form.getTitle();
+        content = form.getContent();
+        postSummary = form.getPostSummary();
+        postUrl = form.getUrl();
+        writable = form.isOpen();
+    }
+
+    public void updateThumbnail(String storedFileName) {
+        this.thumbnail = storedFileName;
+    }
 }

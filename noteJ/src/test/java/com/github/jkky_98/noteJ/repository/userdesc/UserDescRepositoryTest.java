@@ -1,6 +1,5 @@
 package com.github.jkky_98.noteJ.repository.userdesc;
 
-import com.github.jkky_98.noteJ.domain.FileMetadata;
 import com.github.jkky_98.noteJ.domain.user.ThemeMode;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
 import com.github.jkky_98.noteJ.repository.UserDescRepository;
@@ -128,26 +127,5 @@ public class UserDescRepositoryTest {
         // then
         assertThat(updatedUserDesc.getDescription()).isEqualTo("Updated Description");
         assertThat(updatedUserDesc.getProfilePic()).isEqualTo("updated-pic.png");
-    }
-
-    @Test
-    @DisplayName("[UserDescRepository] UserDesc와 FileMetadata 연관관계 테스트")
-    void userDescFileMetadataRelation() {
-        // given
-        FileMetadata fileMetadata = FileMetadata.builder()
-                .storedFileName("file1.png")
-                .build();
-
-        UserDesc userDesc = UserDesc.builder()
-                .description("With FileMetadata")
-                .fileMetadata(fileMetadata)
-                .build();
-
-        // when
-        UserDesc savedUserDesc = userDescRepository.save(userDesc);
-
-        // then
-        assertThat(savedUserDesc.getFileMetadata()).isNotNull();
-        assertThat(savedUserDesc.getFileMetadata().getStoredFileName()).isEqualTo("file1.png");
     }
 }

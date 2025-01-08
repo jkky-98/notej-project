@@ -26,7 +26,7 @@ public class WriteService {
     private final PostTagRepository postTagRepository;
     private final FileStore fileStore;
 
-    public List<String> getWrite(User sessionUser) {
+    public List<String> getSeriesWithUser(User sessionUser) {
         // 사용자 정보를 조회
         Optional<User> byId = userRepository.findById(getSessionUser(sessionUser).getId());
         User user = byId.orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -82,10 +82,9 @@ public class WriteService {
         Optional<User> byId = userRepository.findById(getSessionUser(sessionUser).getId());
         User user = byId.orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        FileMetadata updateFile = null;
-
+        String storedFileName = null;
         if (form.getThumbnail() != null) {
-            updateFile = fileStore.storeFile(form.getThumbnail());
+            storedFileName = fileStore.storeFile(form.getThumbnail());
         }
 
         Series series = seriesRepository.findBySeriesName(form.getSeries()).orElse(null);
@@ -101,13 +100,18 @@ public class WriteService {
                 .postSummary(form.getPostSummary())
                 .postUrl(form.getUrl())
                 .series(series)
-                .thumbnail(updateFile != null ? updateFile.getStoredFileName() : null)
+                .thumbnail(storedFileName != null ? storedFileName : null)
                 .user(user)
                 .build();
 
         List<Tag> tags = tagProvider(form.getTags());
 
         Post postSaved = postRepository.save(post);
+        setTag(tags, postSaved);
+
+    }
+
+    private void setTag(List<Tag> tags, Post postSaved) {
         List<Tag> tagsSaved = tagRepository.saveAll(tags);
 
         List<PostTag> postTagsForBulkSave = new ArrayList<>();
@@ -122,8 +126,38 @@ public class WriteService {
         }
 
         postTagRepository.saveAll(postTagsForBulkSave);
+    }
+
+    @Transactional
+    public void saveEditWrite(WriteForm form, String title) throws IOException {
+        Post post = postRepository.findByTitle(title).orElseThrow(() -> new EntityNotFoundException("Post 엔티티 존재하지 않음"));
+        post.updatePostWithoutThumbnailAndSeries(form);
+
+        String storedFileName = null;
+        if (form.getThumbnail() != null) {
+            storedFileName = fileStore.storeFile(form.getThumbnail());
+        }
+
+        Series series = seriesRepository.findBySeriesName(form.getSeries()).orElseThrow(() -> new EntityNotFoundException("Series 엔티티 존재하지 않음"));
+        post.updateSeries(series);
+
+        // 기존 Post-PostTag 관계 제거
+        for (PostTag postTag : post.getPostTags()) {
+            postTag.getTag().getPostTags().remove(postTag); // Tag와의 관계 끊기
+        }
+        post.getPostTags().clear(); // Post와의 관계 끊기
+
+        String thumbnailDeleted = post.getThumbnail();
+        fileStore.storeFile(form.getThumbnail()); // 새로운 파일 업로드
+        post.updateThumbnail(storedFileName);
+        fileStore.deleteFile(thumbnailDeleted); // 기존 파일 삭제
+
+        //Tag 업데이트
+        List<Tag> tags = tagProvider(form.getTags());
+        setTag(tags, post);
 
     }
+
 
     private User getSessionUser(User sessionUser) {
         Optional<User> findUser = userRepository.findById(sessionUser.getId());
@@ -157,4 +191,6 @@ public class WriteService {
             form.setUrl(uniqueUrl);
         }
     }
+
+
 }

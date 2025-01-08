@@ -2,12 +2,12 @@ package com.github.jkky_98.noteJ.file;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.github.jkky_98.noteJ.domain.FileMetadata;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
@@ -25,32 +25,36 @@ public class FileStoreS3 implements FileStore {
         this.amazonS3 = amazonS3;
     }
 
-    /**
-     * S3에 파일을 업로드하고, 파일 메타데이터를 반환합니다.
-     */
-    public FileMetadata storeFile(MultipartFile file) throws IOException {
+    @Override
+    public String storeFile(MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             return null;
         }
 
-        // 파일 메타데이터 생성
-        FileMetadata fileMetadata = FileMetadata.builder()
-                .originalFileName(file.getOriginalFilename())
-                .storedFileName(createStoredFileName(file.getOriginalFilename()))
-                .fileType(file.getContentType())
-                .fileSize(file.getSize())
-                .build();
-
+        String storeFileName = createStoredFileName(file.getOriginalFilename());
         // 파일을 S3에 업로드
-        uploadToS3(file, fileMetadata.getStoredFileName());
+        uploadToS3(file, storeFileName);
 
-        return fileMetadata;
+        return storeFileName;
     }
 
     @Override
     public String getFullPath(String fileName) {
         return "";
     }
+
+    @Override
+    public String deleteFile(String thumbnailDeleted) {
+        try {
+            // S3에서 파일 삭제
+            amazonS3.deleteObject(s3BucketName, thumbnailDeleted);
+            return thumbnailDeleted;
+        } catch (Exception e) {
+            // 삭제 실패 시 예외 처리
+            throw new RuntimeException("Failed to delete the file: " + thumbnailDeleted, e);
+        }
+    }
+
 
     /**
      * S3에 파일을 업로드

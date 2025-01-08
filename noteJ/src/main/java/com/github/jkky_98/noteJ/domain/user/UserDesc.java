@@ -1,13 +1,9 @@
 package com.github.jkky_98.noteJ.domain.user;
 
-import com.github.jkky_98.noteJ.domain.FileMetadata;
 import com.github.jkky_98.noteJ.domain.base.BaseTimeEntity;
-import com.github.jkky_98.noteJ.file.FileStore;
 import com.github.jkky_98.noteJ.web.controller.form.UserSettingsForm;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.io.IOException;
 
 @Entity
 @Getter
@@ -48,9 +44,6 @@ public class UserDesc extends BaseTimeEntity {
             mappedBy = "userDesc")
     private User user;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "file_metadata_id")
-    private FileMetadata fileMetadata;
 
     public void updateSetting(UserSettingsForm form, String newProfilePicPath) {
         // 다른 필드 업데이트

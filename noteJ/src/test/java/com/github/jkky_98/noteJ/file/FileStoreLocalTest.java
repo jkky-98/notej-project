@@ -1,6 +1,5 @@
 package com.github.jkky_98.noteJ.file;
 
-import com.github.jkky_98.noteJ.domain.FileMetadata;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,38 +47,16 @@ class FileStoreLocalTest {
         );
 
         // when
-        FileMetadata fileMetadata = fileStoreLocal.storeFile(mockFile);
+        String storedFileName = fileStoreLocal.storeFile(mockFile);
 
         // then
-        assertThat(fileMetadata).isNotNull();
-        assertThat(fileMetadata.getOriginalFileName()).isEqualTo("example.txt");
-        assertThat(fileMetadata.getFileType()).isEqualTo("text/plain");
-        assertThat(fileMetadata.getFileSize()).isEqualTo(mockFile.getSize());
-        assertThat(fileMetadata.getStoredFileName()).matches("^[a-f0-9\\-]+\\.txt$");
+        assertThat(storedFileName).matches("^[a-f0-9\\-]+\\.txt$");
 
         // 파일이 실제로 저장되었는지 확인
-        File storedFile = new File(fileStoreLocal.getFullPath(fileMetadata.getStoredFileName()));
+        File storedFile = new File(fileStoreLocal.getFullPath(storedFileName));
         assertThat(storedFile).exists();
 
         // 저장된 파일 삭제
         storedFile.delete();
-    }
-
-    @Test
-    @DisplayName("[FileStoreLocal] storeFile 빈 파일 테스트")
-    void storeFileEmptyFileTest() throws IOException {
-        // given
-        MockMultipartFile emptyFile = new MockMultipartFile(
-                "file",
-                "",
-                "text/plain",
-                new byte[0]
-        );
-
-        // when
-        FileMetadata fileMetadata = fileStoreLocal.storeFile(emptyFile);
-
-        // then
-        assertThat(fileMetadata).isNull();
     }
 }

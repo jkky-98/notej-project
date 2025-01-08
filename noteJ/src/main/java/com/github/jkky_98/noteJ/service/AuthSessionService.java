@@ -1,6 +1,5 @@
 package com.github.jkky_98.noteJ.service;
 
-import com.github.jkky_98.noteJ.domain.FileMetadata;
 import com.github.jkky_98.noteJ.domain.user.ThemeMode;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
 import com.github.jkky_98.noteJ.web.controller.form.LoginForm;
@@ -50,8 +49,7 @@ public class AuthSessionService implements AuthService {
             return null;
         }
 
-        FileMetadata fileMetadata = FileMetadata.builder()
-                .build();
+
 
         UserDesc userDesc = UserDesc.builder()
                 .blogTitle(signUpForm.getBlogTitle())
@@ -59,7 +57,6 @@ public class AuthSessionService implements AuthService {
                 .commentAlarm(true)
                 .noteJAlarm(true)
                 .theme(ThemeMode.LIGHT)
-                .fileMetadata(fileMetadata)
                 .build();
 
         User signUpUser = User.builder()

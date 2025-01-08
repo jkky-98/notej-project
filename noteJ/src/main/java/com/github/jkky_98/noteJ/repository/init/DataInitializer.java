@@ -28,8 +28,6 @@ public class DataInitializer {
     public void init() {
         // 데이터베이스에 초기 데이터 삽입
         if (userRepository.count() == 0) {
-            FileMetadata initFileMetadata = FileMetadata.builder()
-                    .build();
 
             UserDesc initUserDesc = UserDesc.builder()
                     .blogTitle("TestTitle")
@@ -37,7 +35,6 @@ public class DataInitializer {
                     .commentAlarm(true)
                     .noteJAlarm(true)
                     .theme(ThemeMode.LIGHT)
-                    .fileMetadata(initFileMetadata)
                     .build();
 
             User initSignUpUser = User.builder()

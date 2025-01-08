@@ -35,19 +35,15 @@ public class User extends BaseEntity {
 
     // 연관관계
     @JoinColumn(name = "user_desc_id")
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private UserDesc userDesc;
 
-    public void updateUserDesc(UserDesc userDesc) {
-        this.userDesc = userDesc;
-    }
-
     @Builder.Default
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user")
     private List<Post> posts = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user")
     private List<Series> seriesList = new ArrayList<>();
 
     @Builder.Default
@@ -65,6 +61,10 @@ public class User extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Follow> followerList = new ArrayList<>(); // 나를 팔로우한 사용자들
+
+    public void updateUserDesc(UserDesc userDesc) {
+        this.userDesc = userDesc;
+    }
 
     public void addPost(Post post) {
         this.posts.add(post);
