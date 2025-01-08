@@ -45,7 +45,7 @@ logging.level:
   org.hibernate.orm.jdbc.bind: trace #스프링 부트 3.x, hibernate6
 
 file:
-  dir: "/Users/jkky/Documents/private/noteJ-storage/"
+  dir: ${fileDir:/Users/piehealthcare/Documents/private/noteJ-storage/}
 
 server:
   port: 8080
