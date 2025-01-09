@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <div th:fragment="profile">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css">
     <style>
         .profile-container {
             display: flex;
@@ -54,6 +55,21 @@
         .profile-stats span {
             font-weight: bold;
         }
+
+        .follow-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 14px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .follow-btn:hover {
+            background-color: #0056b3;
+        }
     </style>
     <div class="profile-container">
         <!-- 프로필 이미지 -->
@@ -98,5 +114,26 @@
             <span th:text="'팔로워: ' + ${profileForm.followers}">팔로워: 0</span>
             <span th:text="'팔로잉: ' + ${profileForm.followings}">팔로잉: 0</span>
         </div>
+
+        <!-- 팔로우 버튼 (profileForm.username과 sessionUser.username이 다를 경우에만 표시) -->
+        <div th:if="${sessionUser != null and profileForm.username != sessionUser.username}">
+            <form th:action="@{/follow}" method="post">
+                <input type="hidden" name="targetUsername" th:value="${profileForm.username}">
+                <button type="submit" class="follow-btn" th:text="'팔로우'">팔로우</button>
+            </form>
+        </div>
+
+        <!-- SweetAlert2 JS -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.js"></script>
+
+        <!-- 팔로우 성공(SweetAlert2) -->
+        <script th:if="${followSuccess}" th:inline="javascript">
+            Swal.fire({
+                icon: 'success',
+                title: '팔로우 성공!',
+                text: '이제 해당 사용자를 팔로우하고 있습니다.',
+                confirmButtonText: '확인'
+            });
+        </script>
     </div>
 </div>

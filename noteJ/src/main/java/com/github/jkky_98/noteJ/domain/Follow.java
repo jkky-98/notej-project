@@ -26,4 +26,14 @@ public class Follow extends BaseTimeEntity {
     @JoinColumn(name = "following_id", nullable = false)
     private User following; // 팔로우를 당하는 사용자
 
+    // 팔로우 관계 생성 시에 양방향 연관관계를 설정하는 메서드
+    public void updateFollower(User follower) {
+        this.follower = follower;
+        follower.getFollowingList().add(this);  // 팔로잉 리스트에 추가
+    }
+
+    public void updateFollowing(User following) {
+        this.following = following;
+        following.getFollowerList().add(this);  // 팔로워 리스트에 추가
+    }
 }

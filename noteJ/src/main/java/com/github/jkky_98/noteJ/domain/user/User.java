@@ -76,5 +76,4 @@ public class User extends BaseEntity {
         series.updateUser(this);
     }
 
-
 }
