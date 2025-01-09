@@ -2,6 +2,7 @@ package com.github.jkky_98.noteJ.web.controller;
 
 import com.github.jkky_98.noteJ.domain.Series;
 import com.github.jkky_98.noteJ.domain.user.User;
+import com.github.jkky_98.noteJ.service.FollowService;
 import com.github.jkky_98.noteJ.service.PostsService;
 import com.github.jkky_98.noteJ.service.ProfileService;
 import com.github.jkky_98.noteJ.web.controller.dto.PostDto;
@@ -26,10 +27,12 @@ public class PostsController {
 
     private final ProfileService profileService;
     private final PostsService postsService;
+    private final FollowService followService;
 
     @GetMapping("/@{username}/posts")
     public String posts(@PathVariable("username") String username,
                         @ModelAttribute PostsConditionForm postsConditionForm,
+                        @SessionAttribute ("loginUser") User sessionUser,
                         Model model
                         ) {
 
@@ -37,7 +40,6 @@ public class PostsController {
         model.addAttribute("profileForm", profileForm);
 
         List<PostDto> posts = postsService.getPosts(username, postsConditionForm);
-
         model.addAttribute("posts", posts);
 
         List<TagCountDto> tagAlls = postsService.getAllTag(username);
@@ -45,8 +47,7 @@ public class PostsController {
 
         model.addAttribute("username", username);
 
-        // 현재 활성화된 탭
-        model.addAttribute("activeTab", "posts");
+        model.addAttribute("isFollowing", followService.isFollowing(sessionUser.getUsername(), profileForm.getUsername()));
 
         return "posts";
     }

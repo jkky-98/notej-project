@@ -34,4 +34,23 @@ public class FollowController {
             return "redirect:/";  // Referer가 없으면 기본 페이지로 리다이렉트
         }
     }
+
+    @PostMapping("/unfollow")
+    public String unfollow(@RequestParam String targetUsername,
+                           @SessionAttribute("loginUser") User loginUser,
+                           @RequestHeader(value = "Referer", required = false) String referer,
+                           RedirectAttributes redirectAttributes) {
+        // 언팔로우 처리
+        followService.unfollow(loginUser.getUsername(), targetUsername);
+
+        // 언팔로우 성공 메시지를 플래시 속성에 추가
+        redirectAttributes.addFlashAttribute("unfollowSuccess", true);
+
+        // Referer가 있으면 해당 URL로 리다이렉트, 없으면 기본 페이지로 리다이렉트
+        if (referer != null && !referer.isEmpty()) {
+            return "redirect:" + referer;
+        } else {
+            return "redirect:/";  // Referer가 없으면 기본 페이지로 리다이렉트
+        }
+    }
 }

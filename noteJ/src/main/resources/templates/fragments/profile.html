@@ -70,6 +70,27 @@
         .follow-btn:hover {
             background-color: #0056b3;
         }
+
+        .unfollow-btn {
+            background-color: black; /* 기본 배경색 (검은색) */
+            color: white; /* 기본 텍스트 색상 */
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* 호버 상태 */
+        .unfollow-btn:hover {
+            background-color: red; /* 호버 시 배경색 (빨간색) */
+            color: white;
+        }
+
+        /* 호버 종료 상태 (빨간색 유지) */
+        .unfollow-btn.hover-persistent {
+            background-color: red;
+        }
     </style>
     <div class="profile-container">
         <!-- 프로필 이미지 -->
@@ -115,11 +136,16 @@
             <span th:text="'팔로잉: ' + ${profileForm.followings}">팔로잉: 0</span>
         </div>
 
-        <!-- 팔로우 버튼 (profileForm.username과 sessionUser.username이 다를 경우에만 표시) -->
+        <!-- 팔로우/언팔로우 버튼 -->
         <div th:if="${sessionUser != null and profileForm.username != sessionUser.username}">
-            <form th:action="@{/follow}" method="post">
+            <form th:action="@{/follow}" method="post" th:if="${!isFollowing}">
                 <input type="hidden" name="targetUsername" th:value="${profileForm.username}">
                 <button type="submit" class="follow-btn" th:text="'팔로우'">팔로우</button>
+            </form>
+
+            <form th:action="@{/unfollow}" method="post" th:if="${isFollowing}">
+                <input type="hidden" name="targetUsername" th:value="${profileForm.username}">
+                <button type="submit" class="unfollow-btn" data-default-text="팔로잉" data-hover-text="언팔로우" th:text="'팔로잉'">팔로잉</button>
             </form>
         </div>
 
@@ -135,5 +161,46 @@
                 confirmButtonText: '확인'
             });
         </script>
+
+        <script th:inline="javascript">
+            document.querySelectorAll('.unfollow-btn').forEach(button => {
+                button.addEventListener('click', function (event) {
+                    event.preventDefault(); // 기본 폼 제출 동작 막기
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '언팔로우 하시겠습니까?',
+                        text: '언팔로우하면 더 이상 해당 사용자의 소식을 받지 않습니다.',
+                        showCancelButton: true,
+                        confirmButtonText: '언팔로우',
+                        cancelButtonText: '취소',
+                        reverseButtons: true,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            this.closest('form').submit(); // 확인 버튼 클릭 시 폼 제출
+                        }
+                    });
+                });
+            });
+        </script>
+
+        <script>
+            document.querySelectorAll('.unfollow-btn').forEach(button => {
+                // 기본 텍스트와 호버 텍스트 저장
+                const defaultText = button.dataset.defaultText; // "팔로잉"
+                const hoverText = button.dataset.hoverText;     // "언팔로우"
+
+                // 마우스가 버튼 위로 올라갔을 때
+                button.addEventListener('mouseover', function () {
+                    this.textContent = hoverText; // "언팔로우"
+                });
+
+                // 마우스가 버튼에서 떠났을 때
+                button.addEventListener('mouseout', function () {
+                    this.textContent = hoverText; // "언팔로우" 유지
+                    this.classList.add('hover-persistent'); // 빨간색 배경 유지
+                });
+            });
+        </script>
+
     </div>
 </div>
