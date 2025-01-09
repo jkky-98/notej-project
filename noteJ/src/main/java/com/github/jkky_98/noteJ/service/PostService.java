@@ -43,6 +43,7 @@ public class PostService {
         for (Post post : posts) {
             if (post.getPostUrl().equals(postUrl)) {
                 PostViewDto postViewDto = new PostViewDto();
+                postViewDto.setId(post.getId());
                 postViewDto.setTitle(post.getTitle());
                 postViewDto.setUsername(username);
                 postViewDto.setContent(post.getContent());

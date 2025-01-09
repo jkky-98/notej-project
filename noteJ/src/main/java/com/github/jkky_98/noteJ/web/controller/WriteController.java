@@ -21,14 +21,13 @@ public class WriteController {
     public String write(
             HttpSession session,
             @ModelAttribute WriteForm writeForm,
-            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "id", required = false) Long postId,
             Model model) {
         User sessionUser = (User) session.getAttribute("loginUser");
-
-        if (title == null || title.isEmpty()) {
+        if (postId == null) {
             model.addAttribute("seriesList", writeService.getSeriesWithUser(sessionUser));
         } else {
-            WriteForm writeEditForm = writeService.getWriteEdit(sessionUser, title);
+            WriteForm writeEditForm = writeService.getWriteEdit(sessionUser, postId);
             model.addAttribute("writeForm", writeEditForm);
             model.addAttribute("seriesList", writeService.getSeriesWithUser(sessionUser));
         }
@@ -36,13 +35,14 @@ public class WriteController {
     }
 
     @PostMapping("/write")
-    public String writeSave(@ModelAttribute WriteForm form, HttpSession session, @RequestParam("title") String title) throws IOException {
+    public String writeSave(@ModelAttribute WriteForm form, HttpSession session, @RequestParam(value = "id" , required = false) Long postId) throws IOException {
         User sessionUser = (User) session.getAttribute("loginUser");
-
-        if (!title.isEmpty()) {
+        System.out.println("fasdgasdgas");
+        System.out.println(postId);
+        if (postId == null) {
             writeService.saveWrite(form, sessionUser, false);
         } else {
-            writeService.saveEditWrite(form, title);
+            writeService.saveEditWrite(form, postId);
         }
         return "redirect:/";
     }

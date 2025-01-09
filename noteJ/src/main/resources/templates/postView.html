@@ -110,7 +110,7 @@
 
             <div class="bookmark" th:if="${sessionUser != null and sessionUser.username == postViewDto.username}">
                 <a th:href="@{${currentUrl} + '/stats'}" class="btn btn-link">통계</a> |
-                <a th:href="@{'/write?title=' + ${postViewDto.title}}" class="btn btn-link">수정</a> |
+                <a th:href="@{'/write?id=' + ${postViewDto.id}}" class="btn btn-link">수정</a> |
                 <a th:href="@{${currentUrl} + '/delete'}" class="btn btn-link"
                    onclick="return confirm('삭제하시겠습니까?')">삭제</a>
             </div>

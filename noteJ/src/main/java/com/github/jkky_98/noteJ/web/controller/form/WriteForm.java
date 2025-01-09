@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class WriteForm {
+    private Long id;
     private String title;
     private String tags;
     private String content;

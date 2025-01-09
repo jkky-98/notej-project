@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 public class PostViewDto {
 
+    private Long id;
     private String title;
     private String username;
     private LocalDateTime createByDt;
