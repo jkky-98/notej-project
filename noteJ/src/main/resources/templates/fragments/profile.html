@@ -196,8 +196,7 @@
 
                 // 마우스가 버튼에서 떠났을 때
                 button.addEventListener('mouseout', function () {
-                    this.textContent = hoverText; // "언팔로우" 유지
-                    this.classList.add('hover-persistent'); // 빨간색 배경 유지
+                    this.textContent = defaultText; // "팔로잉"으로 복구
                 });
             });
         </script>
