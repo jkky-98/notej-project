@@ -32,7 +32,7 @@ public class PostsController {
     @GetMapping("/@{username}/posts")
     public String posts(@PathVariable("username") String username,
                         @ModelAttribute PostsConditionForm postsConditionForm,
-                        @SessionAttribute ("loginUser") User sessionUser,
+                        @SessionAttribute (name = "loginUser", required = false) User sessionUser,
                         Model model
                         ) {
 
@@ -47,7 +47,9 @@ public class PostsController {
 
         model.addAttribute("username", username);
 
-        model.addAttribute("isFollowing", followService.isFollowing(sessionUser.getUsername(), profileForm.getUsername()));
+        // sessionUser가 null이면 isFollowing은 false, 아니면 followService 호출
+        boolean isFollowing = sessionUser != null && followService.isFollowing(sessionUser.getUsername(), profileForm.getUsername());
+        model.addAttribute("isFollowing", isFollowing);
 
         return "posts";
     }

@@ -5,11 +5,13 @@ import com.github.jkky_98.noteJ.web.controller.form.SignUpForm;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.service.AuthService;
 import com.github.jkky_98.noteJ.web.session.SessionConst;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -25,14 +27,27 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/login")
-    public String loginForm(@ModelAttribute("loginForm") LoginForm form) {
+    public String loginForm(@RequestHeader(value = "Referer", required = false) String referer,
+                            @ModelAttribute("loginForm") LoginForm form,
+                            Model model) {
+
+        // Referer를 통해 로그인 폼을 요청한 페이지가 있으면 그 페이지로 리다이렉트할 수 있도록 처리
+        String redirectURL = "/";
+        if (referer != null) {
+            // `Referer`가 존재하면 그것을 사용
+            redirectURL = referer;
+        }
+
+        // 로그인 폼에서 사용할 `redirectURL`을 모델에 추가
+        model.addAttribute("redirectURL", redirectURL);
+
         return "auth/loginForm";
     }
 
     @PostMapping("/login")
     public String loginForm(@Validated @ModelAttribute("loginForm") LoginForm form,
                             BindingResult bindingResult,
-                            @RequestHeader(value = "Referer", required = false) String referer,
+                            @RequestParam String redirectURL,
                             HttpSession session) {
 
         // 유효성 검사 오류가 있으면 로그인 폼으로
@@ -48,7 +63,7 @@ public class AuthController {
             session.setAttribute(SessionConst.LOGIN_USER, loginUser);
 
             // Referer가 존재하면 해당 URL로 리다이렉트, 없으면 기본 페이지로 리다이렉트
-            return "redirect:" + (referer != null ? referer : "/");
+            return "redirect:" + redirectURL;
 
         } catch (AuthenticationException e) {
             // 로그인 실패 시 BindingResult에 에러 메시지 추가
