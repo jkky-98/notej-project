@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:insert="~{fragments/header :: header}"></div>
+<body>
+<!-- Include the navigation fragment -->
+<div th:insert="~{fragments/header :: navigation}"></div>
+<div class="container mt-4">
+  <!-- 알림 필터링 버튼들 -->
+  <div class="d-flex justify-content-between mb-3">
+    <div>
+      <!-- 전체, 읽지 않음 버튼 -->
+      <button class="btn btn-secondary" id="allNotificationsBtn">전체</button>
+      <button class="btn btn-secondary" id="unreadNotificationsBtn">읽지 않음</button>
+    </div>
+    <div>
+      <!-- 모두 읽음, 모두 삭제 버튼 -->
+      <button class="btn btn-success" id="markAllAsReadBtn">모두 읽음</button>
+      <button class="btn btn-danger" id="deleteAllBtn">모두 삭제</button>
+    </div>
+  </div>
+
+  <!-- 알림 리스트 -->
+  <div class="list-group">
+    <!-- 리스트 항목 -->
+    <div th:each="notification : ${notifications}" class="list-group-item d-flex justify-content-between align-items-center"
+         th:class="${notification.status ? 'bg-light' : 'bg-white'}">
+      <div>
+        <strong th:text="${notification.getMessage()}"></strong>
+        <p class="mb-0" th:text="${notification.getCreateTime()}"></p> <!-- 알림 시간 -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--<script>-->
+<!--  // 알림 필터링 (전체/읽지 않음)-->
+<!--  document.getElementById('allNotificationsBtn').addEventListener('click', function() {-->
+<!--    // 전체 알림 표시 로직-->
+<!--    window.location.href = '/notifications'; // 전체 알림을 다시 로드-->
+<!--  });-->
+
+<!--  document.getElementById('unreadNotificationsBtn').addEventListener('click', function() {-->
+<!--    // 읽지 않은 알림만 표시하는 로직-->
+<!--    window.location.href = '/notifications?status=false'; // 읽지 않은 알림만 로드-->
+<!--  });-->
+
+<!--  // 모두 읽음-->
+<!--  document.getElementById('markAllAsReadBtn').addEventListener('click', function() {-->
+<!--    // 모두 읽음 처리 로직-->
+<!--    fetch('/notifications/markAllAsRead', { method: 'POST' })-->
+<!--            .then(response => response.json())-->
+<!--            .then(data => location.reload()); // 성공 후 새로고침-->
+<!--  });-->
+
+<!--  // 모두 삭제-->
+<!--  document.getElementById('deleteAllBtn').addEventListener('click', function() {-->
+<!--    // 모두 삭제 처리 로직-->
+<!--    fetch('/notifications/deleteAll', { method: 'POST' })-->
+<!--            .then(response => response.json())-->
+<!--            .then(data => location.reload()); // 성공 후 새로고침-->
+<!--  });-->
+
+<!--  // 개별 알림 읽음 처리-->
+<!--  function markAsRead(notificationId) {-->
+<!--    fetch(`/notifications/markAsRead/${notificationId}`, { method: 'POST' })-->
+<!--            .then(response => response.json())-->
+<!--            .then(data => location.reload()); // 성공 후 새로고침-->
+<!--  }-->
+
+<!--  // 개별 알림 삭제 처리-->
+<!--  function deleteNotification(notificationId) {-->
+<!--    fetch(`/notifications/delete/${notificationId}`, { method: 'POST' })-->
+<!--            .then(response => response.json())-->
+<!--            .then(data => location.reload()); // 성공 후 새로고침-->
+<!--  }-->
+<!--</script>-->
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

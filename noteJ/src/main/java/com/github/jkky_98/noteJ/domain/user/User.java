@@ -47,6 +47,10 @@ public class User extends BaseEntity {
     private List<Series> seriesList = new ArrayList<>();
 
     @Builder.Default
+    @OneToMany(mappedBy = "user")
+    private List<Notification> receivedNotifications = new ArrayList<>();
+
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Like> likes = new ArrayList<>();
 
@@ -62,6 +66,10 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Follow> followerList = new ArrayList<>(); // 나를 팔로우한 사용자들
 
+    @Builder.Default
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> sentNotifications = new ArrayList<>();
+
     public void updateUserDesc(UserDesc userDesc) {
         this.userDesc = userDesc;
     }
@@ -74,6 +82,22 @@ public class User extends BaseEntity {
     public void addSeries(Series series) {
         this.seriesList.add(series);
         series.updateUser(this);
+    }
+
+    // 연관관계 설정 메서드 (User가 Notification을 수신하는 경우)
+    public void addReceivedNotification(Notification notification) {
+        this.receivedNotifications.add(notification);
+        if (notification.getUser() != this) {
+            notification.updateUser(this);  // 수신자 설정
+        }
+    }
+
+    // 연관관계 설정 메서드 (User가 Notification을 발송하는 경우)
+    public void addSentNotification(Notification notification) {
+        this.sentNotifications.add(notification);
+        if (notification.getSender() != this) {
+            notification.updateUser(this);  // 발송자 설정
+        }
     }
 
 }

@@ -87,23 +87,4 @@ public class PostsController {
         Series series = postsService.saveSeries(sessionUser, seriesName);
         return "redirect:/";
     }
-
-    @GetMapping("/@{username}/posts/desc")
-    public String postsDesc(@PathVariable("username") String username, Model model, HttpServletRequest request) {
-
-        ProfileForm profileForm = profileService.getProfile(username);
-        model.addAttribute("profileForm", profileForm);
-
-        model.addAttribute("username", username);
-
-        model.addAttribute("currentUri", request.getRequestURI());
-
-        // 현재 활성화된 탭
-        model.addAttribute("activeTab", "posts");
-
-        // 검색어 초기값 (없을 시 빈 값)
-        model.addAttribute("searchQuery", "");
-
-        return "postsDesc";
-    }
 }

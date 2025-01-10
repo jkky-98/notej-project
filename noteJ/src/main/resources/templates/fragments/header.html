@@ -81,7 +81,12 @@
                     <a class="nav-link" href="/write">새 글 작성</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/notifications">알림</a>
+                    <a class="nav-link" href="/notifications">
+                        알림
+                        <span th:if="${notificationCountNotRead > 0}"
+                              class="badge badge-danger"
+                              th:text="${notificationCountNotRead}" style="background-color: red; color: white; font-size: 1rem; padding: 0.25rem 0.5rem;"></span>
+                    </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/search">검색</a>

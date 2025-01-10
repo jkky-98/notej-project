@@ -3,6 +3,8 @@ package com.github.jkky_98.noteJ.web.controller.global;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
 import com.github.jkky_98.noteJ.repository.UserRepository;
+import com.github.jkky_98.noteJ.service.NotificationService;
+import com.github.jkky_98.noteJ.web.controller.dto.NotificationDto;
 import com.github.jkky_98.noteJ.web.controller.form.UserViewForm;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -11,11 +13,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+import java.util.List;
+
 @ControllerAdvice
 @RequiredArgsConstructor
 public class GlobalControllerAdvice {
 
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @ModelAttribute("currentUrl")
     public String currentUrl(HttpServletRequest request) {
@@ -40,9 +45,11 @@ public class GlobalControllerAdvice {
 
         // UserViewForm에 데이터 매핑
         UserViewForm userViewForm = getUserViewForm(fullyInitializedUser);
-
-        // 모델에 추가
         model.addAttribute("sessionUser", userViewForm);
+
+        // 알림 수 가져오기
+        Long notificationCountNotRead = notificationService.getNotificationCountNotRead(sessionUser);
+        model.addAttribute("notificationCountNotRead", notificationCountNotRead);
     }
 
     private static UserViewForm getUserViewForm(User fullyInitializedUser) {

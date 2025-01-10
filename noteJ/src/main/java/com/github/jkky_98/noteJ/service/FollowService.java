@@ -15,6 +15,7 @@ public class FollowService {
     
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public void follow(String sessionUsername, String getFollwingUsername) {
@@ -24,6 +25,8 @@ public class FollowService {
         Follow follow = validFollowUser(userFollowing, userGetFollowing);
         // 저장
         followRepository.save(follow);
+        // 상대방에 팔로우 알림 보내기
+        notificationService.sendFollowNotification(userGetFollowing, userFollowing);
     }
 
     private Follow validFollowUser(User userFollowing, User userGetFollowing) {
