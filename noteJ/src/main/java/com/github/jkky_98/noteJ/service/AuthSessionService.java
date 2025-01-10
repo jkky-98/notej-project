@@ -9,8 +9,10 @@ import com.github.jkky_98.noteJ.domain.user.UserRole;
 import com.github.jkky_98.noteJ.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
+
+import javax.naming.AuthenticationException;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +27,7 @@ public class AuthSessionService implements AuthService {
     }
 
     @Override
-    public User login(LoginForm form, BindingResult bindingResult) {
+    public User login(LoginForm form) throws AuthenticationException {
         String loginId = form.getUsername();
         String loginPassword = form.getPassword();
 
@@ -34,23 +36,26 @@ public class AuthSessionService implements AuthService {
                 .orElse(null);
 
         if (loginUser == null) {
-            bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
+            throw new AuthenticationException("아이디 또는 비밀번호가 맞지 않습니다.");
         }
 
         return loginUser;
     }
 
     @Override
-    public User signUp(SignUpForm signUpForm, BindingResult bindingResult) {
-        validSignUpForm(signUpForm, bindingResult);
+    public User signUp(SignUpForm signUpForm) {
+        // 중복 검증
+        validSignUpForm(signUpForm);
 
-        // 중복이 있으면 바로 반환하여 처리를 중단
-        if (bindingResult.hasErrors()) {
-            return null;
-        }
+        /**
+         * User, UserDesc 구축
+         */
+        User signUpUser = initializeUser(signUpForm);
 
+        return userRepository.save(signUpUser);
+    }
 
-
+    private static User initializeUser(SignUpForm signUpForm) {
         UserDesc userDesc = UserDesc.builder()
                 .blogTitle(signUpForm.getBlogTitle())
                 .socialEmail(signUpForm.getEmail())
@@ -66,19 +71,18 @@ public class AuthSessionService implements AuthService {
                 .userRole(UserRole.USER)
                 .userDesc(userDesc)
                 .build();
-
-        return userRepository.save(signUpUser);
+        return signUpUser;
     }
 
-    private void validSignUpForm(SignUpForm signUpForm, BindingResult bindingResult) {
+    private void validSignUpForm(SignUpForm signUpForm) {
         // 중복 체크: username
         if (userRepository.findByUsername(signUpForm.getUsername()).isPresent()) {
-            bindingResult.rejectValue("username", "error.username", "Username already exists.");
+            throw new DataIntegrityViolationException("Username already exists.");
         }
 
         // 중복 체크: email
         if (userRepository.findByEmail(signUpForm.getEmail()).isPresent()) {
-            bindingResult.rejectValue("email", "error.email", "Email already exists.");
+            throw new DataIntegrityViolationException("Email already exists.");
         }
     }
 }
