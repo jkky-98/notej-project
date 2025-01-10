@@ -21,7 +21,7 @@ public class UserDescRepositoryTest {
 
     @Test
     @DisplayName("[UserDescRepository] UserDesc 저장 테스트")
-    void saveUserDesc() {
+    void testSaveUserDesc() {
         // given
         UserDesc userDesc = UserDesc.builder()
                 .description("Test Description")
@@ -48,7 +48,7 @@ public class UserDescRepositoryTest {
 
     @Test
     @DisplayName("[UserDescRepository] UserDesc 조회 테스트")
-    void findUserDescById() {
+    void testFindUserDescById() {
         // given
         UserDesc userDesc = UserDesc.builder()
                 .description("Another Description")
@@ -69,7 +69,7 @@ public class UserDescRepositoryTest {
 
     @Test
     @DisplayName("[UserDescRepository] UserDesc 삭제 테스트")
-    void deleteUserDesc() {
+    void testDeleteUserDesc() {
         // given
         UserDesc userDesc = UserDesc.builder()
                 .description("Delete Test")
@@ -87,7 +87,7 @@ public class UserDescRepositoryTest {
 
     @Test
     @DisplayName("[UserDescRepository] UserDesc 리스트 조회 테스트")
-    void findAllUserDescs() {
+    void testFindAllUserDescs() {
         // given
         UserDesc userDesc1 = UserDesc.builder()
                 .description("First Description")
@@ -109,7 +109,7 @@ public class UserDescRepositoryTest {
 
     @Test
     @DisplayName("[UserDescRepository] UserDesc 업데이트 테스트")
-    void updateUserDesc() {
+    void testUpdateUserDesc() {
         // given
         UserDesc userDesc = UserDesc.builder()
                 .description("Original Description")

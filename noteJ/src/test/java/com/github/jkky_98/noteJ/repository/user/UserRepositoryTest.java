@@ -35,8 +35,6 @@ public class UserRepositoryTest {
     @Autowired
     EntityManager em;
 
-
-
     @Autowired
     UserRepository userRepository;
 
@@ -58,8 +56,8 @@ public class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("[UserRepository] 유저 엔티티 영속성 컨텍스트 persist 성공 시나리오 테스트")
-    void saveUserTest() {
+    @DisplayName("[UserRepository] User 엔티티 영속성 컨텍스트 persist 성공 시나리오 테스트")
+    void testSaveUser() {
     	// given
         User testUser = User.builder()
                 .username("tester1")
@@ -69,14 +67,13 @@ public class UserRepositoryTest {
                 .build();
         // when
         User saveUser = userRepository.save(testUser);
-
         // then
         assertThat(saveUser).isEqualTo(testUser);
     }
 
     @Test
-    @DisplayName("[UserRepository] 유저 엔티티 findById 성공 시나리오 테스트")
-    void findByIdTest() {
+    @DisplayName("[UserRepository] User 엔티티 findById 성공 시나리오 테스트")
+    void testFindById() {
     	// given
         User testUser = User.builder()
                 .username("tester1")
@@ -93,7 +90,7 @@ public class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("[UserRepository] 유저 엔티티 이메일 형식 실패 시나리오 테스트")
+    @DisplayName("[UserRepository] User와 UserDesc 연관관계 매핑 테스트")
     public void testUserAndUserDescRelationship() {
         // Given
         UserDesc userDesc = UserDesc.builder()
@@ -154,8 +151,8 @@ public class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("[UserRepository] 사용자 전체 조회 테스트")
-    public void testFindAll() {
+    @DisplayName("[UserRepository] User 전체 조회 테스트")
+    public void testFindUserAll() {
         // Given
         User user1 = User.builder()
                 .username("user1")
@@ -185,8 +182,8 @@ public class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("[UserRepository] 사용자 삭제 테스트")
-    public void testDelete() {
+    @DisplayName("[UserRepository] User 삭제 테스트")
+    public void testDeleteUserOne() {
         // Given
         User user = User.builder()
                 .username("testuser")
@@ -206,7 +203,7 @@ public class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("[UserRepository] 사용자 존재 여부 확인 테스트")
+    @DisplayName("[UserRepository] User 저장 후 존재 여부 확인 테스트")
     public void testExistsById() {
         // Given
         User user = User.builder()
@@ -226,8 +223,8 @@ public class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("[UserRepository] 사용자 수 조회 테스트")
-    public void testCount() {
+    @DisplayName("[UserRepository] User 수 조회 테스트")
+    public void testCountUser() {
         // Given
         User user1 = User.builder()
                 .username("user1")
@@ -255,7 +252,7 @@ public class UserRepositoryTest {
 
     @Test
     @DisplayName("[UserRepository] findByUsername 메서드 테스트")
-    void findByUsernameTest() {
+    void testFindByUsername() {
         // given
         User user = User.builder()
                 .username("testuser")
@@ -276,7 +273,7 @@ public class UserRepositoryTest {
 
     @Test
     @DisplayName("[UserRepository] findByEmail 메서드 테스트")
-    void findByEmailTest() {
+    void testFindByEmail() {
         // given
         User user = User.builder()
                 .username("anotheruser")
@@ -296,8 +293,8 @@ public class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("[UserRepository] findByUsername 없는 경우 테스트")
-    void findByUsernameNotFoundTest() {
+    @DisplayName("[UserRepository] findByUsername: User 없는 경우 테스트")
+    void testFindByUsernameNotFound() {
         // when
         Optional<User> result = userRepository.findByUsername("nonexistentuser");
 
@@ -306,8 +303,8 @@ public class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("[UserRepository] findByEmail 없는 경우 테스트")
-    void findByEmailNotFoundTest() {
+    @DisplayName("[UserRepository] findByEmail: Email 없는 경우 테스트")
+    void testFindByEmailNotFound() {
         // when
         Optional<User> result = userRepository.findByEmail("nonexistent@example.com");
 
