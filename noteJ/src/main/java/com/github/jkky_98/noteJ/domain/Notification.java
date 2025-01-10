@@ -36,4 +36,12 @@ public class Notification extends BaseEntity {
     public void updateUser(User user) {
         this.user = user;
     }
+
+    public void readNotification() {
+        if (!status) {
+            this.status = true;
+        } else {
+            throw new IllegalStateException("이미 읽은 Notification을 읽음 처리하려고 하고 있습니다.");
+        }
+    }
 }
