@@ -31,6 +31,11 @@ public class PostService {
     private final UserRepository userRepository;
 
     @Transactional
+    public Post findById(Long postId) {
+        return postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Post not found"));
+    }
+
+    @Transactional
     public PostViewDto getPost(String username, String postUrl, HttpServletRequest request) {
 
         // 포스트 조회수 증가 로직

@@ -115,7 +115,7 @@
                             <!-- 썸네일 업로드 -->
                             <div class="mb-3">
                                 <label for="thumbnail" class="form-label">썸네일 업로드</label>
-                                <input type="file" class="form-control" th:field="*{thumbnail}">
+                                <input type="file" class="form-control" id="thumbnail" th:field="*{thumbnail}">
                             </div>
                             <!-- 간략한 소개 -->
                             <textarea th:field="*{postSummary}" class="form-control" rows="4" placeholder="당신의 포스트를 짧게 소개해보세요."></textarea>
@@ -146,8 +146,8 @@
                             <div class="mb-3">
                                 <label for="url" class="form-label">URL 설정</label>
                                 <div class="input-group">
-                                    <span class="input-group-text" th:text="|@${sessionUser.username}|">@aal2525/</span>
-                                    <input type="text" class="form-control" th:field="*{url}" placeholder="포스트 URL을 입력하세요.">
+                                    <span class="input-group-text" th:text="직접입력">@aal2525/</span>
+                                    <input type="text" class="form-control" id="url" th:field="*{url}" placeholder="포스트 URL을 입력하세요.">
                                 </div>
                             </div>
                             <!-- 시리즈 설정 -->
@@ -158,7 +158,7 @@
                                     <select class="form-select" id="seriesNameList" th:field="*{series}">
                                         <option value="" disabled selected>시리즈 선택</option>
                                         <!-- 시리즈 리스트를 반복해서 옵션 생성 -->
-                                        <option th:each="series : ${seriesList}" th:value="${series}" th:text="${series}"></option>
+                                        <option th:each="series : *{seriesList}" th:value="${series}" th:text="${series}"></option>
                                     </select>
                                 </div>
                             </div>

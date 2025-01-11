@@ -3,6 +3,9 @@ package com.github.jkky_98.noteJ.web.controller.form;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 public class WriteForm {
     private Long id;
@@ -14,4 +17,5 @@ public class WriteForm {
     private boolean open;
     private String url;
     private String series;
+    private List<String> seriesList = new ArrayList<>();
 }
