@@ -18,7 +18,6 @@ public class PostHitsService {
     private final PostHitsRepository postHitsRepository;
     private final PostService postService;
 
-
     @Transactional
     public void increamentPostView(String usernamePost, String postUrl, Optional<User> sessionUser, String clientIp) {
 
