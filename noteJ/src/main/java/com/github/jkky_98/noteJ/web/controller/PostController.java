@@ -2,8 +2,10 @@ package com.github.jkky_98.noteJ.web.controller;
 
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.service.CommentService;
+import com.github.jkky_98.noteJ.service.PostHitsService;
 import com.github.jkky_98.noteJ.service.PostService;
 import com.github.jkky_98.noteJ.service.PostStatsService;
+import com.github.jkky_98.noteJ.web.controller.dto.PostHitsDto;
 import com.github.jkky_98.noteJ.web.controller.dto.PostStatsDto;
 import com.github.jkky_98.noteJ.web.controller.dto.PostViewDto;
 import com.github.jkky_98.noteJ.web.controller.form.CommentForm;
@@ -15,6 +17,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 
 @Controller
 @RequiredArgsConstructor
@@ -22,7 +26,7 @@ public class PostController {
 
     private final PostService postService;
     private final PostStatsService postStatsService;
-    private final CommentService commentService;
+    private final PostHitsService postHitsService;
 
     @GetMapping("/@{username}/post/{postUrl}")
     public String getPost(
@@ -30,47 +34,11 @@ public class PostController {
             @PathVariable("postUrl") String postUrl,
             @ModelAttribute("commentForm") CommentForm commentForm,
             Model model,
-            HttpServletRequest request
+            @SessionAttribute(value = "loginUser", required = false) User sessionUser,
+            @RequestHeader(value = "X-Forwarded-For", required = false) String xForwardedForHeader
     ) {
-        // 에러 메시지를 모델에 추가
-
-        PostViewDto postViewDto = postService.getPost(username, postUrl, request);
-
-        model.addAttribute("postViewDto", postViewDto);
+        model.addAttribute("postViewDto", postService.getPost(username, postUrl, Optional.ofNullable(sessionUser)), getClientIp(xForwardedForHeader));
         return "postView";
-    }
-
-    @PostMapping("/@{username}/post/{postUrl}")
-    public String writeComment(
-            @PathVariable("username") String username,
-            @PathVariable("postUrl") String postUrl,
-            @SessionAttribute("loginUser") User sessionUser,
-            @Validated @ModelAttribute("commentForm") CommentForm commentForm,
-            BindingResult bindingResult,
-            HttpServletRequest request,
-            Model model
-    ) {
-
-        if (bindingResult.hasErrors()) {
-            System.out.println("검증 오류 발생:");
-            PostViewDto postViewDto = postService.getPost(username, postUrl, request);
-
-            model.addAttribute("postViewDto", postViewDto);
-            return "postView";
-        }
-
-        String referer = request.getHeader("Referer");
-
-        // 쿼리 파라미터 제거 로직
-        if (referer != null) {
-            int queryIndex = referer.indexOf("?");
-            if (queryIndex != -1) {
-                referer = referer.substring(0, queryIndex); // 쿼리 파라미터 제거
-            }
-        }
-
-        commentService.saveComment(commentForm, sessionUser, postUrl, username);
-        return "redirect:" + (referer != null ? referer : "/");
     }
 
 
@@ -83,5 +51,14 @@ public class PostController {
         PostStatsDto postStatsDto = postStatsService.getPostStats(postUrl, sessionUser);
         model.addAttribute("postStats", postStatsDto);
         return "postStats";
+    }
+
+    private String getClientIp(String xForwardedForHeader) {
+        if (xForwardedForHeader == null || xForwardedForHeader.isEmpty()) {
+            return "noIP"; // IP 헤더가 없으면 처리
+        }
+        // X-Forwarded-For 헤더는 IP 목록이 있을 수 있으므로, 첫 번째 IP를 가져옴
+        String[] ipAddresses = xForwardedForHeader.split(",");
+        return ipAddresses[0].trim(); // 첫 번째 IP 반환
     }
 }

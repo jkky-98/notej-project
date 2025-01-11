@@ -4,39 +4,46 @@ import com.github.jkky_98.noteJ.domain.Post;
 import com.github.jkky_98.noteJ.domain.PostHits;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.PostHitsRepository;
-import com.github.jkky_98.noteJ.repository.PostRepository;
-import com.github.jkky_98.noteJ.repository.UserRepository;
-import com.github.jkky_98.noteJ.web.ClientUtils;
-import com.github.jkky_98.noteJ.web.controller.dto.PostHitsDto;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class PostHitsService {
 
     private final PostHitsRepository postHitsRepository;
-    private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final PostService postService;
+
 
     @Transactional
-    public void increamentPostView(PostHitsDto dto, HttpServletRequest request) {
+    public void increamentPostView(String usernamePost, String postUrl, Optional<User> sessionUser, String clientIp) {
 
-        String ipAddress = ClientUtils.getRemoteIP(request);
+        Post postFind = postService.findByUserUsernameAndPostUrl(usernamePost, postUrl);
 
-        Post post = postRepository.findByUserUsernameAndPostUrl(dto.getUsername(), dto.getPostUrl()).orElseThrow(() -> new EntityNotFoundException("not found Post"));
-        User user = userRepository.findByUsername(dto.getUsername()).orElseThrow(() -> new EntityNotFoundException("not found User"));
+        sessionUser.ifPresentOrElse(
+                user -> {
+                    // 세션에 로그인된 사용자가 있고, 그 사용자가 요청한 게시글의 작성자와 같지 않으면 조회수 증가
+                    if (!user.getUsername().equals(usernamePost)) {
+                        savePostHit(user, postFind, clientIp);
+                    }
+                },
+                () -> {
+                    // 세션에 로그인된 사용자가 없으면 조회수 증가
+                    savePostHit(null, postFind, clientIp);
+                }
+        );
+    }
 
+    private void savePostHit(User user, Post post, String clientIp) {
         PostHits postHits = PostHits.builder()
-                .post(post)
-                .user(user)
                 .viewedAt(LocalDateTime.now())
-                .ipAddress(ipAddress)
+                .ipAddress(clientIp)
+                .post(post)
+                .user(user) // user는 null일 수 있음
                 .build();
 
         postHitsRepository.save(postHits);

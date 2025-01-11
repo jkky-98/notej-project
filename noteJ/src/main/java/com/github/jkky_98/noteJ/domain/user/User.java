@@ -70,6 +70,10 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> sentNotifications = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostHits> postHitsList = new ArrayList<>();
+
     public void updateUserDesc(UserDesc userDesc) {
         this.userDesc = userDesc;
     }

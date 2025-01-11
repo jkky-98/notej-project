@@ -29,4 +29,6 @@ public class PostHits {
     private User user; // 조회한 사용자 (비회원일 경우 null)
 
     private LocalDateTime viewedAt; // 조회 시간
+
+
 }

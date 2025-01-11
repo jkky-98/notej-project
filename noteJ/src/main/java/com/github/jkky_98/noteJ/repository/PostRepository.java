@@ -15,7 +15,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
             "FROM User u " +
             "JOIN u.posts p " + // 연관 필드를 기준으로 조인
             "WHERE p.postUrl = :postUrl AND u.username = :username")
-    Post findOnePost(@Param("username") String username, @Param("postUrl") String postUrl);
+    Post findPostByUsernameAndPostUrl(@Param("username") String username, @Param("postUrl") String postUrl);
 
     Optional<Post> findByUserUsernameAndPostUrl(String username, String postUrl);
 

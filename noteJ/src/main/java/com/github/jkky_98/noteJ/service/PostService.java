@@ -26,82 +26,58 @@ public class PostService {
 
     private final TagRepository tagRepository;
 
-    private final PostHitsRepository postHitsRepository;
+    private final PostHitsService postHitsService;
 
-    private final UserRepository userRepository;
-
+    private final UserService userService;
+    /**
+     * postId로 Post 엔티티 가져오기
+     * @param postId
+     * @return
+     */
     @Transactional
     public Post findById(Long postId) {
         return postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Post not found"));
     }
 
+    /**
+     * 게시글 살펴보기 GET 요청시
+     * @param usernamePost
+     * @param postUrl
+     * @return
+     */
     @Transactional
-    public PostViewDto getPost(String username, String postUrl, HttpServletRequest request) {
+    public PostViewDto getPost(String usernamePost, String postUrl, Optional<User> sessionUser, String clientIP) {
 
-        // 포스트 조회수 증가 로직
-        savePostHits(username, postUrl, request);
+        Post post = postRepository.findPostByUsernameAndPostUrl(usernamePost, postUrl);
 
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        List<Post> posts = user.getPosts();
-
-        for (Post post : posts) {
-            if (post.getPostUrl().equals(postUrl)) {
-                PostViewDto postViewDto = new PostViewDto();
-                postViewDto.setId(post.getId());
-                postViewDto.setTitle(post.getTitle());
-                postViewDto.setUsername(username);
-                postViewDto.setContent(post.getContent());
-                postViewDto.setCreateByDt(post.getCreateDt());
-                postViewDto.setLikeCount(post.getLikes().size());
-
-                List<String> tags = getTags(post);
-                postViewDto.setTags(tags);
-
-                List<CommentsDto> comments = getComments(post);
-                postViewDto.setComments(comments);
-                return postViewDto;
-            }
-        }
-
-        throw new EntityNotFoundException("Post not Found");
+        /**
+         * 요구사항
+         * PostViewDto
+         * Post 정보 가져야 함.
+         * Comment 정보 가져야 함.
+         * Like 정보 가져야 함.
+         */
+        PostViewDto postViewDto = setPostViewDto(usernamePost, post);
+        // 조회수 증가 로직
+        postHitsService.increamentPostView(usernamePost, postUrl, sessionUser, clientIP);
+        return postViewDto;
     }
 
-    private void savePostHits(String username, String postUrl, HttpServletRequest request) {
-        Optional<User> sessionUser = SessionUtils.getSessionUser(request);
-        sessionUser.ifPresentOrElse(
-                user -> {
-                    // sessionUser.getUsername()과 입력된 username 비교
-                    if (user.getUsername().equals(username)) {
-                        return; // 값이 같으면 아무 작업도 하지 않음
-                    }
+    private static PostViewDto setPostViewDto(String usernamePost, Post post) {
+        PostViewDto postViewDto = new PostViewDto();
+        postViewDto.setId(post.getId());
+        postViewDto.setTitle(post.getTitle());
+        postViewDto.setUsername(usernamePost);
+        postViewDto.setContent(post.getContent());
+        postViewDto.setCreateByDt(post.getCreateDt());
+        postViewDto.setLikeCount(post.getLikes().size());
+        postViewDto.setTags(getTags(post));
+        postViewDto.setComments(getComments(post));
+        return postViewDto;
+    }
 
-                    // 값이 있을 경우: sessionUser 기반으로 PostHits 생성
-                    User userFind = userRepository.findById(user.getId()).orElseThrow(() -> new EntityNotFoundException("User not Found"));
-                    Post postFind = postRepository.findByUserUsernameAndPostUrl(username, postUrl).orElseThrow(() -> new EntityNotFoundException("Post not Found"));
-
-                    PostHits postHits = PostHits.builder()
-                            .ipAddress(ClientUtils.getRemoteIP(request))
-                            .viewedAt(LocalDateTime.now())
-                            .user(userFind)
-                            .post(postFind)
-                            .build();
-
-                    postHitsRepository.save(postHits);
-                },
-                () -> {
-                    // 값이 없을 경우: 기본 PostHits 생성
-                    Post postFind = postRepository.findByUserUsernameAndPostUrl(username, postUrl).orElseThrow(() -> new EntityNotFoundException("Post not Found"));
-
-                    PostHits postHits = PostHits.builder()
-                            .ipAddress(ClientUtils.getRemoteIP(request))
-                            .viewedAt(LocalDateTime.now())
-                            .post(postFind)
-                            .build();
-
-                    postHitsRepository.save(postHits);
-                }
-        );
+    public Post findByUserUsernameAndPostUrl(String username, String postUrl) {
+        return postRepository.findByUserUsernameAndPostUrl(username, postUrl).orElseThrow(() -> new EntityNotFoundException("Post not found"));
     }
 
     private static List<CommentsDto> getComments(Post post) {
