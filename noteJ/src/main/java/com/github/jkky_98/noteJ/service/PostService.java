@@ -25,10 +25,6 @@ public class PostService {
     private final PostRepository postRepository;
 
     private final TagRepository tagRepository;
-
-    private final PostHitsService postHitsService;
-
-    private final UserService userService;
     /**
      * postId로 Post 엔티티 가져오기
      * @param postId
@@ -46,7 +42,7 @@ public class PostService {
      * @return
      */
     @Transactional
-    public PostViewDto getPost(String usernamePost, String postUrl, Optional<User> sessionUser, String clientIP) {
+    public PostViewDto getPost(String usernamePost, String postUrl) {
 
         Post post = postRepository.findPostByUsernameAndPostUrl(usernamePost, postUrl);
 
@@ -58,8 +54,6 @@ public class PostService {
          * Like 정보 가져야 함.
          */
         PostViewDto postViewDto = setPostViewDto(usernamePost, post);
-        // 조회수 증가 로직
-        postHitsService.increamentPostView(usernamePost, postUrl, sessionUser, clientIP);
         return postViewDto;
     }
 

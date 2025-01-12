@@ -25,7 +25,7 @@ public class CommentService {
     @Transactional
     public void saveComment(CommentForm commentForm, User sessionUser, String postUrl, String postUsername) {
 
-        Post findPost = postRepository.findOnePost(postUsername, postUrl);
+        Post findPost = postRepository.findPostByUsernameAndPostUrl(postUsername, postUrl);
         User findSessionUser = userRepository.findById(sessionUser.getId()).orElseThrow(() -> new EntityNotFoundException("SessionUser not Found"));
 
         // parents 존재시

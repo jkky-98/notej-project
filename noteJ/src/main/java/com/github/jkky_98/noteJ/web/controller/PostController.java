@@ -37,7 +37,9 @@ public class PostController {
             @SessionAttribute(value = "loginUser", required = false) User sessionUser,
             @RequestHeader(value = "X-Forwarded-For", required = false) String xForwardedForHeader
     ) {
-        model.addAttribute("postViewDto", postService.getPost(username, postUrl, Optional.ofNullable(sessionUser)), getClientIp(xForwardedForHeader));
+        postHitsService.increamentPostView(username, postUrl, Optional.ofNullable(sessionUser), getClientIp(xForwardedForHeader));
+        model.addAttribute("postViewDto", postService.getPost(username, postUrl));
+
         return "postView";
     }
 
