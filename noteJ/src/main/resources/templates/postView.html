@@ -132,16 +132,14 @@
         <div class="comments-container">
             <h3>댓글</h3>
             <!-- Comment Form -->
-            <form th:action="@{${currentUrl}}" th:method="post" class="mb-4"
+            <form th:action="${currentUrl}" th:method="post" class="mb-4"
                   th:object="${commentForm}" th:if="${sessionUser != null}">
 
                 <!-- URL 정보를 숨겨진 input 필드에 담기 -->
                 <input type="hidden" name="requestUrl" th:value="${currentUrl}" />
 
-                <!-- 숨겨진 에러 메시지 -->
-                <input type="hidden" id="contentErrorMessage-normal"
-                       th:if="${#fields.hasErrors('content')}"
-                       th:value="${#fields.errors('content')[0]}">
+                <!-- 에러 메시지 -->
+                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('content')}" th:text="${#fields.errors('content')[0]}"></div>
 
                 <!-- content 필드 바인딩 -->
                 <textarea class="form-control mb-2"
@@ -173,77 +171,44 @@
                             <div class="comment-content mt-2" th:text="${comment.content}">
                                 댓글 내용
                             </div>
+                            <!-- 대댓글 달기 버튼 -->
                             <div class="comment-actions mt-3">
-                                <!-- 대댓글 달기 버튼 -->
-                                <p>
-                                    <a class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse"
-                                       th:href="'#collapse-' + ${comment.id}"
-                                       role="button"
-                                       aria-expanded="false"
-                                       th:attr="aria-controls='collapse-' + ${comment.id}">
-                                        대댓글 달기
-                                    </a>
-                                    <!-- 삭제 버튼 -->
-                                    <a href="#" class="btn btn-outline-danger btn-sm"
-                                       th:if="${sessionUser.username == comment.createBy}"
-                                       th:href="@{/comments/delete/{id}(id=${comment.id})}">삭제
-                                    </a>
-                                </p>
-                                <div class="row">
-                                    <div class="col">
-                                        <div class="collapse multi-collapse" th:id="'collapse-' + ${comment.id}">
-                                            <div class="card card-body">
-                                                <form th:action="@{${currentUrl}}"
-                                                      th:object="${commentForm}" th:method="post">
-
-                                                    <input type="hidden" th:field="*{parentsId}" th:value="${comment.id}" />
-
-                                                    <!-- 숨겨진 에러 메시지 -->
-                                                    <input type="hidden" id="contentErrorMessage-${comment.id}"
-                                                           th:if="${#fields.hasErrors('content')}"
-                                                           th:value="${#fields.errors('content')[0]}">
-
-                                                    <textarea class="form-control mb-2"
-                                                              th:field="*{content}"
-                                                              rows="3"
-                                                              placeholder="댓글을 입력하세요...">
-                                                    </textarea>
-
-                                                    <button type="submit" class="btn btn-primary btn-sm">작성</button>
-                                                </form>
-                                            </div>
+                                <a class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse"
+                                   th:href="'#replyForm-' + ${comment.id}"
+                                   role="button"
+                                   aria-expanded="false"
+                                   th:attr="aria-controls='replyForm-' + ${comment.id}">
+                                    대댓글 달기
+                                </a>
+                            </div>
+                            <!-- 대댓글 작성 폼 -->
+                            <div class="collapse mt-3" th:id="'replyForm-' + ${comment.id}">
+                                <form th:action="${currentUrl}" th:method="post" th:object="${commentForm}">
+                                    <input type="hidden" name="parentsId" th:value="${comment.id}" />
+                                    <textarea class="form-control mb-2" th:field="*{content}" rows="3" placeholder="대댓글을 입력하세요..."></textarea>
+                                    <button type="submit" class="btn btn-primary btn-sm">대댓글 작성</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 대댓글 리스트 -->
+                    <div class="replies" style="margin-left: 20px;">
+                        <div class="comment" th:each="reply : ${postViewDto.comments}" th:if="${reply.parentsId == comment.id}">
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <div class="comment-meta d-flex justify-content-between">
+                                        <div>
+                                            <strong th:text="${reply.createBy}">작성자</strong>
+                                            <span class="text-muted" th:text="${#temporals.format(reply.createByDt, 'yyyy-MM-dd HH:mm')}">작성 시간</span>
                                         </div>
                                     </div>
-                                </div>
-
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 대댓글 -->
-                    <div class="replies" style="margin-left: 20px;">
-                        <div class="comment card mb-2" th:each="reply : ${postViewDto.comments}" th:if="${reply.parentsId == comment.id}">
-                            <div class="card-body">
-                                <div class="comment-meta d-flex justify-content-between">
-                                    <div>
-                                        <strong th:text="${reply.createBy}">작성자</strong>
-                                        <span class="text-muted" th:text="${#temporals.format(reply.createByDt, 'yyyy-MM-dd HH:mm')}">작성 시간</span>
+                                    <div class="comment-content mt-2" th:text="${reply.content}">
+                                        대댓글 내용
                                     </div>
                                 </div>
-                                <div class="comment-content mt-2" th:text="${reply.content}">
-                                    대댓글 내용
-                                </div>
-                                <div class="comment-actions mt-3">
-                                    <!-- 삭제 버튼 -->
-                                    <a href="#" class="btn btn-outline-danger btn-sm"
-                                       th:if="${sessionUser.username == reply.createBy}"
-                                       th:href="@{/comments/delete/{id}(id=${reply.id})}">삭제</a>
-                                </div>
                             </div>
                         </div>
                     </div>
-                    <hr>
                 </div>
             </div>
 
