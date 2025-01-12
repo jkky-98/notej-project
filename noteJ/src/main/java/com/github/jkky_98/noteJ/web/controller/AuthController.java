@@ -113,8 +113,15 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public String logout(HttpSession session) {
+    public String logout(
+            HttpSession session,
+            @RequestHeader(value = "Referer", required = false) String referer
+                         ) {
         authService.logout(session);
-        return "redirect:/";
+        if (referer != null && !referer.isEmpty()) {
+            return "redirect:" + referer;
+        } else {
+            return "redirect:/";
+        }
     }
 }
