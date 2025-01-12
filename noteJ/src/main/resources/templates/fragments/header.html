@@ -121,8 +121,13 @@
                         <li th:if="${sessionUser != null}">
                             <hr class="dropdown-divider">
                         </li>
+
                         <li th:if="${sessionUser != null}">
-                            <a class="dropdown-item text-danger" th:href="@{/logout}">로그아웃</a>
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="dropdown-item text-danger">
+                                    로그아웃
+                                </button>
+                            </form>
                         </li>
 
                         <!-- 로그인되지 않은 경우 -->
