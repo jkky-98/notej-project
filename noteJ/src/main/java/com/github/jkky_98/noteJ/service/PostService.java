@@ -25,6 +25,12 @@ public class PostService {
     private final PostRepository postRepository;
 
     private final TagRepository tagRepository;
+
+    @Transactional
+    public Post findByPostUrl(String postUrl) {
+        return postRepository.findByPostUrl(postUrl).orElseThrow(() -> new EntityNotFoundException("Post Not Found"));
+    }
+
     /**
      * postId로 Post 엔티티 가져오기
      * @param postId
@@ -59,7 +65,7 @@ public class PostService {
 
     private static PostViewDto setPostViewDto(String usernamePost, Post post) {
         PostViewDto postViewDto = new PostViewDto();
-        postViewDto.setId(post.getId());
+        postViewDto.setPostUrl(post.getPostUrl());
         postViewDto.setTitle(post.getTitle());
         postViewDto.setUsername(usernamePost);
         postViewDto.setContent(post.getContent());

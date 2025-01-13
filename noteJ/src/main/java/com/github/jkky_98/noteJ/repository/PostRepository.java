@@ -19,5 +19,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
 
     Optional<Post> findByUserUsernameAndPostUrl(String username, String postUrl);
 
+    Optional<Post> findByPostUrl(String postUrl);
+
     Optional<Post> findByTitle(String title);
 }

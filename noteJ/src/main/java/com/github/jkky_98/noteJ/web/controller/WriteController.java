@@ -20,18 +20,24 @@ public class WriteController {
     @GetMapping("/write")
     public String write(
             @ModelAttribute WriteForm writeForm,
-            @RequestParam(value = "id", required = false) Long postId,
-            @SessionAttribute("loginUser") User sessionUser,
-            Model model) {
+            @SessionAttribute("loginUser") User sessionUser
+            ) {
 
-        if (postId == null) {
-            writeService.getWrite(writeForm, sessionUser.getId());
-        } else {
-            WriteForm writeEditForm = writeService.getWriteEdit(sessionUser.getId(), postId);
-            model.addAttribute("writeForm", writeEditForm);
-        }
+        writeService.getWrite(writeForm, sessionUser.getId());
         return "write";
     }
+
+    @GetMapping("/edit/{postUrl}")
+    public String edit(
+            @PathVariable("postUrl") String postUrl,
+            @SessionAttribute("loginUser") User sessionUser,
+            Model model
+    ) {
+        WriteForm writeEditForm = writeService.getWriteEdit(sessionUser.getId(), postUrl);
+        model.addAttribute("writeForm", writeEditForm);
+        return "edit";
+    }
+
 
     @PostMapping("/write")
     public String writeSave(
@@ -40,11 +46,18 @@ public class WriteController {
             @RequestParam(value = "id" , required = false) Long postId
     ) throws IOException {
 
-        if (postId == null) {
-            writeService.saveWrite(form, sessionUser.getId());
-        } else {
-            writeService.saveEditWrite(form, postId);
-        }
+        writeService.saveWrite(form, sessionUser.getId());
+        return "redirect:" + "/@" + sessionUser.getUsername() + "/posts";
+    }
+
+    @PostMapping("/edit/{postUrl}")
+    public String editSave(
+            @ModelAttribute WriteForm form,
+            @SessionAttribute("loginUser") User sessionUser,
+            @PathVariable String postUrl
+    ) throws IOException {
+
+        writeService.saveEditWrite(form, postUrl);
         return "redirect:" + "/@" + sessionUser.getUsername() + "/posts";
     }
 

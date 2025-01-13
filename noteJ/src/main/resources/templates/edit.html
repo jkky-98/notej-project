@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>글 작성</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    <style>
+        .write-container {
+            max-width: 95%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .title-input {
+            font-size: 2rem;
+            font-weight: bold;
+            border: none;
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .title-input:focus {
+            outline: none;
+            border-color: #6c757d;
+        }
+
+        .editor-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .editor-toolbar i {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .editor-toolbar i:hover {
+            color: #495057;
+        }
+
+        .editor-textarea {
+            border: none;
+            border-bottom: 2px solid #ddd;
+            width: 100%;
+            height: 100vh;
+            font-size: 1.2rem;
+            resize: none;
+            margin-top: 10px;
+            color: #495057;
+        }
+
+        .editor-textarea:focus {
+            outline: none;
+            border-color: #6c757d;
+        }
+
+        .btn-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .btn-actions a, .btn-actions button {
+            width: 150px;
+        }
+
+        .equal-height {
+            display: flex;
+            align-items: stretch; /* 자식 요소 동일 높이 */
+        }
+
+        .card {
+            height: 100%; /* 카드 높이 균등 */
+            display: flex;
+            flex-direction: column; /* 수직 정렬 */
+        }
+
+        .card-body {
+            flex-grow: 1; /* 내용이 확장 가능한 영역 */
+        }
+
+        /* 버튼 영역에 여유 공간 추가 */
+        .btn-actions {
+            margin-top: 20px; /* 버튼 영역 위에 여백 */
+        }
+    </style>
+</head>
+<body>
+<div class="write-container">
+    <form th:object="${writeForm}" th:action="@{${currentUrl}}" method="post" enctype="multipart/form-data">
+        <!-- 제목 입력 -->
+        <input type="text" th:field="*{title}" class="form-control title-input" placeholder="제목을 입력하세요">
+
+        <!-- 태그 입력 -->
+        <small class="text-muted">태그를 입력하세요</small>
+        <input type="text" th:field="*{tags}" class="form-control mb-3" placeholder="예: Java, Spring, Thymeleaf">
+
+        <input type="hidden" th:field="*{id}">
+
+        <!-- 에디터를 적용할 요소 (컨테이너) -->
+        <div id="editor">
+        </div>
+        <input type="textarea" name="content" id="editor-content-provider" hidden style="display: block;">
+        <section class="container mt-5">
+            <div class="row mb-5">
+                <!-- 포스트 미리보기 -->
+                <div class="col-md-6">
+                    <h5 class="mb-3">포스트 미리보기</h5>
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <!-- 썸네일 업로드 -->
+                            <div class="mb-3">
+                                <label for="thumbnail" class="form-label">썸네일 업로드</label>
+                                <input type="file" class="form-control" id="thumbnail" th:field="*{thumbnail}">
+                            </div>
+                            <!-- 간략한 소개 -->
+                            <textarea th:field="*{postSummary}" class="form-control" rows="4" placeholder="당신의 포스트를 짧게 소개해보세요."></textarea>
+                            <div class="text-end mt-1">
+                                <small>0/150</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 공개 설정 -->
+                <div class="col-md-6">
+                    <h5 class="mb-3">공개 설정</h5>
+                    <div class="card">
+                        <div class="card-body">
+                            <!-- 공개 여부 -->
+                            <div class="mb-3">
+                                <label class="form-label">공개 설정</label>
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" th:field="*{open}" id="public" value="true">
+                                    <label class="btn btn-outline-success" for="public">전체 공개</label>
+
+                                    <input type="radio" class="btn-check" th:field="*{open}" id="private" value="false">
+                                    <label class="btn btn-outline-danger" for="private">비공개</label>
+                                </div>
+                            </div>
+                            <!-- URL 설정 -->
+                            <div class="mb-3">
+                                <label for="url" class="form-label">URL 설정</label>
+                                <div class="input-group">
+                                    <span class="input-group-text" th:text="직접입력">@aal2525/</span>
+                                    <input type="text" class="form-control" id="url" th:field="*{url}" placeholder="포스트 URL을 입력하세요.">
+                                </div>
+                            </div>
+                            <!-- 시리즈 설정 -->
+                            <div class="mb-3">
+                                <label for="seriesNameList" class="form-label">시리즈 설정</label>
+                                <div class="input-group">
+                                    <!-- Dropdown for series -->
+                                    <select class="form-select" id="seriesNameList" th:field="*{series}">
+                                        <option value="" disabled selected>시리즈 선택</option>
+                                        <!-- 시리즈 리스트를 반복해서 옵션 생성 -->
+                                        <option th:each="series : *{seriesList}" th:value="${series}" th:text="${series}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- 버튼 그룹 -->
+            <div class="btn-actions">
+                <a href="/" class="btn btn-outline-secondary">나가기</a>
+                <div>
+                    <button type="button" class="btn btn-outline-success me-2">임시저장</button>
+                    <button type="submit" class="btn btn-success">출간하기</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- CSS 스타일 -->
+        <style>
+            textarea[name="postSummary"] {
+                resize: none;
+            }
+        </style>
+
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- TUI 에디터 JS CDN -->
+<script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+<script th:inline="javascript">
+    let writeFormContent = /*[[${writeForm.content ?: ''}]]*/ '';
+
+    const editor = new toastui.Editor({
+        el: document.querySelector('#editor'), // 에디터를 적용할 요소 (컨테이너)
+        height: 'auto',                        // 에디터 영역의 높이 값 (OOOpx || auto)
+        initialEditType: 'markdown',            // 최초로 보여줄 에디터 타입 (markdown || wysiwyg)
+        initialValue: writeFormContent || '',   // 내용의 초기 값으로, 반드시 마크다운 문자열 형태여야 함
+        previewStyle: 'vertical',               // 마크다운 프리뷰 스타일 (tab || vertical)
+        placeholder: '내용을 입력해 주세요.',
+        hooks: {
+            async addImageBlobHook(blob, callback) { // 이미지 업로드 로직 커스텀
+                try {
+                    /*
+                     * 1. 에디터에 업로드한 이미지를 FormData 객체에 저장
+                     *    (이때, 컨트롤러 uploadEditorImage 메서드의 파라미터인 'image'와 formData에 append 하는 key('image')값은 동일해야 함)
+                     */
+                    const formData = new FormData();
+                    formData.append('image', blob);
+
+                    // 2. FileApiController - uploadEditorImage 메서드 호출
+                    const response = await fetch('/editor/image-upload', {
+                        method : 'POST',
+                        body : formData,
+                    });
+
+                    // 3. 컨트롤러에서 전달받은 디스크에 저장된 파일명
+                    const filename = await response.text();
+                    console.log('서버에 저장된 파일명 : ', filename);
+
+                    // 4. addImageBlobHook의 callback 함수를 통해, 디스크에 저장된 이미지를 에디터에 렌더링
+                    const imageUrl = `/editor/image-print?filename=${filename}`;
+                    callback(imageUrl, 'image alt attribute');
+
+                } catch (error) {
+                    console.error('업로드 실패 : ', error);
+                }
+            }
+        }
+
+    });
+    document.querySelector('form').addEventListener('submit', function (event) {
+    // 에디터에서 작성된 내용을 가져옵니다.
+    const content = editor.getMarkdown();
+
+    const encodedContent = encodeURIComponent(content);
+
+    // 숨겨진 input 태그에 값을 넣습니다.
+    document.querySelector('#editor-content-provider').value = encodedContent;
+    });
+</script>
+
+</body>
+</html>

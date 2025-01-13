@@ -5,8 +5,8 @@ import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.file.FileStore;
 import com.github.jkky_98.noteJ.repository.*;
 import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,9 +17,9 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WriteService {
 
-    private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final SeriesService seriesService;
     private final TagRepository tagRepository;
@@ -51,17 +51,17 @@ public class WriteService {
     }
 
     /**
-     * write?id={postId} get 요청에 사용될 WriteForm을 구성
+     * write/{postUrl} get 요청에 사용될 WriteForm을 구성
      * @param sessionUserId
-     * @param postId
+     * @param postUrl
      * @return
      */
     @Transactional
-    public WriteForm getWriteEdit(Long sessionUserId, Long postId) {
-        User user = userRepository.findById(sessionUserId).orElseThrow(() -> new EntityNotFoundException("User 엔티티 호출 실패"));
+    public WriteForm getWriteEdit(Long sessionUserId, String postUrl) {
+        User user = userService.findUserById(sessionUserId);
 
         WriteForm writeForm = new WriteForm();
-        Post postEdit = postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Post 엔티티 호출 실패"));
+        Post postEdit = postService.findByPostUrl(postUrl);
 
         writeForm.setId(postEdit.getId());
         writeForm.setTitle(postEdit.getTitle());
@@ -118,14 +118,14 @@ public class WriteService {
     }
 
     /**
-     * /write?id={postId} post 요청에 사용, WriteForm을 사용하여 Post엔티티에 수정
+     * /write/{postUrl} post 요청에 사용, WriteForm을 사용하여 Post엔티티에 수정
      * @param form
-     * @param postId
+     * @param postUrl
      * @throws IOException
      */
     @Transactional
-    public void saveEditWrite(WriteForm form, Long postId) throws IOException {
-        Post post = postService.findById(postId);
+    public void saveEditWrite(WriteForm form, String postUrl) throws IOException {
+        Post post = postService.findByPostUrl(postUrl);
 
         Series series = seriesService.getSeries(form.getSeries());
         post.updateSeries(series);
@@ -142,12 +142,14 @@ public class WriteService {
         }
         post.getPostTags().clear(); // Post와의 관계 끊기
 
+        //폼 객체에 썸네일이 들어있을 경우
         if (form.getThumbnail() != null && !form.getThumbnail().isEmpty()) {
-            String thumbnailDeleted = post.getThumbnail();
-            String storedFileName = fileStore.storeFile(form.getThumbnail());// 새로운 파일 업로드
-            // 기존 파일이 존재할 경우
-            if (post.getThumbnail() != null) {
-                post.updateThumbnail(storedFileName);
+            String thumbnailDeleted = post.getThumbnail(); //지울 썸네
+            String storedFileName = fileStore.storeFile(form.getThumbnail());//새로운 파일 업로드
+
+            post.updateThumbnail(storedFileName);
+            if (thumbnailDeleted != null) {
+                log.info("delete thumbnail : {}", thumbnailDeleted);
                 fileStore.deleteFile(thumbnailDeleted); // 기존 파일 삭제
             }
         }

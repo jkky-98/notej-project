@@ -54,6 +54,7 @@ public class NotificationService {
 
         for (Notification notification : notificationRepository.findAllNotificationsByUser(sessionUser)) {
             NotificationDto notificationDto = new NotificationDto();
+            notificationDto.setId(notification.getId());
             notificationDto.setMessage(notification.getMessage());
             notificationDto.setType(notification.getType().name());
             notificationDto.setStatus(notification.isStatus());
