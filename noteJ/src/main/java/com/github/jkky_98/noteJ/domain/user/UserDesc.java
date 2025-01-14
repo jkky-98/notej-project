@@ -1,6 +1,7 @@
 package com.github.jkky_98.noteJ.domain.user;
 
 import com.github.jkky_98.noteJ.domain.base.BaseTimeEntity;
+import com.github.jkky_98.noteJ.web.controller.form.SignUpForm;
 import com.github.jkky_98.noteJ.web.controller.form.UserSettingsForm;
 import jakarta.persistence.*;
 import lombok.*;
@@ -67,6 +68,16 @@ public class UserDesc extends BaseTimeEntity {
 
     public void updateProfilePic(String updatedProfilePic) {
         profilePic = updatedProfilePic;
+    }
+
+    public static UserDesc of(SignUpForm signUpForm) {
+        return UserDesc.builder()
+                .blogTitle(signUpForm.getBlogTitle())
+                .socialEmail(signUpForm.getEmail())
+                .commentAlarm(true)
+                .noteJAlarm(true)
+                .theme(ThemeMode.LIGHT)
+                .build();
     }
 }
 

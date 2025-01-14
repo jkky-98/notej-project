@@ -13,33 +13,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class CommentService {
-
-    private final PostRepository postRepository;
-    private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final PostService postService;
+    private final UserService userService;
 
     @Transactional
     public void saveComment(CommentForm commentForm, User sessionUser, String postUrl, String postUsername) {
 
-        Post findPost = postRepository.findPostByUsernameAndPostUrl(postUsername, postUrl);
-        User findSessionUser = userRepository.findById(sessionUser.getId()).orElseThrow(() -> new EntityNotFoundException("SessionUser not Found"));
+        Post postFind = postService.findByUserUsernameAndPostUrl(postUsername, postUrl);
+        User userFindSession = userService.findUserById(sessionUser.getId());
 
-        // parents 존재시
-        Comment parentComment = null;
-        if (commentForm.getParentsId() != null) {
-            parentComment = commentRepository.findById(commentForm.getParentsId()).orElseThrow(() -> new EntityNotFoundException("Parent Comment not Found"));
-        }
-
-        Comment comment = Comment.builder()
-                .post(findPost)
-                .user(findSessionUser)
-                .content(commentForm.getContent())
-                .parent(parentComment)
-                .build();
+        Comment comment = Comment.of(postFind, userFindSession, commentForm.getContent(), commentRepository.findById(commentForm.getParentsId()));
 
         Comment savedComment = commentRepository.save(comment);
         log.info("[CommentService.saveComment] PostUrl : {}, Comment 등록 id: {}", postUrl, savedComment.getId());

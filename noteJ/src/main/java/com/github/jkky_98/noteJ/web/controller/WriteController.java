@@ -3,10 +3,11 @@ package com.github.jkky_98.noteJ.web.controller;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.service.WriteService;
 import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -27,6 +28,20 @@ public class WriteController {
         return "write";
     }
 
+    @PostMapping("/write")
+    public String writeSave(
+            @Validated @ModelAttribute WriteForm writeForm,
+            BindingResult bindingResult,
+            @SessionAttribute("loginUser") User sessionUser
+    ) throws IOException {
+        if (bindingResult.hasErrors()) {
+            return "write";
+        }
+
+        writeService.saveWrite(writeForm, sessionUser.getId());
+        return "redirect:" + "/@" + sessionUser.getUsername() + "/posts";
+    }
+
     @GetMapping("/edit/{postUrl}")
     public String edit(
             @PathVariable("postUrl") String postUrl,
@@ -39,23 +54,16 @@ public class WriteController {
     }
 
 
-    @PostMapping("/write")
-    public String writeSave(
-            @ModelAttribute WriteForm form,
-            @SessionAttribute("loginUser") User sessionUser,
-            @RequestParam(value = "id" , required = false) Long postId
-    ) throws IOException {
-
-        writeService.saveWrite(form, sessionUser.getId());
-        return "redirect:" + "/@" + sessionUser.getUsername() + "/posts";
-    }
-
     @PostMapping("/edit/{postUrl}")
     public String editSave(
-            @ModelAttribute WriteForm form,
+            @Validated @ModelAttribute WriteForm form,
             @SessionAttribute("loginUser") User sessionUser,
-            @PathVariable String postUrl
+            @PathVariable String postUrl,
+            BindingResult bindResult
     ) throws IOException {
+        if (bindResult.hasErrors()) {
+            return "edit";
+        }
 
         writeService.saveEditWrite(form, postUrl);
         return "redirect:" + "/@" + sessionUser.getUsername() + "/posts";

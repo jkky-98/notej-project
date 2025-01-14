@@ -2,6 +2,7 @@ package com.github.jkky_98.noteJ.domain.user;
 
 import com.github.jkky_98.noteJ.domain.*;
 import com.github.jkky_98.noteJ.domain.base.BaseEntity;
+import com.github.jkky_98.noteJ.web.controller.form.SignUpForm;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -104,4 +105,13 @@ public class User extends BaseEntity {
         }
     }
 
+    public static User of(SignUpForm signUpForm, UserDesc userDesc) {
+        return User.builder()
+                .username(signUpForm.getUsername())
+                .email(signUpForm.getEmail())
+                .password(signUpForm.getPassword())
+                .userRole(UserRole.USER)
+                .userDesc(userDesc)
+                .build();
+    }
 }

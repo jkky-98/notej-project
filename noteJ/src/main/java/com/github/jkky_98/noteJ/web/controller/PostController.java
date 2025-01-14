@@ -1,20 +1,14 @@
 package com.github.jkky_98.noteJ.web.controller;
 
 import com.github.jkky_98.noteJ.domain.user.User;
-import com.github.jkky_98.noteJ.service.CommentService;
 import com.github.jkky_98.noteJ.service.PostHitsService;
 import com.github.jkky_98.noteJ.service.PostService;
 import com.github.jkky_98.noteJ.service.PostStatsService;
-import com.github.jkky_98.noteJ.web.controller.dto.PostHitsDto;
 import com.github.jkky_98.noteJ.web.controller.dto.PostStatsDto;
-import com.github.jkky_98.noteJ.web.controller.dto.PostViewDto;
 import com.github.jkky_98.noteJ.web.controller.form.CommentForm;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;

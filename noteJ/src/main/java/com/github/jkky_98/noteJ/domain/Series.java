@@ -35,4 +35,10 @@ public class Series extends BaseEntity {
     public void updateUser(User user) {
         this.user = user;
     }
+
+    public static Series of(String seriesName) {
+        return Series.builder()
+                .seriesName(seriesName)
+                .build();
+    }
 }

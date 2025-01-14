@@ -31,7 +31,6 @@ public class CommentController {
     ) {
 
         if (bindingResult.hasErrors()) {
-            System.out.println("검증 오류 발생:");
             PostViewDto postViewDto = postService.getPost(username, postUrl);
 
             model.addAttribute("postViewDto", postViewDto);

@@ -111,4 +111,18 @@ public class Post extends BaseEntity {
     public void updateThumbnail(String storedFileName) {
         this.thumbnail = storedFileName;
     }
+
+    // 정적 팩토리 메서드
+    public static Post of(WriteForm form, User user, Series series, String thumbnail) {
+        return Post.builder()
+                .title(form.getTitle())
+                .content(form.getContent())
+                .writable(!form.isOpen())
+                .postSummary(form.getPostSummary())
+                .postUrl(form.getUrl())
+                .series(series)
+                .thumbnail(thumbnail)
+                .user(user)
+                .build();
+    }
 }

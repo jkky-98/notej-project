@@ -1,32 +1,21 @@
 package com.github.jkky_98.noteJ.service;
 
 import com.github.jkky_98.noteJ.domain.*;
-import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.*;
-import com.github.jkky_98.noteJ.web.ClientUtils;
-import com.github.jkky_98.noteJ.web.controller.dto.CommentsDto;
 import com.github.jkky_98.noteJ.web.controller.dto.PostViewDto;
-import com.github.jkky_98.noteJ.web.session.SessionUtils;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
-
     private final TagRepository tagRepository;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Post findByPostUrl(String postUrl) {
         return postRepository.findByPostUrl(postUrl).orElseThrow(() -> new EntityNotFoundException("Post Not Found"));
     }
@@ -36,7 +25,7 @@ public class PostService {
      * @param postId
      * @return
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public Post findById(Long postId) {
         return postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Post not found"));
     }
@@ -47,7 +36,7 @@ public class PostService {
      * @param postUrl
      * @return
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public PostViewDto getPost(String usernamePost, String postUrl) {
 
         Post post = postRepository.findPostByUsernameAndPostUrl(usernamePost, postUrl);
@@ -59,71 +48,28 @@ public class PostService {
          * Comment 정보 가져야 함.
          * Like 정보 가져야 함.
          */
-        PostViewDto postViewDto = setPostViewDto(usernamePost, post);
-        return postViewDto;
-    }
-
-    private static PostViewDto setPostViewDto(String usernamePost, Post post) {
-        PostViewDto postViewDto = new PostViewDto();
-        postViewDto.setPostUrl(post.getPostUrl());
-        postViewDto.setTitle(post.getTitle());
-        postViewDto.setUsername(usernamePost);
-        postViewDto.setContent(post.getContent());
-        postViewDto.setCreateByDt(post.getCreateDt());
-        postViewDto.setLikeCount(post.getLikes().size());
-        postViewDto.setTags(getTags(post));
-        postViewDto.setComments(getComments(post));
-        return postViewDto;
+        return PostViewDto.of(post);
     }
 
     public Post findByUserUsernameAndPostUrl(String username, String postUrl) {
         return postRepository.findByUserUsernameAndPostUrl(username, postUrl).orElseThrow(() -> new EntityNotFoundException("Post not found"));
     }
 
-    private static List<CommentsDto> getComments(Post post) {
-
-        List<CommentsDto> returnCommentsDto = new ArrayList<>();
-
-        List<Comment> comments = post.getComments();
-        for (Comment comment : comments) {
-            CommentsDto commentsDto = new CommentsDto();
-            commentsDto.setCreateBy(comment.getCreateBy());
-            commentsDto.setCreateByDt(comment.getCreateDt());
-            commentsDto.setContent(comment.getContent());
-            commentsDto.setId(comment.getId());
-            commentsDto.setParentsId(comment.getParent() != null ? comment.getParent().getId() : null);
-
-            returnCommentsDto.add(commentsDto);
-        }
-
-        return returnCommentsDto;
-    }
-
-    private static List<String> getTags(Post post) {
-        List<String> tags = new ArrayList<>();
-        for (PostTag postTag : post.getPostTags()) {
-            tags.add(postTag.getTag().getName());
-        }
-        return tags;
-    }
-
     @Transactional
     public void removePost(Long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Post not found"));
+        Post post = findById(postId);
 
         // 2. Post에 연결된 PostTag 처리
-        for (PostTag postTag : new ArrayList<>(post.getPostTags())) {
-            Tag tag = postTag.getTag();
-
-            // PostTag 제거
-            tag.removePostTag(postTag);
+        post.getPostTags().forEach(postTag -> {
+            // 연관관계 해제
+            postTag.getTag().removePostTag(postTag);
             post.removePostTag(postTag);
 
             // 고아 상태가 된 Tag 삭제
-            if (tag.getPostTags().isEmpty()) {
-                tagRepository.delete(tag);
+            if (postTag.getTag().getPostTags().isEmpty()) {
+                tagRepository.delete(postTag.getTag());
             }
-        }
+        });
 
         // 3. Post 삭제
         postRepository.delete(post);
@@ -131,20 +77,21 @@ public class PostService {
 
     @Transactional
     public void removeTagInPost(Long postId, Long tagId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Post not found"));
+        Post post = findById(postId);
 
-        for (PostTag postTag : new ArrayList<>(post.getPostTags())) {
-            if (postTag.getTag().getId().equals(tagId)) {
-                // 양방향에서 연관관계 끊기
-                Tag targetTag = postTag.getTag();
-                targetTag.removePostTag(postTag);
-                post.removePostTag(postTag);
+        post.getPostTags().stream()
+                .filter(postTag -> postTag.getTag().getId().equals(tagId))
+                .findFirst()
+                .ifPresent(postTag -> {
+                    // 양방향에서 연관관계 끊기
+                    Tag targetTag = postTag.getTag();
+                    targetTag.removePostTag(postTag);
+                    post.removePostTag(postTag);
 
-                if (targetTag.getPostTags().isEmpty()) {
-                    tagRepository.delete(targetTag);
-                }
-                return;
-            }
-        }
+                    if (targetTag.getPostTags().isEmpty()) {
+                        tagRepository.delete(targetTag);
+                    }
+                });
     }
+
 }

@@ -5,6 +5,8 @@ import com.github.jkky_98.noteJ.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Optional;
+
 @Entity
 @Getter
 @Builder
@@ -34,4 +36,16 @@ public class Comment extends BaseEntity {
     public void updatePost(Post post) {
         this.post = post;
     }
+
+    public static Comment of(Post post, User sessionUser, String content, Optional<Comment> parent) {
+        return Comment.builder()
+                .post(post)
+                .user(sessionUser)
+                .content(content)
+                .parent(
+                        parent.orElse(null)
+                )
+                .build();
+    }
+
 }

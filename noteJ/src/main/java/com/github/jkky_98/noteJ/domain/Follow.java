@@ -36,4 +36,11 @@ public class Follow extends BaseTimeEntity {
         this.following = following;
         following.getFollowerList().add(this);  // 팔로워 리스트에 추가
     }
+
+    public static Follow of(User userFollowing, User userGetFollowing) {
+        return Follow.builder()
+                .follower(userFollowing)
+                .following(userGetFollowing)
+                .build();
+    }
 }

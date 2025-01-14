@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class FollowService {
@@ -16,6 +18,7 @@ public class FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final UserService userService;
 
     @Transactional
     public void follow(String sessionUsername, String getFollwingUsername) {
@@ -31,7 +34,7 @@ public class FollowService {
 
     private Follow validFollowUser(User userFollowing, User userGetFollowing) {
         // 자기 자신을 팔로우하는 경우 예외 처리
-        if (this.equals(userGetFollowing)) {
+        if (userFollowing.getId().equals(userGetFollowing.getId())) {
             throw new IllegalArgumentException("자기 자신을 팔로우할 수 없습니다.");
         }
 
@@ -44,10 +47,7 @@ public class FollowService {
         }
 
         // 팔로우 객체 생성
-        Follow follow = Follow.builder()
-                .follower(userFollowing)
-                .following(userGetFollowing)
-                .build();
+        Follow follow = Follow.of(userFollowing, userGetFollowing);
 
         // 현재 사용자의 followingList에 추가
         userFollowing.getFollowingList().add(follow);
@@ -57,12 +57,14 @@ public class FollowService {
         return follow;
     }
 
-    @Transactional
-    public boolean isFollowing(String sessionUsername, String getFollwingUsername) {
-        User sessionUser = userRepository.findByUsername(sessionUsername).orElseThrow(() -> new EntityNotFoundException("sessionUser를 찾을 수 없습니다."));
-        // 세션 유저의 팔로우 리스트에서 찾기
-        return sessionUser.getFollowingList().stream()
-                .anyMatch(follow -> follow.getFollowing().getUsername().equals(getFollwingUsername));
+    @Transactional(readOnly = true)
+    public boolean isFollowing(Optional<User> sessionUser, String getFollwingUsername) {
+        return sessionUser.map(user -> {
+                    User userFind = userService.findUserById(user.getId());
+                    return userFind.getFollowingList().stream()
+                            .anyMatch(follow -> follow.getFollowing().getUsername().equals(getFollwingUsername));
+                })
+                .orElse(false);
     }
 
     @Transactional

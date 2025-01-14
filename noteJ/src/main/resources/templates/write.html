@@ -93,13 +93,12 @@
 <div class="write-container">
     <form th:object="${writeForm}" th:action="@{/write}" method="post" enctype="multipart/form-data">
         <!-- 제목 입력 -->
-        <input type="text" th:field="*{title}" class="form-control title-input" placeholder="제목을 입력하세요">
-
+        <input type="text" th:field="*{title}" class="form-control title-input" placeholder="제목을 입력하세요" th:errorclass="field-error">
+        <!-- 에러 메시지 렌더링 -->
+        <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
         <!-- 태그 입력 -->
         <small class="text-muted">태그를 입력하세요</small>
         <input type="text" th:field="*{tags}" class="form-control mb-3" placeholder="예: Java, Spring, Thymeleaf">
-
-        <input type="hidden" th:field="*{id}">
 
         <!-- 에디터를 적용할 요소 (컨테이너) -->
         <div id="editor">

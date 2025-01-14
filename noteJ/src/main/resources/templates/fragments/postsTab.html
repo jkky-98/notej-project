@@ -4,8 +4,8 @@
     <div class="container mt-4">
         <div class="row">
             <nav class="nav nav-tabs nav-pills">
-                <a class="nav-link" id="postsTab" th:href="@{'/@' + ${username} + '/posts'}">글</a>
-                <a class="nav-link" id="seriesTab" th:href="@{'/@' + ${username} + '/posts/series'}">시리즈</a>
+                <a class="nav-link" id="postsTab" th:href="@{'/@' + ${postsViewDto.username} + '/posts'}">글</a>
+                <a class="nav-link" id="seriesTab" th:href="@{'/@' + ${postsViewDto.username} + '/posts/series'}">시리즈</a>
             </nav>
         </div>
     </div>

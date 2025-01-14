@@ -23,7 +23,6 @@ public class AuthSessionService implements AuthService {
     @Override
     public void logout(HttpSession session) {
         session.invalidate();
-        return;
     }
 
     @Override
@@ -56,21 +55,8 @@ public class AuthSessionService implements AuthService {
     }
 
     private static User initializeUser(SignUpForm signUpForm) {
-        UserDesc userDesc = UserDesc.builder()
-                .blogTitle(signUpForm.getBlogTitle())
-                .socialEmail(signUpForm.getEmail())
-                .commentAlarm(true)
-                .noteJAlarm(true)
-                .theme(ThemeMode.LIGHT)
-                .build();
-
-        User signUpUser = User.builder()
-                .username(signUpForm.getUsername())
-                .email(signUpForm.getEmail())
-                .password(signUpForm.getPassword())
-                .userRole(UserRole.USER)
-                .userDesc(userDesc)
-                .build();
+        UserDesc userDesc = UserDesc.of(signUpForm);
+        User signUpUser = User.of(signUpForm, userDesc);
         return signUpUser;
     }
 

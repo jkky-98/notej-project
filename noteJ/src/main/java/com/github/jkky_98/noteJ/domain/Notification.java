@@ -44,4 +44,14 @@ public class Notification extends BaseEntity {
             throw new IllegalStateException("이미 읽은 Notification을 읽음 처리하려고 하고 있습니다.");
         }
     }
+
+    public static Notification ofFollow(User userSendNotification, User userGetNotification) {
+        return Notification.builder()
+                .type(NotificationType.FOLLOW)
+                .message(userSendNotification.getUsername() + "님으로부터 팔로우 되었습니다.")
+                .status(false)
+                .sender(userSendNotification)
+                .user(userGetNotification)
+                .build();
+    }
 }

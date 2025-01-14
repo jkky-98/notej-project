@@ -92,62 +92,64 @@
             background-color: red;
         }
     </style>
-    <div class="profile-container">
+    <div class="profile-container" th:object="${postsViewDto.profileForm}">
         <!-- 프로필 이미지 -->
-        <img th:src="|${profileForm.profilePic != null ? '/storage/'+ profileForm.profilePic : '/storage/default/default-profile.png'}|" alt="Profile Picture" class="profile-avatar" th:field="*{profileForm.profilePic}">
+        <img th:src="|${profilePic != null ? '/storage/' + profilePic : '/storage/default/default-profile.png'}|"
+             alt="Profile Picture" class="profile-avatar">
 
         <!-- 사용자 이름 -->
-        <div class="profile-username" th:text="${profileForm.username}" th:field="*{profileForm.username}">사용자 이름</div>
+        <div class="profile-username" th:text="*{username}">사용자 이름</div>
 
         <!-- 사용자 설명 -->
-        <div class="profile-description" th:text="${profileForm.description}" th:field="*{profileForm.description}">사용자 설명</div>
+        <div class="profile-description" th:text="*{description}">사용자 설명</div>
 
         <!-- 소셜 아이콘 -->
         <div class="profile-icons">
             <!-- 항상 랜더링되는 socialEmail -->
-            <a th:href="${profileForm.socialEmail}" title="Email" th:if="${profileForm.socialEmail}">
+            <a th:href="*{socialEmail}" title="Email" th:if="*{socialEmail}">
                 <i class="bi bi-envelope"></i>
             </a>
 
             <!-- GitHub (값이 있을 때만 랜더링) -->
-            <a th:href="${profileForm.socialGitHub}" target="_blank" title="GitHub" th:if="${profileForm.socialGitHub}">
+            <a th:href="*{socialGitHub}" target="_blank" title="GitHub" th:if="*{socialGitHub}">
                 <i class="bi bi-github"></i>
             </a>
 
             <!-- Twitter (값이 있을 때만 랜더링) -->
-            <a th:href="${profileForm.socialTwitter}" target="_blank" title="Twitter" th:if="${profileForm.socialTwitter}">
+            <a th:href="*{socialTwitter}" target="_blank" title="Twitter" th:if="*{socialTwitter}">
                 <i class="bi bi-twitter"></i>
             </a>
 
             <!-- Facebook (값이 있을 때만 랜더링) -->
-            <a th:href="${profileForm.socialFacebook}" target="_blank" title="Facebook" th:if="${profileForm.socialFacebook}">
+            <a th:href="*{socialFacebook}" target="_blank" title="Facebook" th:if="*{socialFacebook}">
                 <i class="bi bi-facebook"></i>
             </a>
 
             <!-- 기타 소셜 (값이 있을 때만 랜더링) -->
-            <a th:href="${profileForm.socialOther}" target="_blank" title="Other" th:if="${profileForm.socialOther}">
+            <a th:href="*{socialOther}" target="_blank" title="Other" th:if="*{socialOther}">
                 <i class="bi bi-link-45deg"></i>
             </a>
         </div>
 
-        <!-- 팔로워/팔로잉 (임시 데이터로 설정 가능) -->
+        <!-- 팔로워/팔로잉 -->
         <div class="profile-stats">
-            <span th:text="'팔로워: ' + ${profileForm.followers}">팔로워: 0</span>
-            <span th:text="'팔로잉: ' + ${profileForm.followings}">팔로잉: 0</span>
+            <span th:text="'팔로워: ' + *{followers}">팔로워: 0</span>
+            <span th:text="'팔로잉: ' + *{followings}">팔로잉: 0</span>
         </div>
 
         <!-- 팔로우/언팔로우 버튼 -->
-        <div th:if="${sessionUser != null and profileForm.username != sessionUser.username}">
-            <form th:action="@{/follow}" method="post" th:if="${!isFollowing}">
-                <input type="hidden" name="targetUsername" th:value="${profileForm.username}">
-                <button type="submit" class="follow-btn" th:text="'팔로우'">팔로우</button>
+        <div th:if="${sessionUser != null and postsViewDto.username != sessionUser.username}">
+            <form th:action="@{/follow}" method="post" th:if="${!postsViewDto.followStatus}">
+                <input type="hidden" name="targetUsername" th:value="${postsViewDto.username}">
+                <button type="submit" class="follow-btn">팔로우</button>
             </form>
 
-            <form th:action="@{/unfollow}" method="post" th:if="${isFollowing}">
-                <input type="hidden" name="targetUsername" th:value="${profileForm.username}">
-                <button type="submit" class="unfollow-btn" data-default-text="팔로잉" data-hover-text="언팔로우" th:text="'팔로잉'">팔로잉</button>
+            <form th:action="@{/unfollow}" method="post" th:if="${postsViewDto.followStatus}">
+                <input type="hidden" name="targetUsername" th:value="${postsViewDto.username}">
+                <button type="submit" class="unfollow-btn" data-default-text="팔로잉" data-hover-text="언팔로우">팔로잉</button>
             </form>
         </div>
+    </div>
 
         <!-- SweetAlert2 JS -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.js"></script>
@@ -203,3 +205,4 @@
 
     </div>
 </div>
+</html>

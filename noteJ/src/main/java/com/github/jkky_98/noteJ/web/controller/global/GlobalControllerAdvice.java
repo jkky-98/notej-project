@@ -13,8 +13,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
-import java.util.List;
-
 @ControllerAdvice
 @RequiredArgsConstructor
 public class GlobalControllerAdvice {
@@ -26,6 +24,11 @@ public class GlobalControllerAdvice {
     public String currentUrl(HttpServletRequest request) {
         String queryString = request.getQueryString();
         return request.getRequestURI() + (queryString != null ? "?" + queryString : "");
+    }
+
+    @ModelAttribute("currentUri")
+    public String currentUri(HttpServletRequest request) {
+        return request.getRequestURI();
     }
 
     @ModelAttribute

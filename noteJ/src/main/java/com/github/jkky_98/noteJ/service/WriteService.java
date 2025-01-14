@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,11 +42,10 @@ public class WriteService {
         User userById = userService.findUserById(sessionUserId);
 
         List<Series> seriesList = userById.getSeriesList();
-        List<String> returnSeriesList = new ArrayList<>();
         // 구성
-        for (Series series : seriesList) {
-            returnSeriesList.add(series.getSeriesName());
-        }
+        List<String> returnSeriesList = seriesList.stream()
+                .map(Series::getSeriesName)
+                .toList();
 
         form.setSeriesList(returnSeriesList);
     }
@@ -60,20 +60,9 @@ public class WriteService {
     public WriteForm getWriteEdit(Long sessionUserId, String postUrl) {
         User user = userService.findUserById(sessionUserId);
 
-        WriteForm writeForm = new WriteForm();
         Post postEdit = postService.findByPostUrl(postUrl);
 
-        writeForm.setId(postEdit.getId());
-        writeForm.setTitle(postEdit.getTitle());
-        writeForm.setTags(getTagsStringforForm(postEdit));
-        writeForm.setContent(postEdit.getContent());
-        writeForm.setPostSummary(postEdit.getPostSummary());
-        writeForm.setOpen(postEdit.getWritable());
-        writeForm.setUrl(postEdit.getPostUrl());
-        writeForm.setSeries(postEdit.getSeries().getSeriesName());
-        writeForm.setSeriesList(user.getSeriesList().stream().map(Series::getSeriesName).toList());
-
-        return writeForm;
+        return WriteForm.of(postEdit, user);
     }
 
     /**
@@ -88,33 +77,34 @@ public class WriteService {
         // 사용자 정보를 조회
         User userById = userService.findUserById(sessionUserId);
 
+        // 썸네일 설정
+        String storedFileName = handleThumnail(form);
+
+        // url, content 인코딩
+        encodingUrlAndContent(form);
+
+        // Post Entity 생성
+        Post post = Post.of(form, userById, seriesService.getSeries(form.getSeries()), storedFileName);
+
+        // Post save
+        Post postSaved = postRepository.save(post);
+
+        // Post에 딸린 Tag 생성 및 저장
+        setTag(tagProvider(form.getTags()), postSaved);
+
+    }
+
+    private void encodingUrlAndContent(WriteForm form) {
+        urlProvider(form); // url 설정
+        encodedContent(form); // content 인코딩
+    }
+
+    private String handleThumnail(WriteForm form) throws IOException {
         String storedFileName = DEFAULT_POST_PIC;
         if (form.getThumbnail() != null) {
             storedFileName = fileStore.storeFile(form.getThumbnail());
         }
-
-        Series series = seriesService.getSeries(form.getSeries());
-
-        urlProvider(form); // url 설정
-
-        encodedContent(form); // content 인코딩
-
-        Post post = Post.builder()
-                .title(form.getTitle())
-                .content(form.getContent())
-                .writable(!form.isOpen())
-                .postSummary(form.getPostSummary())
-                .postUrl(form.getUrl())
-                .series(series)
-                .thumbnail(storedFileName)
-                .user(userById)
-                .build();
-
-        List<Tag> tags = tagProvider(form.getTags());
-
-        Post postSaved = postRepository.save(post);
-        setTag(tags, postSaved);
-
+        return storedFileName;
     }
 
     /**
@@ -125,27 +115,34 @@ public class WriteService {
      */
     @Transactional
     public void saveEditWrite(WriteForm form, String postUrl) throws IOException {
+        // Post 엔티티 조회
         Post post = postService.findByPostUrl(postUrl);
 
-        Series series = seriesService.getSeries(form.getSeries());
-        post.updateSeries(series);
+        // Series 업데이트
+        post.updateSeries(seriesService.getSeries(form.getSeries()));
 
-        urlProvider(form); // url 설정
+        // url, content 인코딩
+        encodingUrlAndContent(form);
 
-        encodedContent(form); // content 설정
-
+        // thumnail, series 빼고 업데이트
         post.updatePostWithoutThumbnailAndSeries(form);
 
         // 기존 Post-PostTag 관계 제거
-        for (PostTag postTag : post.getPostTags()) {
-            postTag.getTag().getPostTags().remove(postTag); // Tag와의 관계 끊기
-        }
+        post.getPostTags().forEach(postTag -> postTag.getTag().getPostTags().remove(postTag));
         post.getPostTags().clear(); // Post와의 관계 끊기
 
-        //폼 객체에 썸네일이 들어있을 경우
+        // thumnail 업데이트 로직
+        editThumnail(form, post);
+
+        // Tag 업데이트
+        setTag(tagProvider(form.getTags()), post);
+
+    }
+
+    private void editThumnail(WriteForm form, Post post) throws IOException {
         if (form.getThumbnail() != null && !form.getThumbnail().isEmpty()) {
-            String thumbnailDeleted = post.getThumbnail(); //지울 썸네
-            String storedFileName = fileStore.storeFile(form.getThumbnail());//새로운 파일 업로드
+            String thumbnailDeleted = post.getThumbnail(); //지울 썸네일 사진파일 이름
+            String storedFileName = fileStore.storeFile(form.getThumbnail()); //새로운 파일 업로드
 
             post.updateThumbnail(storedFileName);
             if (thumbnailDeleted != null) {
@@ -153,11 +150,6 @@ public class WriteService {
                 fileStore.deleteFile(thumbnailDeleted); // 기존 파일 삭제
             }
         }
-
-        //Tag 업데이트
-        List<Tag> tags = tagProvider(form.getTags());
-        setTag(tags, post);
-
     }
 
     /**
@@ -166,18 +158,9 @@ public class WriteService {
      * @return
      */
     private static String getTagsStringforForm(Post postEdit) {
-        StringBuilder sb = new StringBuilder();
-        int count = 0;
-        for (PostTag postTag : postEdit.getPostTags()) {
-            String tagName = postTag.getTag().getName();
-            if (count != 0) {
-                sb.append(",");
-            }
-            count++;
-            sb.append(tagName);
-        }
-
-        return sb.toString();
+        return postEdit.getPostTags().stream()
+                .map(postTag -> postTag.getTag().getName())
+                .collect(Collectors.joining(","));
     }
 
     /**
@@ -187,16 +170,9 @@ public class WriteService {
      */
     private void setTag(List<Tag> tags, Post postSaved) {
         List<Tag> tagsSaved = tagRepository.saveAll(tags);
-        List<PostTag> postTagsForBulkSave = new ArrayList<>();
-
-        for (Tag tag : tagsSaved) {
-            PostTag postTag = PostTag.builder()
-                    .post(postSaved)
-                    .tag(tag)
-                    .build();
-
-            postTagsForBulkSave.add(postTag);
-        }
+        List<PostTag> postTagsForBulkSave = tagsSaved.stream()
+                .map(tag -> PostTag.of(postSaved, tag))
+                .toList();
         postTagRepository.saveAll(postTagsForBulkSave);
     }
 
