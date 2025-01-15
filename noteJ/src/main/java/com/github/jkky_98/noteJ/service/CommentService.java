@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -26,11 +28,24 @@ public class CommentService {
     }
 
     private Comment createCommentEntity(CommentController.SaveCommentRequest saveCommentRequest) {
-        Post postFind = postService.findByUserUsernameAndPostUrl(saveCommentRequest.getUsername(), saveCommentRequest.getPostUrl());
+        // Post와 User 조회
+        Post postFind = postService.findByUserUsernameAndPostUrl(
+                saveCommentRequest.getUsername(),
+                saveCommentRequest.getPostUrl()
+        );
         User userFindSession = userService.findUserById(saveCommentRequest.getSessionUser().getId());
 
-        Comment comment = Comment.of(postFind, userFindSession, saveCommentRequest.getCommentForm().getContent(), commentRepository.findById(saveCommentRequest.getCommentForm().getParentsId()));
-        return comment;
+        // 부모 댓글 조회
+        Optional<Comment> parentComment = Optional.ofNullable(saveCommentRequest.getCommentForm().getParentsId())
+                .flatMap(commentRepository::findById);
+
+        // Comment 엔티티 생성
+        return Comment.of(
+                postFind,
+                userFindSession,
+                saveCommentRequest.getCommentForm().getContent(),
+                parentComment
+        );
     }
 
 

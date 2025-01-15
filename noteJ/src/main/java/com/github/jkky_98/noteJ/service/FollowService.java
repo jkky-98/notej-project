@@ -4,7 +4,6 @@ import com.github.jkky_98.noteJ.domain.Follow;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.FollowRepository;
 import com.github.jkky_98.noteJ.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,67 +15,78 @@ import java.util.Optional;
 public class FollowService {
     
     private final FollowRepository followRepository;
-    private final UserRepository userRepository;
     private final NotificationService notificationService;
     private final UserService userService;
 
     @Transactional
-    public void follow(String sessionUsername, String getFollwingUsername) {
-        User userFollowing = userRepository.findByUsername(sessionUsername).orElseThrow(() -> new EntityNotFoundException("follow를 신청한 User를 찾을 수 없습니다. 세션 로그인 유저와 일치할 것..."));
-        User userGetFollowing = userRepository.findByUsername(getFollwingUsername).orElseThrow(() -> new EntityNotFoundException("follow를 당한 User를 찾을 수 없습니다"));
+    public void follow(String myUsername, String myFollowingUsername) {
+        User userMe = userService.findUserByUsername(myUsername);
+        User userMyFollowing = userService.findUserByUsername(myFollowingUsername);
         // 검증 및 Follow 엔티티 생성
-        Follow follow = validFollowUser(userFollowing, userGetFollowing);
+        Follow follow = validFollowUser(userMe, userMyFollowing);
         // 저장
         followRepository.save(follow);
         // 상대방에 팔로우 알림 보내기
-        notificationService.sendFollowNotification(userGetFollowing, userFollowing);
+        notificationService.sendFollowNotification(userMyFollowing, userMe);
     }
 
-    private Follow validFollowUser(User userFollowing, User userGetFollowing) {
+    private Follow validFollowUser(User userMe, User targetUser) {
         // 자기 자신을 팔로우하는 경우 예외 처리
-        if (userFollowing.getId().equals(userGetFollowing.getId())) {
+        if (userMe.getId().equals(targetUser.getId())) {
             throw new IllegalArgumentException("자기 자신을 팔로우할 수 없습니다.");
         }
 
         // 이미 팔로우한 사용자 체크
-        boolean alreadyFollowing = userFollowing.getFollowingList().stream()
-                .anyMatch(follow -> follow.getFollowing().equals(userGetFollowing));
+        boolean alreadyFollowing = userMe.getFollowingList().stream()
+                .anyMatch(follow -> follow.getFollowing().equals(targetUser));
 
         if (alreadyFollowing) {
             throw new IllegalArgumentException("이미 팔로우한 사용자입니다.");
         }
 
         // 팔로우 객체 생성
-        Follow follow = Follow.of(userFollowing, userGetFollowing);
+        Follow follow = Follow.of(userMe, targetUser);
 
         // 현재 사용자의 followingList에 추가
-        userFollowing.getFollowingList().add(follow);
+        userMe.getFollowingList().add(follow);
         // 상대방 사용자의 followerList에 추가
-        userGetFollowing.getFollowerList().add(follow);
+        targetUser.getFollowerList().add(follow);
 
         return follow;
     }
 
     @Transactional(readOnly = true)
-    public boolean isFollowing(Optional<User> sessionUser, String getFollwingUsername) {
-        return sessionUser.map(user -> {
-                    User userFind = userService.findUserById(user.getId());
-                    return userFind.getFollowingList().stream()
-                            .anyMatch(follow -> follow.getFollowing().getUsername().equals(getFollwingUsername));
-                })
+    public boolean isFollowing(Optional<User> sessionUser, String myFollowingUsername) {
+
+        User userMyFollowing = userService.findUserByUsername(myFollowingUsername);
+
+        // 세션 사용자와의 관계 확인
+        return sessionUser
+                .map(user -> checkIfUserIsFollowing(user, userMyFollowing))
                 .orElse(false);
     }
 
     @Transactional
-    public void unfollow(String sessionUsername, String getFollwingUsername) {
-        User sessionUser = userRepository.findByUsername(sessionUsername).orElseThrow(() -> new EntityNotFoundException("sessionUser를 찾을 수 없습니다."));
-        User userGetFollowing = userRepository.findByUsername(getFollwingUsername).orElseThrow(() -> new EntityNotFoundException("unfollow를 당한 User를 찾을 수 없습니다."));
+    public void unfollow(String sessionUsername, String myFollowingUsername) {
+        User sessionUser = userService.findUserByUsername(sessionUsername);
+        User userMyFollowing = userService.findUserByUsername(myFollowingUsername);
+
         Follow follow = sessionUser.getFollowingList().stream()
-                .filter(follow1 -> follow1.getFollowing().equals(userGetFollowing))
+                .filter(myFollowing -> myFollowing.matchFollowing(userMyFollowing))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("follow를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("요청에 대한 팔로잉 관계를 찾을 수 없습니다."));
 
         sessionUser.getFollowingList().remove(follow);
-        userGetFollowing.getFollowerList().remove(follow);
+        userMyFollowing.getFollowerList().remove(follow);
+    }
+
+    // 세션 유저가 특정 사용자를 팔로우하고 있는지 확인
+    private boolean checkIfUserIsFollowing(User sessionUser, User userMyFollowing) {
+        // 세션 유저의 정보 다시 조회
+        User userFind = userService.findUserById(sessionUser.getId());
+
+        // 팔로잉 리스트에서 특정 사용자와의 관계 확인
+        return userFind.getFollowingList().stream()
+                .anyMatch(follow -> follow.matchFollowing(userMyFollowing));
     }
 }

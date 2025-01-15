@@ -5,8 +5,6 @@ import lombok.Data;
 
 @Data
 public class CommentForm {
-
-    //toDo: 빈 값으로 업로드하면 안댐 테스트
     @NotBlank(message = "댓글을 입력하지 않았습니다.")
     private String content;
     private Long parentsId;

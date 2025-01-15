@@ -19,11 +19,11 @@ public class FollowController {
 
     @PostMapping("/follow")
     public String follow(@RequestParam String targetUsername,
-                         @SessionAttribute(SessionConst.LOGIN_USER) User loginUser,
+                         @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser,
                          @RequestHeader(value = "Referer", required = false, defaultValue = "/") String referer,
                          RedirectAttributes redirectAttributes) {
         // 팔로우 처리
-        followService.follow(loginUser.getUsername(), targetUsername);
+        followService.follow(sessionUser.getUsername(), targetUsername);
 
         // 팔로우 성공 메시지를 플래시 속성에 추가
         redirectAttributes.addFlashAttribute("followSuccess", true);
@@ -33,11 +33,11 @@ public class FollowController {
 
     @PostMapping("/unfollow")
     public String unfollow(@RequestParam String targetUsername,
-                           @SessionAttribute(SessionConst.LOGIN_USER) User loginUser,
+                           @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser,
                            @RequestHeader(value = "Referer", required = false, defaultValue = "/") String referer,
                            RedirectAttributes redirectAttributes) {
         // 언팔로우 처리
-        followService.unfollow(loginUser.getUsername(), targetUsername);
+        followService.unfollow(sessionUser.getUsername(), targetUsername);
 
         // 언팔로우 성공 메시지를 플래시 속성에 추가
         redirectAttributes.addFlashAttribute("unfollowSuccess", true);

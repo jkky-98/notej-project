@@ -43,4 +43,13 @@ public class Follow extends BaseTimeEntity {
                 .following(userGetFollowing)
                 .build();
     }
+
+    public boolean matchFollowingByUsername(String getFollowingUsername) {
+        return this.following.getUsername().equals(getFollowingUsername);
+    }
+
+    public boolean matchFollowing(User userMyFollowing) {
+        return this.following.equals(userMyFollowing);
+    }
+
 }
