@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +31,8 @@ public class NotificationService {
         // 알림 저장
         notificationRepository.save(notification);
 
-        userGetNotification.addReceivedNotification(notification); // 수신자에 알림 추가
-        userSendNotification.addSentNotification(notification); // 발송자에 알림 추가
+        userGetNotification.addNotificationToRecipient(notification); // 수신자에 알림 추가
+        userSendNotification.addNotificationToSender(notification); // 발송자에 알림 추가
     }
 
     /**
@@ -40,15 +41,10 @@ public class NotificationService {
      * @return
      */
     @Transactional(readOnly = true)
-    public List<NotificationDto> getNotification(User sessionUser) {
+    public List<NotificationDto> getNotification(User sessionUser, Optional<Boolean> status) {
+        List<Notification> notifications = filterNotificationsByStatus(sessionUser, status);
 
-        if (sessionUser == null) {
-            throw new UnauthenticatedUserException("not authenticated");
-        }
-
-        return notificationRepository.findAllNotificationsByUser(sessionUser).stream()
-                .map(NotificationDto::of)
-                .toList();
+        return convertNotificationsToDto(notifications);
     }
 
     /**
@@ -97,5 +93,17 @@ public class NotificationService {
     }
 
 
+    private List<NotificationDto> convertNotificationsToDto(List<Notification> notifications) {
+        return notifications.stream()
+                .map(NotificationDto::of)
+                .toList();
+    }
 
+    private List<Notification> filterNotificationsByStatus(User sessionUser, Optional<Boolean> status) {
+        List<Notification> notifications = status
+                .filter(s -> !s) // status가 false일 경우 필터 통과
+                .map(s -> notificationRepository.findAllUnreadNotificationsByUser(sessionUser))
+                .orElseGet(() -> notificationRepository.findAllNotificationsByUser(sessionUser)); // Optional이 empty거나 다른 값인 경우
+        return notifications;
+    }
 }
