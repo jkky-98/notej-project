@@ -2,6 +2,7 @@ package com.github.jkky_98.noteJ.web.controller;
 
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.service.FollowService;
+import com.github.jkky_98.noteJ.web.session.SessionConst;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,8 +19,8 @@ public class FollowController {
 
     @PostMapping("/follow")
     public String follow(@RequestParam String targetUsername,
-                         @SessionAttribute("loginUser") User loginUser,
-                         @RequestHeader(value = "Referer", required = false) String referer,
+                         @SessionAttribute(SessionConst.LOGIN_USER) User loginUser,
+                         @RequestHeader(value = "Referer", required = false, defaultValue = "/") String referer,
                          RedirectAttributes redirectAttributes) {
         // 팔로우 처리
         followService.follow(loginUser.getUsername(), targetUsername);
@@ -27,18 +28,13 @@ public class FollowController {
         // 팔로우 성공 메시지를 플래시 속성에 추가
         redirectAttributes.addFlashAttribute("followSuccess", true);
 
-        // Referer가 있으면 해당 URL로 리다이렉트, 없으면 기본 페이지로 리다이렉트
-        if (referer != null && !referer.isEmpty()) {
-            return "redirect:" + referer;
-        } else {
-            return "redirect:/";  // Referer가 없으면 기본 페이지로 리다이렉트
-        }
+        return "redirect:" + referer;
     }
 
     @PostMapping("/unfollow")
     public String unfollow(@RequestParam String targetUsername,
-                           @SessionAttribute("loginUser") User loginUser,
-                           @RequestHeader(value = "Referer", required = false) String referer,
+                           @SessionAttribute(SessionConst.LOGIN_USER) User loginUser,
+                           @RequestHeader(value = "Referer", required = false, defaultValue = "/") String referer,
                            RedirectAttributes redirectAttributes) {
         // 언팔로우 처리
         followService.unfollow(loginUser.getUsername(), targetUsername);
@@ -46,11 +42,6 @@ public class FollowController {
         // 언팔로우 성공 메시지를 플래시 속성에 추가
         redirectAttributes.addFlashAttribute("unfollowSuccess", true);
 
-        // Referer가 있으면 해당 URL로 리다이렉트, 없으면 기본 페이지로 리다이렉트
-        if (referer != null && !referer.isEmpty()) {
-            return "redirect:" + referer;
-        } else {
-            return "redirect:/";  // Referer가 없으면 기본 페이지로 리다이렉트
-        }
+        return "redirect:" + referer;
     }
 }

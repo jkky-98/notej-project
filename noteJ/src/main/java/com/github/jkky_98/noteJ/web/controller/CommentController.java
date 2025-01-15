@@ -5,6 +5,7 @@ import com.github.jkky_98.noteJ.service.CommentService;
 import com.github.jkky_98.noteJ.service.PostService;
 import com.github.jkky_98.noteJ.web.controller.dto.PostViewDto;
 import com.github.jkky_98.noteJ.web.controller.form.CommentForm;
+import com.github.jkky_98.noteJ.web.session.SessionConst;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class CommentController {
     public String writeComment(
             @PathVariable("username") String username, // 포스트 주인의 username
             @PathVariable("postUrl") String postUrl, // 포스트의 url
-            @SessionAttribute("loginUser") User sessionUser, // 코멘트 입력자
+            @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser, // 코멘트 입력자
             @Validated @ModelAttribute("commentForm") CommentForm commentForm, // 코멘트 폼 데이터
             BindingResult bindingResult,
             @RequestHeader("Referer") String referer,

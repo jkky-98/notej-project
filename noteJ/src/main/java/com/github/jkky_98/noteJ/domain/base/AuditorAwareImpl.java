@@ -1,6 +1,7 @@
 package com.github.jkky_98.noteJ.domain.base;
 
 import com.github.jkky_98.noteJ.domain.user.User;
+import com.github.jkky_98.noteJ.web.session.SessionConst;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.AuditorAware;
@@ -21,7 +22,7 @@ public class AuditorAwareImpl implements AuditorAware<String> {
     @Override
     public Optional<String> getCurrentAuditor() {
         // 세션에서 로그인된 사용자 정보 가져오기
-        User sessionUser = (User) httpSession.getAttribute("loginUser");
+        User sessionUser = (User) httpSession.getAttribute(SessionConst.LOGIN_USER);
 
         // 로그인된 사용자가 있다면 그 사용자의 username을 반환
         if (sessionUser != null) {

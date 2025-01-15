@@ -26,7 +26,7 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/login")
-    public String loginForm(@RequestHeader(value = "Referer", required = false) String referer,
+    public String loginForm(@RequestHeader(value = "Referer", required = false, defaultValue = "/") String referer,
                             @ModelAttribute("loginForm") LoginForm form,
                             Model model) {
 
@@ -114,13 +114,9 @@ public class AuthController {
     @PostMapping("/logout")
     public String logout(
             HttpSession session,
-            @RequestHeader(value = "Referer", required = false) String referer
+            @RequestHeader(value = "Referer", required = false, defaultValue = "/") String referer
                          ) {
         authService.logout(session);
-        if (referer != null && !referer.isEmpty()) {
-            return "redirect:" + referer;
-        } else {
-            return "redirect:/";
-        }
+        return "redirect:" + referer;
     }
 }

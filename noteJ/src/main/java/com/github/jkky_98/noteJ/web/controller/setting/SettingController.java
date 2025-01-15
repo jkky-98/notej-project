@@ -5,7 +5,7 @@ import com.github.jkky_98.noteJ.file.FileStore;
 import com.github.jkky_98.noteJ.service.setting.SettingService;
 import com.github.jkky_98.noteJ.web.controller.dto.SettingDto;
 import com.github.jkky_98.noteJ.web.controller.form.UserSettingsForm;
-import jakarta.servlet.http.HttpSession;
+import com.github.jkky_98.noteJ.web.session.SessionConst;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,14 +21,14 @@ public class SettingController {
     private final FileStore fileStore;
 
     @GetMapping("/settings")
-    public String settings(Model model, @SessionAttribute("loginUser") User sessionUser) {
+    public String settings(Model model, @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser) {
         SettingDto dto = settingService.getUserSettingData(sessionUser);
         model.addAttribute("settingDto", dto);
         return "setting/settings";
     }
 
     @PostMapping("/settings")
-    public String saveSettings(@ModelAttribute UserSettingsForm form, @SessionAttribute("loginUser") User sessionUser) throws IOException {
+    public String saveSettings(@ModelAttribute UserSettingsForm form, @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser) throws IOException {
         settingService.saveSettings(form, sessionUser);
         return "redirect:/";
     }

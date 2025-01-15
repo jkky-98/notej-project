@@ -6,6 +6,7 @@ import com.github.jkky_98.noteJ.service.PostService;
 import com.github.jkky_98.noteJ.service.PostStatsService;
 import com.github.jkky_98.noteJ.web.controller.dto.PostStatsDto;
 import com.github.jkky_98.noteJ.web.controller.form.CommentForm;
+import com.github.jkky_98.noteJ.web.session.SessionConst;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,7 +29,7 @@ public class PostController {
             @PathVariable("postUrl") String postUrl,
             @ModelAttribute("commentForm") CommentForm commentForm,
             Model model,
-            @SessionAttribute(value = "loginUser", required = false) User sessionUser,
+            @SessionAttribute(value = SessionConst.LOGIN_USER, required = false) User sessionUser,
             @RequestHeader(value = "X-Forwarded-For", required = false) String xForwardedForHeader
     ) {
         postHitsService.increamentPostView(username, postUrl, Optional.ofNullable(sessionUser), getClientIp(xForwardedForHeader));
@@ -41,7 +42,7 @@ public class PostController {
     @GetMapping("/@{username}/post/{postUrl}/stats")
     public String getPostStats(
             @PathVariable("postUrl") String postUrl,
-            @SessionAttribute("loginUser") User sessionUser,
+            @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser,
             Model model
     ) {
         PostStatsDto postStatsDto = postStatsService.getPostStats(postUrl, sessionUser);

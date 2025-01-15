@@ -6,6 +6,7 @@ import com.github.jkky_98.noteJ.repository.UserRepository;
 import com.github.jkky_98.noteJ.service.NotificationService;
 import com.github.jkky_98.noteJ.web.controller.dto.NotificationDto;
 import com.github.jkky_98.noteJ.web.controller.form.UserViewForm;
+import com.github.jkky_98.noteJ.web.session.SessionConst;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class GlobalControllerAdvice {
     @ModelAttribute
     public void addSessionUserToModel(HttpSession session, Model model) {
         // 세션에서 사용자 ID 가져오기
-        User sessionUser = (User) session.getAttribute("loginUser");
+        User sessionUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
         if (sessionUser == null) {
             return; // 세션에 사용자 정보가 없으면 바로 반환
         }

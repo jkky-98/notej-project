@@ -1,13 +1,10 @@
 package com.github.jkky_98.noteJ.web.controller;
 
-import com.github.jkky_98.noteJ.domain.Series;
 import com.github.jkky_98.noteJ.domain.user.User;
-import com.github.jkky_98.noteJ.service.FollowService;
 import com.github.jkky_98.noteJ.service.PostsService;
-import com.github.jkky_98.noteJ.service.ProfileService;
 import com.github.jkky_98.noteJ.service.SeriesService;
 import com.github.jkky_98.noteJ.web.controller.form.PostsConditionForm;
-import jakarta.servlet.http.HttpSession;
+import com.github.jkky_98.noteJ.web.session.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -27,7 +24,7 @@ public class PostsController {
     @GetMapping("/@{username}/posts")
     public String posts(@PathVariable("username") String usernamePost,
                         @ModelAttribute PostsConditionForm postsConditionForm,
-                        @SessionAttribute (name = "loginUser", required = false) User sessionUser,
+                        @SessionAttribute (name = SessionConst.LOGIN_USER, required = false) User sessionUser,
                         Model model
                         ) {
 
@@ -45,7 +42,7 @@ public class PostsController {
     @GetMapping("/@{username}/posts/series")
     public String postsSeries(
             @PathVariable("username") String username,
-            @SessionAttribute (name = "loginUser", required = false) User sessionUser,
+            @SessionAttribute (name = SessionConst.LOGIN_USER, required = false) User sessionUser,
             Model model
             ) {
         model.addAttribute("postsViewDto",
@@ -60,15 +57,11 @@ public class PostsController {
     @PostMapping("/@{username}/posts/series")
     public String postsSeriesSaveSeries(
             @RequestParam String seriesName,
-            @SessionAttribute("loginUser") User sessionUser,
-            @RequestHeader(value = "Referer", required = false) String referer
+            @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser,
+            @RequestHeader(value = "Referer", required = false, defaultValue = "/") String referer
             ) {
         seriesService.saveSeries(sessionUser, seriesName);
 
-        if (referer != null && !referer.isEmpty()) {
-            return "redirect:" + referer;
-        } else {
-            return "redirect:/";
-        }
+        return "redirect:" + referer;
     }
 }

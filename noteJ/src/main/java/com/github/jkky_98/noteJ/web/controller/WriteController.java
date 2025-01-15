@@ -3,6 +3,7 @@ package com.github.jkky_98.noteJ.web.controller;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.service.WriteService;
 import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
+import com.github.jkky_98.noteJ.web.session.SessionConst;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +22,7 @@ public class WriteController {
     @GetMapping("/write")
     public String write(
             @ModelAttribute WriteForm writeForm,
-            @SessionAttribute("loginUser") User sessionUser
+            @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser
             ) {
 
         writeService.getWrite(writeForm, sessionUser.getId());
@@ -32,7 +33,7 @@ public class WriteController {
     public String writeSave(
             @Validated @ModelAttribute WriteForm writeForm,
             BindingResult bindingResult,
-            @SessionAttribute("loginUser") User sessionUser
+            @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser
     ) throws IOException {
         if (bindingResult.hasErrors()) {
             return "write";
@@ -45,7 +46,7 @@ public class WriteController {
     @GetMapping("/edit/{postUrl}")
     public String edit(
             @PathVariable("postUrl") String postUrl,
-            @SessionAttribute("loginUser") User sessionUser,
+            @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser,
             Model model
     ) {
         WriteForm writeEditForm = writeService.getWriteEdit(sessionUser.getId(), postUrl);
@@ -57,7 +58,7 @@ public class WriteController {
     @PostMapping("/edit/{postUrl}")
     public String editSave(
             @Validated @ModelAttribute WriteForm form,
-            @SessionAttribute("loginUser") User sessionUser,
+            @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser,
             @PathVariable String postUrl,
             BindingResult bindResult
     ) throws IOException {

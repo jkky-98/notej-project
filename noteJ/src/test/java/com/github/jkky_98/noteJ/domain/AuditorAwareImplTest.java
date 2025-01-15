@@ -2,6 +2,7 @@ package com.github.jkky_98.noteJ.domain;
 
 import com.github.jkky_98.noteJ.domain.base.AuditorAwareImpl;
 import com.github.jkky_98.noteJ.domain.user.User;
+import com.github.jkky_98.noteJ.web.session.SessionConst;
 import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,7 +29,7 @@ class AuditorAwareImplTest {
     void getCurrentAuditorWhenUserIsLoggedInTest() {
         // given
         User mockUser = User.builder().username("testuser").build();
-        httpSession.setAttribute("loginUser", mockUser);
+        httpSession.setAttribute(SessionConst.LOGIN_USER, mockUser);
 
         // when
         Optional<String> auditor = auditorAware.getCurrentAuditor();
