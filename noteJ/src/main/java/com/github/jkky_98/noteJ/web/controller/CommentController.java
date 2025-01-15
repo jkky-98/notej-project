@@ -5,6 +5,8 @@ import com.github.jkky_98.noteJ.service.CommentService;
 import com.github.jkky_98.noteJ.service.PostService;
 import com.github.jkky_98.noteJ.web.controller.dto.PostViewDto;
 import com.github.jkky_98.noteJ.web.controller.form.CommentForm;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,15 +39,33 @@ public class CommentController {
             return "postView";
         }
 
-        // 쿼리 파라미터 제거 로직
+        // 쿼리 파라미터 제거한 referer
+        referer = removeQueryStringInReferer(referer);
+
+        commentService.saveComment(SaveCommentRequest.of(commentForm, sessionUser, postUrl, username));
+        return "redirect:" + (referer != null ? referer : "/");
+    }
+
+    private static String removeQueryStringInReferer(String referer) {
         if (referer != null) {
             int queryIndex = referer.indexOf("?");
             if (queryIndex != -1) {
                 referer = referer.substring(0, queryIndex); // 쿼리 파라미터 제거
             }
         }
+        return referer;
+    }
 
-        commentService.saveComment(commentForm, sessionUser, postUrl, username);
-        return "redirect:" + (referer != null ? referer : "/");
+    @Getter
+    @AllArgsConstructor
+    public static class SaveCommentRequest {
+        private final CommentForm commentForm;
+        private final User sessionUser;
+        private final String postUrl;
+        private final String username;
+
+        private static SaveCommentRequest of(CommentForm commentForm, User sessionUser, String postUrl, String username) {
+            return new SaveCommentRequest(commentForm, sessionUser, postUrl, username);
+        }
     }
 }
