@@ -1,11 +1,9 @@
 package com.github.jkky_98.noteJ.service;
 
-import com.github.jkky_98.noteJ.domain.user.ThemeMode;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
 import com.github.jkky_98.noteJ.web.controller.form.LoginForm;
 import com.github.jkky_98.noteJ.web.controller.form.SignUpForm;
 import com.github.jkky_98.noteJ.domain.user.User;
-import com.github.jkky_98.noteJ.domain.user.UserRole;
 import com.github.jkky_98.noteJ.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -27,18 +25,12 @@ public class AuthSessionService implements AuthService {
 
     @Override
     public User login(LoginForm form) throws AuthenticationException {
-        String loginId = form.getUsername();
-        String loginPassword = form.getPassword();
+        String AuthenticationUsername = form.getUsername();
+        String AuthenticationPassword = form.getPassword();
 
-        User loginUser = userRepository.findByUsername(loginId)
-                .filter(user -> user.getPassword().equals(loginPassword))
-                .orElse(null);
-
-        if (loginUser == null) {
-            throw new AuthenticationException("아이디 또는 비밀번호가 맞지 않습니다.");
-        }
-
-        return loginUser;
+        return userRepository.findByUsername(AuthenticationUsername)
+                .filter(user -> user.isPasswordValid(AuthenticationPassword))
+                .orElseThrow(() -> new AuthenticationException("아이디 또는 비밀번호가 맞지 않습니다."));
     }
 
     @Override
@@ -46,28 +38,39 @@ public class AuthSessionService implements AuthService {
         // 중복 검증
         validSignUpForm(signUpForm);
 
-        /**
-         * User, UserDesc 구축
-         */
-        User signUpUser = initializeUser(signUpForm);
+        User signUpUser = createUserWithDescription(signUpForm);
 
         return userRepository.save(signUpUser);
     }
 
-    private static User initializeUser(SignUpForm signUpForm) {
+    /**
+     * User, UserDesc 엔티티 생성 메서드(UserDesc는 User에 내재된다.)
+     * @param signUpForm
+     * @return
+     */
+    private static User createUserWithDescription(SignUpForm signUpForm) {
         UserDesc userDesc = UserDesc.of(signUpForm);
         User signUpUser = User.of(signUpForm, userDesc);
         return signUpUser;
     }
 
+    /**
+     * 이메일, Username 중복 검증
+     * @param signUpForm
+     */
     private void validSignUpForm(SignUpForm signUpForm) {
-        // 중복 체크: username
-        if (userRepository.findByUsername(signUpForm.getUsername()).isPresent()) {
+        validateUsernameDuplication(signUpForm.getUsername());
+        validateEmailDuplication(signUpForm.getEmail());
+    }
+
+    private void validateUsernameDuplication(String username) {
+        if (userRepository.findByUsername(username).isPresent()) {
             throw new DataIntegrityViolationException("Username already exists.");
         }
+    }
 
-        // 중복 체크: email
-        if (userRepository.findByEmail(signUpForm.getEmail()).isPresent()) {
+    private void validateEmailDuplication(String email) {
+        if (userRepository.findByEmail(email).isPresent()) {
             throw new DataIntegrityViolationException("Email already exists.");
         }
     }
