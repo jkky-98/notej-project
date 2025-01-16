@@ -25,7 +25,7 @@ public class Notification extends BaseEntity {
     // 연관관계
     // 수신자 (알림을 받는 사용자)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "receiver_id")
     private User receiver;
 
     // 발신자 (알림을 발생시킨 사용자)
@@ -42,7 +42,7 @@ public class Notification extends BaseEntity {
     }
 
     public void readNotification() {
-        if (!status) {
+        if (status == false) {
             this.status = true;
         } else {
             throw new IllegalStateException("이미 읽은 Notification을 읽음 처리하려고 하고 있습니다.");

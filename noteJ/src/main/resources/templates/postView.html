@@ -95,7 +95,7 @@
         <div class="post" th:object="${postViewDto}">
             <!-- Post Title -->
             <div class="post-header" th:text="${postViewDto.title}">title</div>
-            <div th:insert="~{fragments/likeButton :: like-button}">
+            <div th:insert="~{fragments/likeButton :: like-button}" th:if="${sessionUser != null and postViewDto.username != sessionUser.username}">
             </div>
             <!-- Post Meta -->
             <div class="post-meta">
