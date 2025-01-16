@@ -20,13 +20,28 @@
     var fullUrl = window.location.href; // 전체 URL 가져오기
     var pathArray = fullUrl.split('/'); // '/'를 기준으로 URL 분리
     var postUrl = pathArray[5]; // 마지막 경로를 postUrl로 설정 (예: "/posts/123" → "123")
+    var like_parent = document.querySelector('.like-container');
+
+    var burst = new mojs.Burst({
+        parent: like_parent,
+        radius:   { 20: 60 },
+        count: 15,
+        angle:{0:30},
+        children: {
+            delay: 250,
+            duration: 700,
+            radius:{10: 0},
+            fill:   [ '#ddca7e' ],
+            easing: 		mojs.easing.bezier(.08,.69,.39,.97)
+        }
+    });
 
     $(document).ready(function () {
         // 페이지 로드 시 초기 상태 가져오기
         fetchLikeStatus();
     });
 
-    // 좋아요 상태 가져오기
+        // 좋아요 상태 가져오기
     function fetchLikeStatus() {
         $.ajax({
             url: "/like/status", // 서버에서 좋아요 상태를 반환하는 API 엔드포인트
@@ -147,6 +162,7 @@
         t1.set('.like-btn', {scale: 0});
         t1.to(like_cnt, 0.6, {scale: 1, background: '#6da7ff', ease: Expo.easeOut});
         t2.to('.like-btn', 0.65, {scale: 1, ease: Elastic.easeOut.config(1, 0.3)}, '+=0.2');
+        burst.replay();
     }
 
     // 좋아요 비활성화 애니메이션
@@ -160,7 +176,7 @@
 <style>
     .like-container {
         filter: url('#filter');
-        position: relative;
+        position: fixed;
         left: 5%;
         top: 50%;
         transform: translate(50%, -50%);
