@@ -1,12 +1,11 @@
 package com.github.jkky_98.noteJ.service;
 
 import com.github.jkky_98.noteJ.domain.Like;
-import com.github.jkky_98.noteJ.domain.Notification;
 import com.github.jkky_98.noteJ.domain.Post;
 import com.github.jkky_98.noteJ.domain.user.User;
-import com.github.jkky_98.noteJ.exception.SelfLikeException;
+import com.github.jkky_98.noteJ.exception.LikeBadRequestClientException;
+import com.github.jkky_98.noteJ.exception.LikeSelfSaveClientException;
 import com.github.jkky_98.noteJ.repository.LikeRepository;
-import com.github.jkky_98.noteJ.repository.PostRepository;
 import com.github.jkky_98.noteJ.service.dto.GetLikeStatusServiceDto;
 import com.github.jkky_98.noteJ.web.controller.dto.LikeStatusResponseDto;
 import jakarta.persistence.EntityNotFoundException;
@@ -39,14 +38,14 @@ public class LikeService {
     public void saveLike(String postUrl, boolean liked, Long sessionUserId) {
         if (liked != false) {
             log.error("좋아요 상태 : {}", liked);
-            throw new IllegalStateException("좋아요 상태가 역전되어 있습니다.");
+            throw new LikeBadRequestClientException("좋아요 상태가 역전되어 있습니다.");
         }
 
         Post postFind = postService.findByPostUrl(postUrl);
         User userFind = userService.findUserById(sessionUserId);
 
         if (postFind.getUser().getId() == userFind.getId()) {
-            throw new SelfLikeException("스스로에게 좋아요는 불가능 합니다.");
+            throw new LikeSelfSaveClientException("스스로에게 좋아요는 불가능 합니다.");
         }
 
         Like like = Like.of(postFind, userFind);
@@ -59,7 +58,7 @@ public class LikeService {
     @Transactional
     public void deleteLike(String postUrl, boolean liked, Long sessionUserId) {
         if (liked != true) {
-            throw new IllegalStateException("좋아요 상태가 역전되어 있습니다.");
+            throw new LikeBadRequestClientException("좋아요 상태가 역전되어 있습니다.");
         }
 
         Post postFind = postService.findByPostUrl(postUrl);
