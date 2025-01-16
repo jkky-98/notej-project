@@ -26,15 +26,19 @@ public class Notification extends BaseEntity {
     // 수신자 (알림을 받는 사용자)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private User receiver;
 
     // 발신자 (알림을 발생시킨 사용자)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id")
     private User sender;  // 알림을 발생시킨 사용자 (발신자)
 
-    public void updateUser(User user) {
-        this.user = user;
+    public void updateReceiver(User user) {
+        this.receiver = user;
+    }
+
+    public void updateSender(User user) {
+        this.sender = user;
     }
 
     public void readNotification() {
@@ -51,7 +55,17 @@ public class Notification extends BaseEntity {
                 .message(userSendNotification.getUsername() + "님으로부터 팔로우 되었습니다.")
                 .status(false)
                 .sender(userSendNotification)
-                .user(userGetNotification)
+                .receiver(userGetNotification)
+                .build();
+    }
+
+    public static Notification ofLike(User userSendNotification, User userGetNotification, String postTitle) {
+        return Notification.builder()
+                .type(NotificationType.LIKE)
+                .message(userSendNotification.getUsername() + "님이 당신의 게시글 : " + postTitle + "에 좋아요를 눌렀습니다.")
+                .status(false)
+                .sender(userSendNotification)
+                .receiver(userGetNotification)
                 .build();
     }
 }

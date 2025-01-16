@@ -30,4 +30,11 @@ public class Like extends BaseTimeEntity {
     public void updatePost(Post post) {
         this.post = post;
     }
+
+    public static Like of(Post post, User user) {
+        return Like.builder()
+                .post(post)
+                .user(user)
+                .build();
+    }
 }

@@ -1,0 +1,194 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="like-button">
+<div class="like-container">
+    <div class="like-cnt unchecked" id="like-cnt">
+        <i class="like-btn material-icons">thumb_up</i>
+    </div>
+</div>
+<!-- Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/mojs/latest/mo.min.js"></script>
+<script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/16327/DrawSVGPlugin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js"></script>
+
+<script th:inline="javascript">
+    var check_status = false; // 좋아요 상태 초기값
+    var like_cnt = $("#like-cnt");
+    var fullUrl = window.location.href; // 전체 URL 가져오기
+    var pathArray = fullUrl.split('/'); // '/'를 기준으로 URL 분리
+    var postUrl = pathArray[5]; // 마지막 경로를 postUrl로 설정 (예: "/posts/123" → "123")
+
+    $(document).ready(function () {
+        // 페이지 로드 시 초기 상태 가져오기
+        fetchLikeStatus();
+    });
+
+    // 좋아요 상태 가져오기
+    function fetchLikeStatus() {
+        $.ajax({
+            url: "/like/status", // 서버에서 좋아요 상태를 반환하는 API 엔드포인트
+            type: "GET",
+            data: {
+                postUrl: postUrl
+            }, // 게시물 ID (예시)
+            headers: {
+                Accept: "application/json" // JSON 응답을 요청
+            },
+            success: function (response) {
+                console.log("좋아요 상태 초기화 성공:", response);
+
+                // 좋아요 상태 설정 (response.liked는 서버에서 반환된 좋아요 상태)
+                check_status = response.liked;
+
+                // 초기 UI 업데이트
+                if (check_status) {
+                    activateLikeAnimation(); // 좋아요 활성화 상태로 초기화
+                } else {
+                    deactivateLikeAnimation(); // 좋아요 비활성화 상태로 초기화
+                }
+
+                console.log("fetch 완료: ", check_status)
+            },
+            error: function (xhr, status, error) {
+                console.error("좋아요 상태 초기화 실패:", error);
+                console.error("좋아요 상태를 가져오지 못했습니다.");
+            }
+        });
+    }
+
+    // 좋아요 버튼 클릭 이벤트
+    $("#like-cnt").click(function () {
+        if (!check_status) {
+            sendLikeRequest(false); // 좋아요 요청
+        } else {
+            sendLikeCancelRequest(true); // 좋아요 취소 요청
+        }
+    });
+
+    // 서버로 좋아요 상태 요청을 보내는 함수
+    function sendLikeRequest(likeStatus) {
+        var requestData = {
+            postUrl: postUrl, // 게시물 ID (예시)
+            liked: likeStatus // true: 좋아요, false: 좋아요 취소
+        };
+        console.log("현재 like 상태 : ", likeStatus)
+
+        $.ajax({
+            url: "/like/save",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(requestData),
+            headers: {
+                Accept: "application/json" // JSON 응답을 요청
+            },
+            success: function (response) {
+                console.log("좋아요 상태 전송 성공:", response);
+
+                // 좋아요 상태 변경
+                check_status = true;
+
+                // 애니메이션 처리
+                if (check_status) {
+                    activateLikeAnimation();
+                } else {
+                    deactivateLikeAnimation();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("좋아요 상태 전송 실패:", error);
+                console.error("좋아요 요청 처리에 실패했습니다. 다시 시도해주세요.");
+            }
+        });
+    }
+
+    // 서버로 좋아요 상태 요청을 보내는 함수
+    function sendLikeCancelRequest(likeStatus) {
+        var requestData = {
+            postUrl: postUrl, // 게시물 ID (예시)
+            liked: likeStatus // true: 좋아요, false: 좋아요 취소
+        };
+
+        $.ajax({
+            url: "/like/delete",
+            type: "DELETE",
+            contentType: "application/json",
+            data: JSON.stringify(requestData),
+            headers: {
+                Accept: "application/json" // JSON 응답을 요청
+            },
+            success: function (response) {
+                console.log("좋아요 상태 전송 성공:", response);
+
+                // 좋아요 상태 변경
+                check_status = false;
+
+                // 애니메이션 처리
+                if (check_status) {
+                    activateLikeAnimation();
+                } else {
+                    deactivateLikeAnimation();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("좋아요 상태 전송 실패:", error);
+                console.error("좋아요 요청 처리에 실패했습니다. 다시 시도해주세요.");
+            }
+        });
+    }
+
+    // 좋아요 활성화 애니메이션
+    function activateLikeAnimation() {
+        var t1 = new TimelineLite();
+        var t2 = new TimelineLite();
+        t1.set(like_cnt, {scale: 0});
+        t1.set('.like-btn', {scale: 0});
+        t1.to(like_cnt, 0.6, {scale: 1, background: '#6da7ff', ease: Expo.easeOut});
+        t2.to('.like-btn', 0.65, {scale: 1, ease: Elastic.easeOut.config(1, 0.3)}, '+=0.2');
+    }
+
+    // 좋아요 비활성화 애니메이션
+    function deactivateLikeAnimation() {
+        var t1 = new TimelineLite();
+        t1.to(like_cnt, 1, {scale: 1})
+            .to(like_cnt, 1, {scale: 1, background: 'rgba(100, 100, 100, 0.3)', ease: Power4.easeOut});
+        t1.timeScale(7);
+    }
+</script>
+<style>
+    .like-container {
+        filter: url('#filter');
+        position: relative;
+        left: 5%;
+        top: 50%;
+        transform: translate(50%, -50%);
+    }
+    .like-cnt {
+        position: fixed;
+        cursor: pointer;
+        left: 50%;
+        top: 100%;
+        transform: translate(50%, -50%);
+        background: rgba(100, 100, 100, 0.3);
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 75px;
+        z-index: 10;
+    }
+    .like-btn {
+        color: #fff;
+    }
+    ::-moz-selection {
+        background: transparent;
+    }
+    ::selection {
+        background: transparent;
+    }
+</style>
+</div>
+</body>
+</html>

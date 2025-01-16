@@ -23,7 +23,8 @@ public class AuthorizationUsernamePasswordFilter implements Filter {
             "/js/**",
             "/img/**",
             "/storage/**",
-            "/@*/posts/**" // 복잡한 경로 매칭 가능
+            "/@*/posts/**",
+            "/@*/post/*"
     };
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 

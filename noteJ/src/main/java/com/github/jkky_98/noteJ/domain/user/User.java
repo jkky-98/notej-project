@@ -48,7 +48,7 @@ public class User extends BaseEntity {
     private List<Series> seriesList = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "receiver")
     private List<Notification> receivedNotifications = new ArrayList<>();
 
     @Builder.Default
@@ -92,8 +92,8 @@ public class User extends BaseEntity {
     // 연관관계 설정 메서드 (User가 Notification을 수신하는 경우)
     public void addNotificationToRecipient(Notification notification) {
         this.receivedNotifications.add(notification);
-        if (notification.getUser() != this) {
-            notification.updateUser(this);  // 수신자 설정
+        if (notification.getReceiver() != this) {
+            notification.updateReceiver(this);  // 수신자 설정
         }
     }
 
@@ -101,7 +101,7 @@ public class User extends BaseEntity {
     public void addNotificationToSender(Notification notification) {
         this.sentNotifications.add(notification);
         if (notification.getSender() != this) {
-            notification.updateUser(this);  // 발송자 설정
+            notification.updateSender(this);  // 발송자 설정
         }
     }
 
