@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<div th:insert="~{fragments/header :: header}"></div>
 <head>
     <meta charset="UTF-8">
     <title>글 작성</title>
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.33.0/tagify.min.css" />
     <style>
         .write-container {
             max-width: 95%;
@@ -96,9 +98,8 @@
         <!-- 에러 메시지 렌더링 -->
         <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
         <!-- 태그 입력 -->
-        <small class="text-muted">태그를 입력하세요</small>
-        <input type="text" th:field="*{tags}" class="form-control mb-3" placeholder="예: Java, Spring, Thymeleaf">
-
+        <input type="hidden" th:field="*{tags}">
+        <input type="text" name="tag-input" id="tag-input"class="form-control mb-3" placeholder="태그를 작성해주세요.">
         <!-- 에디터를 적용할 요소 (컨테이너) -->
         <div id="editor">
         </div>
@@ -187,6 +188,7 @@
 
 <!-- TUI 에디터 JS CDN -->
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.33.0/tagify.min.js"></script>
 
 <script th:inline="javascript">
     let writeFormContent = /*[[${writeForm.content ?: ''}]]*/ '';
@@ -239,6 +241,18 @@
     document.querySelector('#editor-content-provider').value = encodedContent;
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        var input = document.querySelector('input[name=tag-input]');
 
+        const hiddenInput = document.querySelector('#tags');
+        const tagify = new Tagify(input);
+
+        // 태그 변경 시 숨겨진 필드에 값 저장
+        tagify.on('change', () => {
+            hiddenInput.value = tagify.value.map(tag => tag.value);
+        });
+    });
+</script>
 </body>
 </html>

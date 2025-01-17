@@ -81,7 +81,9 @@ public class WriteService {
         String storedFileName = handleThumnail(form);
 
         // url, content 인코딩
+        log.info("[인코딩 전 Content 정보 확인] : {}" , form.getContent());
         encodingUrlAndContent(form);
+        log.info("[인코딩 후 Content 정보 확인] : {}" , form.getContent());
 
         // Post Entity 생성
         Post post = Post.of(form, userById, seriesService.getSeries(form.getSeries()), storedFileName);
@@ -190,24 +192,14 @@ public class WriteService {
      * @param tags
      * @return
      */
-    private List<Tag> tagProvider(String tags) {
-        if (tags == null || tags.trim().isEmpty()) {
+    private List<Tag> tagProvider(List<String> tags) {
+        if (tags == null || tags.isEmpty()) {
             return List.of();
         }
-        List<String> tagsPrev = Arrays.stream(tags.split(","))
-                .map(String::trim) // 각 태그의 앞뒤 공백 제거
-                .filter(tag -> !tag.isEmpty()) // 빈 태그 제거
+
+        return tags.stream()
+                .map(Tag::of)
                 .toList();
-
-        List<Tag> returnTagList = new ArrayList<>();
-
-        for (String tagString : tagsPrev) {
-            returnTagList.add(Tag.builder()
-                    .name(tagString)
-                    .build());
-        }
-
-        return returnTagList;
     }
 
     /**

@@ -68,4 +68,24 @@ public class Notification extends BaseEntity {
                 .receiver(userGetNotification)
                 .build();
     }
+
+    public static Notification ofComment(User userSendNotification, User userGetNotification, String postTitle) {
+        return Notification.builder()
+                .type(NotificationType.COMMENT)
+                .message(userSendNotification.getUsername() + "님이 당신의 게시글 : " + postTitle + "에 댓글을 남겼습니다.")
+                .status(false)
+                .sender(userSendNotification)
+                .receiver(userGetNotification)
+                .build();
+    }
+
+    public static Notification ofCommentParents(User userSendNotification, User userGetNotification, String postTitle) {
+        return Notification.builder()
+                .type(NotificationType.COMMENT)
+                .message(userSendNotification.getUsername() + "님이 게시글 : " + postTitle + "의 당신의 댓글에 대댓글을 남겼습니다.")
+                .status(false)
+                .sender(userSendNotification)
+                .receiver(userGetNotification)
+                .build();
+    }
 }

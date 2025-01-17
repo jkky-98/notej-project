@@ -34,9 +34,28 @@ public class NotificationService {
         userGetNotification.addNotificationToRecipient(notification); // 수신자에 알림 추가
         userSendNotification.addNotificationToSender(notification); // 발송자에 알림 추가
     }
+
     @Transactional
     public void sendLikePostNotification(User userGetNotification, User userSendNotification, String postTitle) {
         Notification notification = Notification.ofLike(userSendNotification, userGetNotification, postTitle);
+        notificationRepository.save(notification);
+
+        userGetNotification.addNotificationToRecipient(notification);
+        userSendNotification.addNotificationToSender(notification);
+    }
+
+    @Transactional
+    public void sendCommentPostNotification(User userGetNotification, User userSendNotification, String postTitle) {
+        Notification notification = Notification.ofComment(userSendNotification, userGetNotification, postTitle);
+        notificationRepository.save(notification);
+
+        userGetNotification.addNotificationToRecipient(notification);
+        userSendNotification.addNotificationToSender(notification);
+    }
+
+    @Transactional
+    public void sendCommentParentsNotification(User userGetNotification, User userSendNotification, String postTitle) {
+        Notification notification = Notification.ofCommentParents(userSendNotification, userGetNotification, postTitle);
         notificationRepository.save(notification);
 
         userGetNotification.addNotificationToRecipient(notification);
