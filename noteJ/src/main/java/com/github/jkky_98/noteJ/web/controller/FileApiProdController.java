@@ -1,8 +1,10 @@
 package com.github.jkky_98.noteJ.web.controller;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectTagging;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -15,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -47,7 +51,18 @@ public class FileApiProdController {
 
         try (InputStream inputStream = image.getInputStream()) {
             // S3에 파일 업로드
-            amazonS3.putObject(new PutObjectRequest(s3BucketName, saveFilename, inputStream, null));
+            // 태그 추가
+            List<Tag> tags = new ArrayList<>();
+            tags.add(new Tag("Status", "delete")); // "Status=delete" 태그 추가
+
+            PutObjectRequest putObjectRequest = new PutObjectRequest(
+                    s3BucketName,
+                    saveFilename,
+                    inputStream,
+                    null).withTagging(new ObjectTagging(tags));
+
+            amazonS3.putObject(putObjectRequest);
+
             return saveFilename;
         } catch (IOException e) {
             throw new RuntimeException("Error uploading file to S3", e);
@@ -68,4 +83,5 @@ public class FileApiProdController {
             throw new RuntimeException("Error download and print from S3");
         }
     }
+
 }
