@@ -26,6 +26,6 @@ public class WebProdConfig implements WebMvcConfigurer {
         // /storage/** 경로를 통해 S3 파일에 접근하도록 설정
         registry.addResourceHandler("/storage/**")
                 // S3 버킷을 URL로 사용
-                .addResourceLocations("https://"+s3BucketName+".s3.amazonaws.com/");
+                .addResourceLocations("https://"+s3BucketName+".s3.ap-northeast-2.amazonaws.com/");
     }
 }
