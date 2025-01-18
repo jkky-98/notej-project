@@ -2,6 +2,7 @@ package com.github.jkky_98.noteJ.web.controller.setting;
 
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.file.FileStore;
+import com.github.jkky_98.noteJ.service.setting.SettingLocalService;
 import com.github.jkky_98.noteJ.service.setting.SettingService;
 import com.github.jkky_98.noteJ.web.controller.dto.SettingDto;
 import com.github.jkky_98.noteJ.web.controller.form.UserSettingsForm;

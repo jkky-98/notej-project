@@ -1,6 +1,5 @@
 package com.github.jkky_98.noteJ.service.setting;
 
-import com.amazonaws.services.s3.AmazonS3;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
 import com.github.jkky_98.noteJ.file.FileStore;
@@ -9,7 +8,6 @@ import com.github.jkky_98.noteJ.web.controller.dto.SettingDto;
 import com.github.jkky_98.noteJ.web.controller.form.UserSettingsForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,20 +17,13 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Profile("local")
 @Slf4j
-@Profile("!local")
-public class SettingProdService implements SettingService {
+public class SettingLocalService implements SettingService {
 
     private final UserRepository userRepository;
     private final FileStore fileStore;
 
-    // 파일 업로드 경로
-    @Value("${cloud.aws.s3.bucket}")
-    private String s3BucketName;
-
-    private final AmazonS3 amazonS3;
-
-    //toDo: 세션 객체 의존 없애기 컨트롤러에서 처리(어차피 바꿀 인증시스템이므로 의존도를 깊게 내리지 말자)
     @Transactional
     public Optional<String> saveSettings(UserSettingsForm form, User sessionUser) throws IOException {
 
@@ -49,7 +40,7 @@ public class SettingProdService implements SettingService {
         // ProfilePic 저장 FileStore 이용
         String newProfilePicPath = null;
 
-        if (form.getProfilePic() != null) {
+        if (form.getProfilePic() != null && !form.getProfilePic().isEmpty()) {
             try {
                 String profilePicMetadata = fileStore.storeFile(form.getProfilePic());
                 newProfilePicPath = profilePicMetadata;
@@ -83,7 +74,7 @@ public class SettingProdService implements SettingService {
                 settingDto.setDescription(userDesc.getDescription());
                 settingDto.setBlogTitle(userDesc.getBlogTitle());
                 settingDto.setNoteJAlarm(userDesc.isNoteJAlarm());
-                settingDto.setProfilePic(getProfilePicUrlS3(s3BucketName, userDesc.getProfilePic()));
+                settingDto.setProfilePic(userDesc.getProfilePic());
                 settingDto.setTheme(userDesc.getTheme());
                 settingDto.setSocialEmail(userDesc.getSocialEmail());
                 settingDto.setSocialFacebook(userDesc.getSocialFacebook());
@@ -99,14 +90,5 @@ public class SettingProdService implements SettingService {
             throw new IllegalStateException("User is not logged in");
         }
 
-    }
-
-    private String getProfilePicUrlS3(String s3BucketName, String profilePic) {
-
-        return String.format("https://%s.s3.%s.amazonaws.com/%s",
-                s3BucketName,
-                amazonS3.getRegionName(), // S3 버킷의 리전
-                profilePic // S3 오브젝트 키
-        );
     }
 }
