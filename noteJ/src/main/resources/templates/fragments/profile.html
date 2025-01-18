@@ -104,32 +104,7 @@
         <div class="profile-description" th:text="*{description}">사용자 설명</div>
 
         <!-- 소셜 아이콘 -->
-        <div class="profile-icons">
-            <!-- 항상 랜더링되는 socialEmail -->
-            <a th:href="*{socialEmail}" title="Email" th:if="*{socialEmail}">
-                <i class="bi bi-envelope"></i>
-            </a>
-
-            <!-- GitHub (값이 있을 때만 랜더링) -->
-            <a th:href="*{socialGitHub}" target="_blank" title="GitHub" th:if="*{socialGitHub}">
-                <i class="bi bi-github"></i>
-            </a>
-
-            <!-- Twitter (값이 있을 때만 랜더링) -->
-            <a th:href="*{socialTwitter}" target="_blank" title="Twitter" th:if="*{socialTwitter}">
-                <i class="bi bi-twitter"></i>
-            </a>
-
-            <!-- Facebook (값이 있을 때만 랜더링) -->
-            <a th:href="*{socialFacebook}" target="_blank" title="Facebook" th:if="*{socialFacebook}">
-                <i class="bi bi-facebook"></i>
-            </a>
-
-            <!-- 기타 소셜 (값이 있을 때만 랜더링) -->
-            <a th:href="*{socialOther}" target="_blank" title="Other" th:if="*{socialOther}">
-                <i class="bi bi-link-45deg"></i>
-            </a>
-        </div>
+        <div th:insert="~{fragments/socialButton :: social-button}"></div>
 
         <!-- 팔로워/팔로잉 -->
         <div class="profile-stats">

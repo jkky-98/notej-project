@@ -9,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -18,7 +17,7 @@ import java.util.stream.Collectors;
 public class WriteForm {
     @NotBlank(message = "제목을 입력하지 않았습니다.")
     private String title;
-    private String tags;
+    private List<String> tags;
     private String content;
     private MultipartFile thumbnail;
     private String postSummary;
@@ -32,7 +31,7 @@ public class WriteForm {
                 .title(post.getTitle())
                 .tags(post.getPostTags().stream()
                         .map(postTag -> postTag.getTag().getName())
-                        .collect(Collectors.joining(",")))
+                        .toList())
                 .content(post.getContent())
                 .open(post.getWritable())
                 .url(post.getPostUrl())

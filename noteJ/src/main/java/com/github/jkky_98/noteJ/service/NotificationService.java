@@ -35,6 +35,33 @@ public class NotificationService {
         userSendNotification.addNotificationToSender(notification); // 발송자에 알림 추가
     }
 
+    @Transactional
+    public void sendLikePostNotification(User userGetNotification, User userSendNotification, String postTitle) {
+        Notification notification = Notification.ofLike(userSendNotification, userGetNotification, postTitle);
+        notificationRepository.save(notification);
+
+        userGetNotification.addNotificationToRecipient(notification);
+        userSendNotification.addNotificationToSender(notification);
+    }
+
+    @Transactional
+    public void sendCommentPostNotification(User userGetNotification, User userSendNotification, String postTitle) {
+        Notification notification = Notification.ofComment(userSendNotification, userGetNotification, postTitle);
+        notificationRepository.save(notification);
+
+        userGetNotification.addNotificationToRecipient(notification);
+        userSendNotification.addNotificationToSender(notification);
+    }
+
+    @Transactional
+    public void sendCommentParentsNotification(User userGetNotification, User userSendNotification, String postTitle) {
+        Notification notification = Notification.ofCommentParents(userSendNotification, userGetNotification, postTitle);
+        notificationRepository.save(notification);
+
+        userGetNotification.addNotificationToRecipient(notification);
+        userSendNotification.addNotificationToSender(notification);
+    }
+
     /**
      * 유저 알림 모두 조회
      * @param sessionUser
@@ -54,7 +81,7 @@ public class NotificationService {
      */
     @Transactional
     public Long getNotificationCountNotRead(User sessionUser) {
-        return notificationRepository.countUnreadNotificationsByUser(sessionUser);
+        return notificationRepository.countUnreadNotificationsByReceiver(sessionUser);
     }
 
     /**
@@ -77,7 +104,7 @@ public class NotificationService {
             throw new UnauthenticatedUserException("not authenticated");
         }
 
-        notificationRepository.findAllNotificationsByUser(sessionUser).stream()
+        notificationRepository.findAllNotificationsByReceiver(sessionUser).stream()
                 .filter(notification -> !notification.isStatus())
                 .forEach(Notification::readNotification);
     }
@@ -88,7 +115,7 @@ public class NotificationService {
      */
     @Transactional
     public void deleteNotificationAll(User sessionUser) {
-        List<Notification> notificationList = notificationRepository.findAllNotificationsByUser(sessionUser);
+        List<Notification> notificationList = notificationRepository.findAllNotificationsByReceiver(sessionUser);
         notificationRepository.deleteAll(notificationList);
     }
 
@@ -102,8 +129,8 @@ public class NotificationService {
     private List<Notification> filterNotificationsByStatus(User sessionUser, Optional<Boolean> status) {
         List<Notification> notifications = status
                 .filter(s -> !s) // status가 false일 경우 필터 통과
-                .map(s -> notificationRepository.findAllUnreadNotificationsByUser(sessionUser))
-                .orElseGet(() -> notificationRepository.findAllNotificationsByUser(sessionUser)); // Optional이 empty거나 다른 값인 경우
+                .map(s -> notificationRepository.findAllUnreadNotificationsByReceiver(sessionUser))
+                .orElseGet(() -> notificationRepository.findAllNotificationsByReceiver(sessionUser)); // Optional이 empty거나 다른 값인 경우
         return notifications;
     }
 }

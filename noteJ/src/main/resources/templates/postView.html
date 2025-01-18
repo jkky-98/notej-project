@@ -95,7 +95,8 @@
         <div class="post" th:object="${postViewDto}">
             <!-- Post Title -->
             <div class="post-header" th:text="${postViewDto.title}">title</div>
-
+            <div th:insert="~{fragments/likeButton :: like-button}" th:if="${sessionUser != null and postViewDto.username != sessionUser.username}">
+            </div>
             <!-- Post Meta -->
             <div class="post-meta">
                 <span th:text="${postViewDto.username}">username</span>
@@ -104,22 +105,7 @@
             </div>
 
             <!-- Tags -->
-            <div class="tags">
-                <a th:each="tag : ${postViewDto.tags}" type="button" class="btn btn-outline-primary btn-sm rounded-pill tag-btn" th:text="${tag}"></a>
-            </div>
-
-            <div class="bookmark" th:if="${sessionUser != null and sessionUser.username == postViewDto.username}">
-                <a th:href="@{${currentUrl} + '/stats'}" class="btn btn-link">통계</a> |
-                <a th:href="@{'/edit/' + ${postViewDto.postUrl}}" class="btn btn-link">수정</a> |
-                <a th:href="@{${currentUrl} + '/delete'}" class="btn btn-link"
-                   onclick="return confirm('삭제하시겠습니까?')">삭제</a>
-            </div>
-
-<!--            &lt;!&ndash; Post Content &ndash;&gt;-->
-<!--            <div class="post-content">-->
-<!--                Java-->
-<!--                <div>📄 목록 보기</div>-->
-<!--            </div>-->
+            <div th:insert="~{fragments/tags :: tags}"></div>
 
         </div>
     </div>
@@ -129,90 +115,7 @@
 
     <div class="row justify-content-center mt-4">
         <!-- Comment Section -->
-        <div class="comments-container">
-            <h3>댓글</h3>
-            <!-- Comment Form -->
-            <form th:action="${currentUrl}" th:method="post" class="mb-4"
-                  th:object="${commentForm}" th:if="${sessionUser != null}">
-
-                <!-- URL 정보를 숨겨진 input 필드에 담기 -->
-                <input type="hidden" name="requestUrl" th:value="${currentUrl}" />
-
-                <!-- 에러 메시지 -->
-                <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('content')}" th:text="${#fields.errors('content')[0]}"></div>
-
-                <!-- content 필드 바인딩 -->
-                <textarea class="form-control mb-2"
-                          th:field="*{content}"
-                          rows="3"
-                          placeholder="댓글을 입력하세요...">
-                </textarea>
-
-                <button type="submit" class="btn btn-primary btn-sm">댓글 작성</button>
-            </form>
-
-            <!-- 세션 사용자가 없을 경우 -->
-            <div th:if="${sessionUser == null}" class="alert alert-warning">
-                댓글을 작성하려면 로그인이 필요합니다. <a th:href="@{/login}" class="alert-link">로그인</a>
-            </div>
-
-            <!-- Comment List -->
-            <div class="comment-list">
-                <div class="comment" th:each="comment : ${postViewDto.comments}" th:if="${comment.parentsId == null}">
-                    <!-- 부모 댓글 -->
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <div class="comment-meta d-flex justify-content-between">
-                                <div>
-                                    <strong th:text="${comment.createBy}">작성자</strong>
-                                    <span class="text-muted" th:text="${#temporals.format(comment.createByDt, 'yyyy-MM-dd HH:mm')}">작성 시간</span>
-                                </div>
-                            </div>
-                            <div class="comment-content mt-2" th:text="${comment.content}">
-                                댓글 내용
-                            </div>
-                            <!-- 대댓글 달기 버튼 -->
-                            <div class="comment-actions mt-3">
-                                <a class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse"
-                                   th:href="'#replyForm-' + ${comment.id}"
-                                   role="button"
-                                   aria-expanded="false"
-                                   th:attr="aria-controls='replyForm-' + ${comment.id}">
-                                    대댓글 달기
-                                </a>
-                            </div>
-                            <!-- 대댓글 작성 폼 -->
-                            <div class="collapse mt-3" th:id="'replyForm-' + ${comment.id}">
-                                <form th:action="${currentUrl}" th:method="post" th:object="${commentForm}">
-                                    <input type="hidden" name="parentsId" th:value="${comment.id}" />
-                                    <textarea class="form-control mb-2" th:field="*{content}" rows="3" placeholder="대댓글을 입력하세요..."></textarea>
-                                    <button type="submit" class="btn btn-primary btn-sm">대댓글 작성</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 대댓글 리스트 -->
-                    <div class="replies" style="margin-left: 20px;">
-                        <div class="comment" th:each="reply : ${postViewDto.comments}" th:if="${reply.parentsId == comment.id}">
-                            <div class="card mb-2">
-                                <div class="card-body">
-                                    <div class="comment-meta d-flex justify-content-between">
-                                        <div>
-                                            <strong th:text="${reply.createBy}">작성자</strong>
-                                            <span class="text-muted" th:text="${#temporals.format(reply.createByDt, 'yyyy-MM-dd HH:mm')}">작성 시간</span>
-                                        </div>
-                                    </div>
-                                    <div class="comment-content mt-2" th:text="${reply.content}">
-                                        대댓글 내용
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
+        <div th:insert="~{fragments/comments :: comments}"></div>
     </div>
 </div><!-- Bootstrap JS -->
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.js"></script>

@@ -39,4 +39,10 @@ public class Tag extends BaseTimeEntity {
         this.postTags.remove(postTag);
         postTag.updateTag(null); // 주인 쪽 관계 해제
     }
+
+    public static Tag of(String tagName) {
+        return Tag.builder()
+                .name(tagName)
+                .build();
+    }
 }

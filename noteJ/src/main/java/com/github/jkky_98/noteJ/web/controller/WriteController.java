@@ -5,6 +5,7 @@ import com.github.jkky_98.noteJ.service.WriteService;
 import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
 import com.github.jkky_98.noteJ.web.session.SessionConst;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,7 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class WriteController {
@@ -38,7 +39,7 @@ public class WriteController {
         if (bindingResult.hasErrors()) {
             return "write";
         }
-
+        log.info("Tags : {}", writeForm.getTags());
         writeService.saveWrite(writeForm, sessionUser.getId());
         return "redirect:" + "/@" + sessionUser.getUsername() + "/posts";
     }

@@ -1,6 +1,7 @@
 package com.github.jkky_98.noteJ.service;
 
 import com.github.jkky_98.noteJ.domain.*;
+import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.*;
 import com.github.jkky_98.noteJ.web.controller.dto.PostViewDto;
 import jakarta.persistence.EntityNotFoundException;
@@ -8,12 +9,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
+    private final UserService userService;
 
     @Transactional(readOnly = true)
     public Post findByPostUrl(String postUrl) {
@@ -59,19 +63,14 @@ public class PostService {
     public void removePost(Long postId) {
         Post post = findById(postId);
 
-        // 2. Post에 연결된 PostTag 처리
-        post.getPostTags().forEach(postTag -> {
-            // 연관관계 해제
-            postTag.getTag().removePostTag(postTag);
-            post.removePostTag(postTag);
+        // 2. Post에 연결된 PostTag의 Tag delete 처리
+        List<Tag> tagsRemoved = post.getPostTags().stream()
+                .map(
+                        postTag -> postTag.getTag()
+                ).toList();
+        tagRepository.deleteAll(tagsRemoved);
 
-            // 고아 상태가 된 Tag 삭제
-            if (postTag.getTag().getPostTags().isEmpty()) {
-                tagRepository.delete(postTag.getTag());
-            }
-        });
-
-        // 3. Post 삭제
+        // 4. Post 삭제
         postRepository.delete(post);
     }
 
@@ -94,4 +93,29 @@ public class PostService {
                 });
     }
 
+    /**
+     * Post 적절성 검토 후 postId 뱉음.
+     * @param postUrl
+     * @param username
+     * @param sessionUser
+     * @return
+     */
+    @Transactional
+    public Long deleteValidPost(String postUrl, String username, User sessionUser) {
+        User userFind = userService.findUserById(sessionUser.getId());
+        Post postFind = findByUserUsernameAndPostUrl(username, postUrl);
+
+        // 세션 로그인 유저와 post유저의 유저네임 일치해야 함.
+        if (userFind.getId() != postFind.getUser().getId()) {
+            throw new IllegalArgumentException("세션유저와 post유저의 유저네임 일치하지 않음");
+        }
+
+        return postFind.getId();
+    }
+
+    @Transactional
+    public void deletePost(String postUrl, String username, User sessionUser) {
+        Long postIdDeleted = deleteValidPost(postUrl, username, sessionUser);
+        removePost(postIdDeleted);
+    }
 }

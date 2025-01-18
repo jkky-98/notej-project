@@ -1,0 +1,24 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="tags">
+  <div class="tags">
+    <a th:each="tag : ${postViewDto.tags}" type="button" class="btn btn-outline-primary btn-sm rounded-pill tag-btn" th:text="${tag}"></a>
+  </div>
+
+  <div class="bookmark" th:if="${sessionUser != null and sessionUser.username == postViewDto.username}">
+    <!-- 통계 버튼 -->
+    <form th:action="@{${currentUrl} + '/stats'}" method="get" style="display: inline;">
+      <button type="submit" class="btn btn-link">통계</button>
+    </form>
+    |
+    <!-- 수정 버튼 -->
+    <form th:action="@{'/edit/' + ${postViewDto.postUrl}}" method="get" style="display: inline;">
+      <button type="submit" class="btn btn-link">수정</button>
+    </form>
+    |
+    <!-- 삭제 버튼 -->
+    <form th:action="@{${currentUrl} + '/delete'}" method="post" style="display: inline;">
+      <button type="submit" class="btn btn-link" onclick="return confirm('삭제하시겠습니까?')">삭제</button>
+    </form>
+  </div>
+</div>
+</html>

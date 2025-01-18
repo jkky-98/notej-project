@@ -25,20 +25,24 @@ public class Notification extends BaseEntity {
     // 연관관계
     // 수신자 (알림을 받는 사용자)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "receiver_id")
+    private User receiver;
 
     // 발신자 (알림을 발생시킨 사용자)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id")
     private User sender;  // 알림을 발생시킨 사용자 (발신자)
 
-    public void updateUser(User user) {
-        this.user = user;
+    public void updateReceiver(User user) {
+        this.receiver = user;
+    }
+
+    public void updateSender(User user) {
+        this.sender = user;
     }
 
     public void readNotification() {
-        if (!status) {
+        if (status == false) {
             this.status = true;
         } else {
             throw new IllegalStateException("이미 읽은 Notification을 읽음 처리하려고 하고 있습니다.");
@@ -51,7 +55,37 @@ public class Notification extends BaseEntity {
                 .message(userSendNotification.getUsername() + "님으로부터 팔로우 되었습니다.")
                 .status(false)
                 .sender(userSendNotification)
-                .user(userGetNotification)
+                .receiver(userGetNotification)
+                .build();
+    }
+
+    public static Notification ofLike(User userSendNotification, User userGetNotification, String postTitle) {
+        return Notification.builder()
+                .type(NotificationType.LIKE)
+                .message(userSendNotification.getUsername() + "님이 당신의 게시글 : " + postTitle + "에 좋아요를 눌렀습니다.")
+                .status(false)
+                .sender(userSendNotification)
+                .receiver(userGetNotification)
+                .build();
+    }
+
+    public static Notification ofComment(User userSendNotification, User userGetNotification, String postTitle) {
+        return Notification.builder()
+                .type(NotificationType.COMMENT)
+                .message(userSendNotification.getUsername() + "님이 당신의 게시글 : " + postTitle + "에 댓글을 남겼습니다.")
+                .status(false)
+                .sender(userSendNotification)
+                .receiver(userGetNotification)
+                .build();
+    }
+
+    public static Notification ofCommentParents(User userSendNotification, User userGetNotification, String postTitle) {
+        return Notification.builder()
+                .type(NotificationType.COMMENT)
+                .message(userSendNotification.getUsername() + "님이 게시글 : " + postTitle + "의 당신의 댓글에 대댓글을 남겼습니다.")
+                .status(false)
+                .sender(userSendNotification)
+                .receiver(userGetNotification)
                 .build();
     }
 }

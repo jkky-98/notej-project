@@ -58,4 +58,14 @@ public class PostController {
         String[] ipAddresses = xForwardedForHeader.split(",");
         return ipAddresses[0].trim(); // 첫 번째 IP 반환
     }
+
+    @PostMapping("/@{username}/post/{postUrl}/delete")
+    public String deletePost(
+            @PathVariable("postUrl") String postUrl,
+            @PathVariable("username") String username,
+            @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser
+    ) {
+        postService.deletePost(postUrl, username, sessionUser);
+        return "redirect:/@"+ username + "/posts";
+    }
 }

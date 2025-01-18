@@ -58,6 +58,10 @@ public class Post extends BaseEntity {
     @Builder.Default
     private List<PostHits> postHits = new ArrayList<>(); // 조회 기록
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<PostFile> postFiles = new ArrayList<>();
+
     public void updateUser(User user) {
         this.user = user;
     }

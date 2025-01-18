@@ -82,7 +82,7 @@
 
   // 개별 알림 읽음 처리
   function markAsRead(notificationId) {
-    fetch(`/notifications/read/${notificationId}`, { method: 'DELETE' })
+    fetch(`/notifications/read/${notificationId}`, { method: 'PATCH' })
             .then(response => response.json())
             .then(data => location.reload());
   }

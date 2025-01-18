@@ -53,7 +53,7 @@ public class NotificationController {
     }
 
     // 4. 개별 알림 읽음 처리
-    @PostMapping("/read/{id}")
+    @PatchMapping("/read/{id}")
     public ResponseEntity<?> markAsRead(@PathVariable Long id,
                                         @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser) {
         notificationService.readNotificationOne(id);
