@@ -96,13 +96,13 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <!-- 세션 존재 & 프로필 사진 존재 -->
-                        <img th:if="${sessionUser != null && sessionUser.profilePic != null}" th:src="|${'/storage/'+ sessionUser.profilePic}|" class="profile-pic me-2" alt="Profile">
+                        <img th:if="${sessionUser != null && sessionUser.profilePic != null}" th:src="@{/image-print{path}(path=${sessionUser.profilePic})}" class="profile-pic me-2" alt="Profile">
 
                         <!-- 세션 존재 & 프로필 사진 없음 -->
-                        <img th:if="${sessionUser != null && sessionUser.profilePic == null}" th:src="@{/storage/default/default-profile.png}" class="profile-pic me-2" alt="Default Profile">
+                        <img th:if="${sessionUser != null && sessionUser.profilePic == null}" th:src="@{/image-print{path}(path=${sessionUser.profilePic})}" class="profile-pic me-2" alt="Default Profile">
 
                         <!-- 세션 비존재 -->
-                        <img th:if="${sessionUser == null}" th:src="@{/storage/default/default-profile.png}" class="profile-pic me-2" alt="Default Profile">
+                        <img th:if="${sessionUser == null}" th:src="@{/image-print/default/default-profile.png}" class="profile-pic me-2" alt="Default Profile">
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                         <!-- 로그인된 경우 -->

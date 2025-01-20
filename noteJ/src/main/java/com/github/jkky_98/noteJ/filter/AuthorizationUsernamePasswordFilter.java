@@ -24,7 +24,10 @@ public class AuthorizationUsernamePasswordFilter implements Filter {
             "/img/**",
             "/storage/**",
             "/@*/posts/**",
-            "/@*/post/*"
+            "/@*/post/*",
+            "/image-print/**",
+            "/image-upload/**",
+            "/editor-image-upload/**",
     };
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 

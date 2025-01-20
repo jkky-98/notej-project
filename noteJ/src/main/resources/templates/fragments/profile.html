@@ -93,9 +93,15 @@
         }
     </style>
     <div class="profile-container" th:object="${postsViewDto.profileForm}">
-        <!-- 프로필 이미지 -->
-        <img th:src="|${profilePic != null ? '/storage/' + profilePic : '/storage/default/default-profile.png'}|"
+        <!-- 프로필 사진이 있는 경우 -->
+        <img th:if="${postsViewDto.profileForm.profilePic != null}"
+             th:src="@{/image-print/{path}(path=${postsViewDto.profileForm.profilePic})}"
              alt="Profile Picture" class="profile-avatar">
+
+        <!-- 기본 프로필 사진 -->
+        <img th:if="${postsViewDto.profileForm.profilePic == null}"
+             th:src="@{/image-print/{path}(path='default/default-profile.png')}"
+             alt="Default Profile Picture" class="profile-avatar">
 
         <!-- 사용자 이름 -->
         <div class="profile-username" th:text="*{username}">사용자 이름</div>

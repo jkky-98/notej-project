@@ -18,8 +18,9 @@ spring:
   devtools:
     livereload:
       enabled: true
-  resources:
-    static-locations: file:src/main/resources/static
+#  web:
+#    resources:
+#      static-locations: classpath:/static/, file:/upload/
   thymeleaf:
     cache: false
     prefix: file:src/main/resources/templates/
@@ -39,9 +40,16 @@ spring:
         default_batch_fetch_size: 100
 
 
-logging.level:
-  org.hibernate.SQL: debug
-  org.hibernate.orm.jdbc.bind: trace #스프링 부트 3.x, hibernate6
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+        orm:
+          jdbc:
+            bind: trace
+      springframework:
+        web: DEBUG
 
 file:
   dir: ${fileDir:/Users/piehealthcare/Documents/private/noteJ-storage/}
