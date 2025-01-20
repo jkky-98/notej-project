@@ -60,7 +60,7 @@
     <div class="card-container">
         <!-- Cards rendered with Thymeleaf -->
         <div class="card" th:each="post : ${posts}">
-            <img th:src="${post.imageUrl}" th:alt="${post.title}">
+            <img th:src="@{/image-print/{path}(path=${post.thumnail})}" th:alt="${post.title}">
             <div class="card-body">
                 <h5 class="card-title" th:text="${post.title}">Post Title</h5>
                 <p class="card-text" th:text="${post.description}">Post Description</p>

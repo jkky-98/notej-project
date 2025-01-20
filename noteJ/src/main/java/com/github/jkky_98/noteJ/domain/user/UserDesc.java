@@ -76,6 +76,7 @@ public class UserDesc extends BaseTimeEntity {
                 .socialEmail(signUpForm.getEmail())
                 .commentAlarm(true)
                 .noteJAlarm(true)
+                .profilePic("default/default-profile.png")
                 .theme(ThemeMode.LIGHT)
                 .build();
     }

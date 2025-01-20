@@ -34,6 +34,7 @@ public class DataInitializer {
                     .socialEmail("example@google.com")
                     .commentAlarm(true)
                     .noteJAlarm(true)
+                    .profilePic("default/default-profile.png")
                     .theme(ThemeMode.LIGHT)
                     .build();
 

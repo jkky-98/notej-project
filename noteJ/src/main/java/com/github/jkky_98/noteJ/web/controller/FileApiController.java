@@ -1,8 +1,12 @@
 package com.github.jkky_98.noteJ.web.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,8 +17,8 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/editor")
 @Profile("local")
+@Slf4j
 public class FileApiController {
 
     // 파일 업로드 경로
@@ -26,7 +30,7 @@ public class FileApiController {
      * @param image 파일 객체;
      * @return 업로드된 파일 명
      */
-    @PostMapping("/image-upload")
+    @PostMapping("/editor/image-upload")
     public String uploadEditorImage(@RequestParam final MultipartFile image) {
         if (image.isEmpty()) {
             return "";
@@ -56,7 +60,7 @@ public class FileApiController {
      * @param filename 디스크에 업로드된 파일명
      * @return image byte array
      */
-    @GetMapping(value = "/image-print", produces = {MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
+    @GetMapping(value = "/editor/editor-image-print", produces = {MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public byte[] printEditorImage(@RequestParam final String filename) {
         // 업로드 파일 전체 경로
         String fileFullPath = Paths.get(uploadDir, filename).toString();
@@ -72,6 +76,78 @@ public class FileApiController {
             return Files.readAllBytes(uploadedFile.toPath());
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @GetMapping(value = "/image-print/{fileUrl}")
+    public ResponseEntity<byte[]> printImage(@PathVariable final String fileUrl) {
+        log.info("fileUrl:{}", fileUrl);
+
+        // 이미지 파일 전체 경로
+        String fileFullPath = Paths.get(uploadDir, fileUrl).toString();
+        File uploadedFile = new File(fileFullPath);
+
+        if (!uploadedFile.exists()) {
+            log.error("File not found: {}", fileFullPath);
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            // 파일 읽기
+            byte[] imageBytes = Files.readAllBytes(uploadedFile.toPath());
+
+            // Content-Type 설정
+            String contentType = Files.probeContentType(uploadedFile.toPath());
+
+            if (contentType == null) {
+                log.warn("Unable to determine Content-Type for file: {}", fileUrl);
+                contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+            }
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, contentType)
+                    .body(imageBytes);
+
+        } catch (IOException e) {
+            log.error("Error reading file: {}", fileFullPath, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping(value = "/image-print/default/{fileUrl}")
+    public ResponseEntity<byte[]> printDefaultImage(@PathVariable final String fileUrl) {
+        log.info("fileUrl:{}", fileUrl);
+
+        String fileUrlFinal = "default/" + fileUrl;
+
+        // 이미지 파일 전체 경로
+        String fileFullPath = Paths.get(uploadDir, fileUrlFinal).toString();
+        File uploadedFile = new File(fileFullPath);
+        log.info("fileFullPath:{}", fileFullPath);
+        if (!uploadedFile.exists()) {
+            log.error("File not found: {}", fileFullPath);
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            // 파일 읽기
+            byte[] imageBytes = Files.readAllBytes(uploadedFile.toPath());
+
+            // Content-Type 설정
+            String contentType = Files.probeContentType(uploadedFile.toPath());
+
+            if (contentType == null) {
+                log.warn("Unable to determine Content-Type for file: {}", fileUrl);
+                contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+            }
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, contentType)
+                    .body(imageBytes);
+
+        } catch (IOException e) {
+            log.error("Error reading file: {}", fileFullPath, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
