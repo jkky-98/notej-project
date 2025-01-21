@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -87,7 +89,8 @@ public class WriteServiceLocal implements WriteService {
         log.info("[인코딩 전 Content 정보 확인] : {}" , form.getContent());
         encodingUrlAndContent(form);
         log.info("[인코딩 후 Content 정보 확인] : {}" , form.getContent());
-
+        List<String> strings = extractImageFilenames(form.getContent());
+        log.info("[추출기 테스트 ] : {}", strings);
         // Post Entity 생성
         Post post = Post.of(form, userById, seriesService.getSeries(form.getSeries()), storedFileName);
 
@@ -97,6 +100,25 @@ public class WriteServiceLocal implements WriteService {
         // Post에 딸린 Tag 생성 및 저장
         setTag(tagProvider(form.getTags()), postSaved);
 
+    }
+    private static List<String> extractImageFilenames(String content) {
+        // 정규식 패턴 (앞에 ![image alt attribute] 포함, 경로 수정)
+        String regex = "!\\[image alt attribute\\]\\(/editor/editor-image-print\\?filename=([a-zA-Z0-9._-]+)\\)";
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(content);
+
+        // 결과를 저장할 리스트
+        List<String> imageFilenames = new ArrayList<>();
+
+        // 정규식 매칭
+        while (matcher.find()) {
+            // 첫 번째 그룹에서 파일명 추출
+            String filename = matcher.group(1);
+            imageFilenames.add(filename);
+        }
+
+        return imageFilenames;
     }
 
     private void encodingUrlAndContent(WriteForm form) {
