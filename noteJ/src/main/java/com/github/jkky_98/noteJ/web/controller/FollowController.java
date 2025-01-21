@@ -2,20 +2,39 @@ package com.github.jkky_98.noteJ.web.controller;
 
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.service.FollowService;
+import com.github.jkky_98.noteJ.web.controller.form.FollowerListForm;
+import com.github.jkky_98.noteJ.web.controller.form.FollowingListForm;
 import com.github.jkky_98.noteJ.web.session.SessionConst;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
 public class FollowController {
 
     private final FollowService followService;
+    @GetMapping("/@{username}/followings")
+    public String followings(@PathVariable("username") String usernamePost,
+                             Model model) {
+        FollowingListForm followingList = followService.getFollowingList(usernamePost);
+        model.addAttribute("followingList", followingList);
+
+        return "followingList";
+    }
+
+    @GetMapping("/@{username}/followers")
+    public String followers(@PathVariable("username") String usernamePost,
+                             Model model) {
+        FollowerListForm followerList = followService.getFollowerList(usernamePost);
+        model.addAttribute("followerList", followerList);
+
+        return "followerList";
+    }
 
     @PostMapping("/follow")
     public String follow(@RequestParam String targetUsername,

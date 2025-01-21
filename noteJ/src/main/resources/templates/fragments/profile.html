@@ -114,8 +114,12 @@
 
         <!-- 팔로워/팔로잉 -->
         <div class="profile-stats">
-            <span th:text="'팔로워: ' + *{followers}">팔로워: 0</span>
-            <span th:text="'팔로잉: ' + *{followings}">팔로잉: 0</span>
+            <a th:href="@{|/@${postsViewDto.username}/followers|}" class="text-decoration-none me-3">
+                <span th:text="'팔로워: ' + *{followers}">팔로워: 0</span>
+            </a>
+            <a th:href="@{|/@${postsViewDto.username}/followings|}" class="text-decoration-none">
+                <span th:text="'팔로잉: ' + *{followings}">팔로잉: 0</span>
+            </a>
         </div>
 
         <!-- 팔로우/언팔로우 버튼 -->
