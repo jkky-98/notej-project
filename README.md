@@ -136,10 +136,10 @@ https://github.com/jkky-98/notej-project/commit/787e273dc97936401a10919403442183
 태그의 상태관리는 PostFile이라는 엔티티를 통해 관리하여 수정시 새로운 영속화 태그를 부착하거나 기존 영속화 태그를 임시태그로 변환하는 등의 작업이 가능했습니다.
 
 #### 수정 전 아키텍처
-![prev_image](https://github.com/user-attachments/assets/6a20b1b4-cafc-4d91-92e8-7c3037799450)
+![prev_img](https://github.com/user-attachments/assets/62f19242-9f82-4282-8a3f-e8c60f253ada)
 
 #### 수정 후 아키텍처
-![after_image](https://github.com/user-attachments/assets/9f7d8472-90a5-4b2d-a8dd-f3c744ea8b0b)
+![after_img](https://github.com/user-attachments/assets/f4c34602-7c3e-4c55-8ecd-de5cd9701bae)
 
 #### 관련 작성글
 https://velog.io/@aal2525/Toast-Editor-%EC%82%AC%EC%A7%84-%EC%A0%80%EC%9E%A5-%EC%B5%9C%EC%A0%81%ED%99%94
@@ -152,6 +152,7 @@ https://velog.io/@aal2525/Toast-Editor-%EC%82%AC%EC%A7%84-%EC%A0%80%EC%9E%A5-%EC
 
 지정한 시간동안 최대 요청수를 인자로 받는 RateLimit AOP를 설계하여 해당 기능을 다른 컨트롤러 메서드에서도 활용할 수 있게 하였습니다.
 
+(아래의 테스트를 위한 영상으로, 1분간 5회 초과 요청이 들어올 경우 alert를 띄우는 것으로 기능을 만들었습니다. 실제 적용시에는 더욱 관대하게 적용할 것입니다.)
 ![화면 기록 2025-01-21 오후 4 52 14](https://github.com/user-attachments/assets/ba1dd182-5e63-439b-bffb-a5a87413510a)
 
 
