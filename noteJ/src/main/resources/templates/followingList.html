@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:insert="~{fragments/header :: header}"></div>
+<body>
+<style>
+  .clickable-div {
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+  }
+  .clickable-div:hover {
+    background-color: #f8f9fa;
+    transform: scale(1.02);
+  }
+</style>
+<div th:replace="~{fragments/header :: navigation}"></div>
+<div class="container mt-5">
+  <!-- 프로필 상단 -->
+  <div class="d-flex align-items-center mb-4" th:object="${followingList.profilePostUser}">
+    <img th:src="@{|/image-print/*{profilePic}|}" class="profile-pic me-2" alt="User Profile Image">
+    <div>
+      <h5 class="mb-0" th:text="*{username}">jkky98</h5>
+      <span class="text-muted">&gt; 팔로우</span>
+    </div>
+  </div>
+
+  <!-- 팔로우 정보 -->
+  <h2 class="mb-4" th:text="|${followingList.profilePostUser.followingCount}명 팔로우|">4명을 팔로우 중</h2>
+
+  <!-- 팔로우 리스트 -->
+  <div class="list-group" th:object="${followingList.followings}">
+    <!-- 팔로우 항목 -->
+    <div th:each="following : ${followingList.followings}" class="list-group-item d-flex justify-content-between align-items-center clickable-div">
+      <div class="d-flex align-items-center clickable-div" th:data-url="'/@' + ${following.followingUserUsername} + '/posts'" onclick="navigateTo(this)">
+        <img th:src="@{|/image-print/${following.followingUserProfilePic}|}" class="profile-pic me-2" alt="Profile">
+        <div>
+          <h6 class="mb-0" th:text="${following.followingUserUsername}">User Name</h6>
+          <span class="text-muted" th:text="'@' + ${following.followingUserUsername}">@username</span>
+          <p class="text-muted small mb-0" th:text="${following.followingUserDescription}">Description</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script th:inline="javascript">
+  function navigateTo(element) {
+    const url = element.getAttribute('data-url');
+    if (url) {
+      window.location.href = url;
+    }
+  }
+</script>
+</body>
+</html>

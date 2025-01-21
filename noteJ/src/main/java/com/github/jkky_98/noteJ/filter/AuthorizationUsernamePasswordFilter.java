@@ -28,6 +28,8 @@ public class AuthorizationUsernamePasswordFilter implements Filter {
             "/image-print/**",
             "/image-upload/**",
             "/editor-image-upload/**",
+            "/@*/followings",
+            "/@*/followers"
     };
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 

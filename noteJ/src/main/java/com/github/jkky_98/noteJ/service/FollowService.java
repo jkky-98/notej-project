@@ -3,8 +3,13 @@ package com.github.jkky_98.noteJ.service;
 import com.github.jkky_98.noteJ.domain.Follow;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.FollowRepository;
-import com.github.jkky_98.noteJ.repository.UserRepository;
+import com.github.jkky_98.noteJ.web.controller.dto.FollowListPostProfileDto;
+import com.github.jkky_98.noteJ.web.controller.dto.FollowerListViewDto;
+import com.github.jkky_98.noteJ.web.controller.dto.FollowingListViewDto;
+import com.github.jkky_98.noteJ.web.controller.form.FollowerListForm;
+import com.github.jkky_98.noteJ.web.controller.form.FollowingListForm;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +17,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FollowService {
     
     private final FollowRepository followRepository;
@@ -88,5 +94,37 @@ public class FollowService {
         // 팔로잉 리스트에서 특정 사용자와의 관계 확인
         return userFind.getFollowingList().stream()
                 .anyMatch(follow -> follow.matchFollowing(userMyFollowing));
+    }
+
+    @Transactional(readOnly = true)
+    public FollowingListForm getFollowingList(String usernameBlog) {
+        User userBlog = userService.findUserByUsername(usernameBlog);
+        FollowingListForm followingListForm = new FollowingListForm();
+
+        userBlog.getFollowingList().stream()
+                .map(Follow::getFollowing)
+                .forEach(follwing -> {
+                    followingListForm.getFollowings().add(FollowingListViewDto.of(follwing));
+                });
+
+        followingListForm.setProfilePostUser(FollowListPostProfileDto.ofFollowing(userBlog));
+
+        return followingListForm;
+    }
+
+    @Transactional(readOnly = true)
+    public FollowerListForm getFollowerList(String usernameBlog) {
+        User userBlog = userService.findUserByUsername(usernameBlog);
+        FollowerListForm followerListForm = new FollowerListForm();
+
+        userBlog.getFollowerList().stream()
+                .map(Follow::getFollower)
+                .forEach(follower -> {
+                    followerListForm.getFollowers().add(FollowerListViewDto.of(follower));
+                });
+
+        followerListForm.setProfilePostUser(FollowListPostProfileDto.ofFollower(userBlog));
+
+        return followerListForm;
     }
 }
