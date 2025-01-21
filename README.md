@@ -116,8 +116,8 @@ None
 
 읽지않은 알림만 볼 수 있도록 필터 기능을 넣어두었습니다.
 
-
 ### 좋아요 및 팔로우 기능
+
 
 ### 무한 스크롤 페이징 기능
 
@@ -137,9 +137,22 @@ https://github.com/jkky-98/notej-project/commit/787e273dc97936401a10919403442183
 
 #### 수정 전 아키텍처
 ![prev_image](https://github.com/user-attachments/assets/6a20b1b4-cafc-4d91-92e8-7c3037799450)
+
 #### 수정 후 아키텍처
 ![after_image](https://github.com/user-attachments/assets/9f7d8472-90a5-4b2d-a8dd-f3c744ea8b0b)
+
 #### 관련 작성글
 https://velog.io/@aal2525/Toast-Editor-%EC%82%AC%EC%A7%84-%EC%A0%80%EC%9E%A5-%EC%B5%9C%EC%A0%81%ED%99%94
+
+#### 악성 사용자 막기
+
+다음과 같은 극단적인 악성 사용자 시나리오를 방지하고자 짧은 시간안에 에디터 이미지 업로드가 매우 자주 들어왔을 경우 해당 컨트롤러의 접근을 1분간 막도록 구현했습니다.
+
+요청 수를 카운트하고 상태를 안전하게 관리하기 위해, 동시성 관점에서 안전한 캐시를 제공하는 Google의 오픈소스 라이브러리인 Guava를 사용하여 상태 관리를 구현하였습니다. Guava는 동시성 제어와 자동 만료 기능을 내장하고 있어, 복잡한 로직 없이 효율적으로 요청 제한 로직을 처리할 수 있습니다.
+
+지정한 시간동안 최대 요청수를 인자로 받는 RateLimit AOP를 설계하여 해당 기능을 다른 컨트롤러 메서드에서도 활용할 수 있게 하였습니다.
+
+![화면 기록 2025-01-21 오후 4 52 14](https://github.com/user-attachments/assets/ba1dd182-5e63-439b-bffb-a5a87413510a)
+
 
 
