@@ -79,7 +79,7 @@ public class FileApiController {
         }
     }
 
-    @GetMapping(value = "/image-print/{fileUrl}")
+    @GetMapping(value = "/image-print/{fileUrl}", produces = {MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public ResponseEntity<byte[]> printImage(@PathVariable final String fileUrl) {
         log.info("fileUrl:{}", fileUrl);
 
@@ -114,7 +114,7 @@ public class FileApiController {
         }
     }
 
-    @GetMapping(value = "/image-print/default/{fileUrl}")
+    @GetMapping(value = "/image-print/default/{fileUrl}", produces = {MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public ResponseEntity<byte[]> printDefaultImage(@PathVariable final String fileUrl) {
         log.info("fileUrl:{}", fileUrl);
 

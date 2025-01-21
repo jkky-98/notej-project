@@ -85,34 +85,17 @@ public class WriteServiceProd implements WriteService{
         return WriteForm.of(postEdit, user);
     }
 
-    /**
-     * /write post 요청에 사용, WriteForm을 사용하여 Post엔티티에 저장
-     * @param form
-     * @param sessionUserId
-     * @throws IOException
-     */
     @Transactional
     public void saveWrite(WriteForm form, Long sessionUserId) throws IOException {
 
-        // 사용자 정보를 조회
         User userById = userService.findUserById(sessionUserId);
 
-        // 썸네일 설정
         String storedFileName = handleThumnail(form);
-
-        // url, content 인코딩
-        log.info("[인코딩 전 Content 정보 확인] : {}" , form.getContent());
         encodingUrlAndContent(form);
-        log.info("[인코딩 후 Content 정보 확인] : {}" , form.getContent());
 
-        // Post Entity 생성
         Post post = Post.of(form, userById, seriesService.getSeries(form.getSeries()), storedFileName);
-
-        // Post save
         Post postSaved = postRepository.save(post);
-
-        // Post에 딸린 Tag 생성 및 저장
-        setTag(tagProvider(form.getTags()), postSaved);
+        setTagsForPost(tagProvider(form.getTags()), postSaved);
 
         // content에서 영구화 시킬 url List 추출
         List<String> imageFilenames = extractImageFilenames(form.getContent());
@@ -122,11 +105,61 @@ public class WriteServiceProd implements WriteService{
 
         // PostFile 추가
         List<PostFile> postFiles = imageFilenames.stream()
-                .map(image -> PostFile.of(postSaved, image))
+                .map(urlImage -> PostFile.of(postSaved, urlImage))
                 .toList();
 
         postFileRepository.saveAll(postFiles);
 
+    }
+
+    @Transactional
+    public void saveEditWrite(WriteForm form, String postUrl) throws IOException {
+
+        Post post = postService.findByPostUrl(postUrl);
+        post.updateSeries(seriesService.getSeries(form.getSeries()));
+
+        // url, content 인코딩
+        encodingUrlAndContent(form);
+
+        // thumnail, series 빼고 업데이트
+        post.updatePostWithoutThumbnailAndSeries(form);
+
+        // 기존 Post-PostTag 관계 제거
+        post.getPostTags().forEach(postTag -> postTag.getTag().getPostTags().remove(postTag));
+        post.getPostTags().clear(); // Post와의 관계 끊기
+
+        editThumnail(form, post);
+        setTagsForPost(tagProvider(form.getTags()), post);
+
+        updateTagAndRepository(form, post);
+    }
+
+    private void updateTagAndRepository(WriteForm form, Post post) {
+        List<String> imageFilenames = extractImageFilenames(form.getContent());
+        List<String> postFilesFromPost = post.getPostFiles().stream()
+                .map(postFile -> postFile.getUrl())
+                .toList();
+
+        updateTagWriteEdit(imageFilenames, postFilesFromPost);
+        updateRepositoryWriteEdit(post, imageFilenames);
+    }
+
+    private void updateRepositoryWriteEdit(Post post, List<String> imageFilenames) {
+        postFileRepository.deleteByPostId(post.getId());
+        postFileRepository.saveAll(imageFilenames.stream()
+                .map(urlImage -> PostFile.of(post, urlImage))
+                .toList());
+    }
+
+    private void updateTagWriteEdit(List<String> imageFilenames, List<String> postFiles) {
+        // 추가된 사진파일 s3 태그로 영속화
+        imageFilenames.stream()
+                        .filter(filename -> !postFiles.contains(filename))
+                        .forEach(filename -> updateTagToPermanent(filename, s3BucketName));
+        // 사라진 사진파일 s3 제거 태그로 변환
+        postFiles.stream()
+                        .filter(postFile -> !imageFilenames.contains(postFile))
+                        .forEach(postFile -> updateTagToDelete(postFile, s3BucketName));
     }
 
     private void encodingUrlAndContent(WriteForm form) {
@@ -140,38 +173,6 @@ public class WriteServiceProd implements WriteService{
             storedFileName = fileStore.storeFile(form.getThumbnail());
         }
         return storedFileName;
-    }
-
-    /**
-     * /write/{postUrl} post 요청에 사용, WriteForm을 사용하여 Post엔티티에 수정
-     * @param form
-     * @param postUrl
-     * @throws IOException
-     */
-    @Transactional
-    public void saveEditWrite(WriteForm form, String postUrl) throws IOException {
-        // Post 엔티티 조회
-        Post post = postService.findByPostUrl(postUrl);
-
-        // Series 업데이트
-        post.updateSeries(seriesService.getSeries(form.getSeries()));
-
-        // url, content 인코딩
-        encodingUrlAndContent(form);
-
-        // thumnail, series 빼고 업데이트
-        post.updatePostWithoutThumbnailAndSeries(form);
-
-        // 기존 Post-PostTag 관계 제거
-        post.getPostTags().forEach(postTag -> postTag.getTag().getPostTags().remove(postTag));
-        post.getPostTags().clear(); // Post와의 관계 끊기
-
-        // thumnail 업데이트 로직
-        editThumnail(form, post);
-
-        // Tag 업데이트
-        setTag(tagProvider(form.getTags()), post);
-
     }
 
     private void editThumnail(WriteForm form, Post post) throws IOException {
@@ -203,7 +204,7 @@ public class WriteServiceProd implements WriteService{
      * @param tags
      * @param postSaved
      */
-    private void setTag(List<Tag> tags, Post postSaved) {
+    private void setTagsForPost(List<Tag> tags, Post postSaved) {
         List<Tag> tagsSaved = tagRepository.saveAll(tags);
         List<PostTag> postTagsForBulkSave = tagsSaved.stream()
                 .map(tag -> PostTag.of(postSaved, tag))
@@ -248,8 +249,8 @@ public class WriteServiceProd implements WriteService{
     }
 
     private static List<String> extractImageFilenames(String content) {
-        // 정규식 패턴 (앞에 ![image alt attribute] 포함)
-        String regex = "!\\[image alt attribute\\]\\(/editor/image-print\\?filename=([a-zA-Z0-9._-]+)\\)";
+        // 정규식 패턴 (앞에 ![image alt attribute] 포함, 경로 수정)
+        String regex = "!\\[image alt attribute\\]\\(/editor/editor-image-print\\?filename=([a-zA-Z0-9._-]+)\\)";
 
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(content);
@@ -267,29 +268,29 @@ public class WriteServiceProd implements WriteService{
         return imageFilenames;
     }
 
-    private void updateTagToPermanent(String fileName, String s3BucketName) {
+    private void updateTag(String fileName, String s3BucketName, String oldStatus, String newStatus) {
         try {
             // 현재 태그 정보 가져오기
             GetObjectTaggingRequest getTaggingRequest = new GetObjectTaggingRequest(s3BucketName, fileName);
             GetObjectTaggingResult taggingResult = amazonS3.getObjectTagging(getTaggingRequest);
             List<com.amazonaws.services.s3.model.Tag> existingTags = taggingResult.getTagSet();
 
-            // 태그 수정: "Status=delete" -> "Status=permanent"
+            // 태그 수정
             List<com.amazonaws.services.s3.model.Tag> updatedTags = new ArrayList<>();
             boolean statusTagUpdated = false;
 
             for (com.amazonaws.services.s3.model.Tag tag : existingTags) {
-                if ("Status".equals(tag.getKey()) && "delete".equals(tag.getValue())) {
-                    updatedTags.add(new com.amazonaws.services.s3.model.Tag("Status", "permanent"));
+                if ("Status".equals(tag.getKey()) && oldStatus.equals(tag.getValue())) {
+                    updatedTags.add(new com.amazonaws.services.s3.model.Tag("Status", newStatus));
                     statusTagUpdated = true;
                 } else {
                     updatedTags.add(tag);
                 }
             }
 
-            // 만약 "Status" 태그가 없었다면, "Status=permanent" 태그 추가
+            // 만약 "Status" 태그가 없었다면, 새 태그 추가
             if (!statusTagUpdated) {
-                updatedTags.add(new com.amazonaws.services.s3.model.Tag("Status", "permanent"));
+                updatedTags.add(new com.amazonaws.services.s3.model.Tag("Status", newStatus));
             }
 
             // 업데이트된 태그 설정
@@ -300,10 +301,18 @@ public class WriteServiceProd implements WriteService{
             );
             amazonS3.setObjectTagging(setTaggingRequest);
 
-            log.info("S3 파일 태그 업데이트 완료: {} -> 태그 'status=delete'를 'status=permanent'로 변경", fileName);
+            log.info("S3 파일 태그 업데이트 완료: {} -> 태그 '{}'를 '{}'로 변경", fileName, oldStatus, newStatus);
         } catch (Exception e) {
             log.error("S3 파일 태그 업데이트 실패: {}", e.getMessage());
             throw new RuntimeException("S3 파일 태그 업데이트 실패", e);
         }
+    }
+
+    private void updateTagToPermanent(String fileName, String s3BucketName) {
+        updateTag(fileName, s3BucketName, "delete", "permanent");
+    }
+
+    private void updateTagToDelete(String fileName, String s3BucketName) {
+        updateTag(fileName, s3BucketName, "permanent", "delete");
     }
 }

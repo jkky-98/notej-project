@@ -6,9 +6,13 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,9 +26,9 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/editor")
 @Profile("!local")
 @RequiredArgsConstructor
+@Slf4j
 public class FileApiProdController {
 
     // 파일 업로드 경로
@@ -33,33 +37,24 @@ public class FileApiProdController {
 
     private final AmazonS3 amazonS3;
 
-    /**
-     * 에디터 이미지 업로드
-     * @param image 파일 객체;
-     * @return 업로드된 파일 명
-     */
-    @PostMapping("/image-upload")
+
+    @PostMapping("/editor/image-upload")
     public String uploadEditorImage(@RequestParam final MultipartFile image) {
         if (image.isEmpty()) {
             return "";
         }
 
-        String orgFilename = image.getOriginalFilename();
-        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-        String extension = orgFilename.substring(orgFilename.lastIndexOf(".") + 1);
-        String saveFilename = uuid + "." + extension;
+        String saveFilename = generateSaveFilename(image);
 
         try (InputStream inputStream = image.getInputStream()) {
-            // S3에 파일 업로드
-            // 태그 추가
-            List<Tag> tags = new ArrayList<>();
-            tags.add(new Tag("Status", "delete")); // "Status=delete" 태그 추가
 
             PutObjectRequest putObjectRequest = new PutObjectRequest(
                     s3BucketName,
                     saveFilename,
                     inputStream,
-                    null).withTagging(new ObjectTagging(tags));
+                    null)
+                    .withTagging(generateDeleteTag());
+                    // 에디터에서 사진 업로드시 delete 태그를 s3객체에 부착해야 한다.
 
             amazonS3.putObject(putObjectRequest);
 
@@ -68,15 +63,15 @@ public class FileApiProdController {
             throw new RuntimeException("Error uploading file to S3", e);
         }
     }
+
     /**
      * 디스크에 업로드된 파일을 byte[]로 반환
      * @param filename 디스크에 업로드된 파일명
      * @return image byte array
      */
-    @GetMapping(value = "/image-print", produces = {MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
+    @GetMapping(value = "/editor/image-print", produces = {MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public byte[] printEditorImage(@RequestParam final String filename) {
-        // S3 객체 가져오기
-        S3Object s3Object = amazonS3.getObject(s3BucketName, filename);
+        S3Object s3Object = getS3Object(filename);
         try {
             return s3Object.getObjectContent().readAllBytes();
         } catch (IOException e) {
@@ -84,4 +79,60 @@ public class FileApiProdController {
         }
     }
 
+    @GetMapping(value = "/image-print/{fileUrl}", produces = {MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
+    public ResponseEntity<byte[]> printImage(@PathVariable final String fileUrl) {
+        S3Object s3Object = getS3Object(fileUrl);
+
+        try (InputStream inputStream = s3Object.getObjectContent()) {
+            byte[] imageBytes = inputStream.readAllBytes();
+
+            // Determine Content-Type based on file extension
+            String contentType = Files.probeContentType(Paths.get(fileUrl));
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(imageBytes);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Error downloading and printing from S3", e);
+        }
+    }
+
+    @GetMapping(value = "/image-print/default/{fileUrl}", produces = {MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
+    public ResponseEntity<byte[]> printDefaultImage(@PathVariable final String fileUrl) {
+        String fileUrlFinal = "default/" + fileUrl;
+        S3Object s3Object = getS3Object(fileUrlFinal);
+
+        try (InputStream inputStream = s3Object.getObjectContent()) {
+            byte[] imageBytes = inputStream.readAllBytes();
+
+            // Determine Content-Type based on file extension
+            String contentType = Files.probeContentType(Paths.get(fileUrl));
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(imageBytes);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Error downloading and printing from S3", e);
+        }
+    }
+
+    private S3Object getS3Object(String filename) {
+        return amazonS3.getObject(s3BucketName, filename);
+    }
+
+    private static ObjectTagging generateDeleteTag() {
+        List<Tag> tags = new ArrayList<>();
+        tags.add(new Tag("Status", "delete"));
+        return new ObjectTagging(tags);
+    }
+
+    private static String generateSaveFilename(MultipartFile image) {
+        String orgFilename = image.getOriginalFilename();
+        String uuid = UUID.randomUUID().toString().replaceAll("-", "");
+        String extension = orgFilename.substring(orgFilename.lastIndexOf(".") + 1);
+        String saveFilename = uuid + "." + extension;
+        return saveFilename;
+    }
 }
