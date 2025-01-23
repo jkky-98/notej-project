@@ -76,7 +76,9 @@
 
         // 스크롤 이벤트 바인딩
         $(window).on('scroll', function () {
+            console.log("Scroll event triggered");
             if (shouldLoadMore()) {
+                console.log("Load more condition met. Current page: " + currentPage);
                 isLoading = true;
                 loadMorePosts(currentPage + 1);
             }
@@ -85,27 +87,42 @@
         // 스크롤 조건 확인
         function shouldLoadMore() {
             const nearBottom = $(window).scrollTop() + $(window).height() >= $(document).height() - 100;
+            console.log("Checking if near bottom: " + nearBottom + ", isLoading: " + isLoading);
             return nearBottom && !isLoading;
         }
 
         // AJAX로 추가 게시물 로드
         function loadMorePosts(page) {
+            console.log("Attempting to load posts for page: " + page);
             $('#loading').show();
+
+            const params = new URLSearchParams(window.location.search);
+            const tagName = params.get("tagName") || null;
+            const seriesName = params.get("seriesName") || null;
+            const search = params.get("search") || null;
+
+            const queryParams = {
+                page: page,
+                size: pageSize,
+                tagName: tagName,
+                seriesName: seriesName,
+                search: search
+            };
 
             $.ajax({
                 url: /*[[@{'/api/@' + ${postsViewDto.username} + '/posts'}]]*/,
                 type: 'GET',
-                data: {
-                    page: page,
-                    size: pageSize
-                },
+                data: queryParams,
                 success: function (data) {
+                    console.log("AJAX success. Data received: ", data);
 
                     // 수정된 로직: data.content 대신 data 확인
                     if (Array.isArray(data) && data.length > 0) {
+                        console.log("Appending posts. Number of posts: " + data.length);
                         appendPosts(data); // 바로 data를 appendPosts에 전달
                         currentPage = page;
                     } else {
+                        console.log("No more posts available. Removing scroll event.");
                         $(window).off('scroll'); // 더 이상 데이터가 없으면 스크롤 이벤트 해제
                     }
 
@@ -122,7 +139,9 @@
 
         // 게시물 HTML 추가
         function appendPosts(posts) {
+            console.log("Appending posts to the DOM");
             posts.forEach(post => {
+                console.log("Appending post: ", post);
                 $('#post-list .row').append(`
                 <a href="/@${post.username}/post/${post.postUrl}" class="card posts-style my-5 text-decoration-none">
                     <img src="/image-print/${post.thumbnail || 'default/default_post.png'}" class="card-img-top thumbnail-posts-img" alt="Post Thumbnail" />

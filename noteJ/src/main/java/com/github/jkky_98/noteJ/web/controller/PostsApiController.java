@@ -23,11 +23,19 @@ public class PostsApiController {
     @GetMapping("/@{username}/posts")
     public ResponseEntity<List<PostDto>> posts(
                         @PathVariable("username") String usernamePost,
-                        @ModelAttribute PostsConditionForm postsConditionForm,
+                        @RequestParam("tagName") String tagName,
+                        @RequestParam("search") String search,
+                        @RequestParam("seriesName") String seriesName,
                         Pageable pageable
     ) {
         log.info("USERNAME POST: {}", usernamePost);
-        List<PostDto> postsWithPageableDto = postsService.getPostsWithPageable(usernamePost, postsConditionForm, pageable);
+        log.info("POSTS CONDITION: {}, {}, {}", tagName, search, seriesName );
+        PostsConditionForm form = new PostsConditionForm();
+        form.setTagName(tagName);
+        form.setSearch(search);
+        form.setSeriesName(seriesName);
+
+        List<PostDto> postsWithPageableDto = postsService.getPostsWithPageable(usernamePost, form, pageable);
 
         return ResponseEntity.ok(postsWithPageableDto);
     }
