@@ -27,7 +27,7 @@
 
         <!-- 프로필 섹션 -->
         <div class="d-flex align-items-center mb-4">
-            <img th:src="@{/image-print{path}(path=${settingDto.profilePic})}"
+            <img th:src="@{/image-print/{path}(path=${settingDto.profilePic})}"
                  class="profile-pic me-3" alt="Profile">
             <div>
                 <h2 th:text="${sessionUser.username}">사용자 이름</h2>

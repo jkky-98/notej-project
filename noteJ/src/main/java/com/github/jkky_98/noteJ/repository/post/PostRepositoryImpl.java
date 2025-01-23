@@ -5,8 +5,12 @@ import com.github.jkky_98.noteJ.domain.user.QUser;
 import com.github.jkky_98.noteJ.web.controller.form.PostsConditionForm;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -41,9 +45,47 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         userCondition(username, u)
                 )
                 .orderBy(p.createDt.desc()) // 최신 날짜 순으로 정렬
+                .limit(5)
                 .distinct()
                 .fetch();
     }
+
+    @Override
+    public Page<Post> searchPostsWithPage(PostsConditionForm form, String username, Pageable pageable) {
+        QPost p = new QPost("p");
+        QPostTag pt = new QPostTag("pt");
+        QTag t = new QTag("t");
+        QSeries s = new QSeries("s");
+        QUser u = new QUser("u");
+
+        // 기본 쿼리
+        JPQLQuery<Post> query = queryFactory
+                .select(p)
+                .from(p)
+                .innerJoin(p.user, u).fetchJoin()
+                .leftJoin(p.postTags, pt).fetchJoin()
+                .leftJoin(pt.tag, t).fetchJoin()
+                .leftJoin(p.series, s).fetchJoin()
+                .where(
+                        searchCondition(form.getSearch(), p),
+                        tagCondition(form.getTagName(), p, pt, t),
+                        seriesCondition(form.getSeriesName(), p, s),
+                        userCondition(username, u)
+                )
+                .distinct();
+
+        // 페이징 설정 (offset과 limit)
+        long total = query.fetchCount(); // 전체 개수 조회
+        List<Post> content = query
+                .orderBy(p.createDt.desc()) // 정렬
+                .offset(pageable.getOffset()) // 시작 인덱스
+                .limit(pageable.getPageSize()) // 개수 제한
+                .fetch();
+
+        // Page 객체 반환
+        return new PageImpl<>(content, pageable, total);
+    }
+
 
     private BooleanExpression userCondition(String username, QUser u) {
         return username != null && !username.isEmpty()

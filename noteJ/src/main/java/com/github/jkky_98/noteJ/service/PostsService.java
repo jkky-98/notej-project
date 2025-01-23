@@ -13,6 +13,8 @@ import com.github.jkky_98.noteJ.web.controller.form.PostsConditionForm;
 import com.github.jkky_98.noteJ.web.controller.dto.SeriesViewDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +40,16 @@ public class PostsService {
         User userFind = userService.findUserByUsername(username);
 
         List<Post> posts = postRepository.searchPosts(cond, username);
+
+        return posts.stream()
+                .map(post -> PostDto.of(post, userFind))
+                .toList();
+    }
+
+    @Transactional
+    public List<PostDto> getPostsWithPageable(String username, PostsConditionForm cond, Pageable pageable) {
+        User userFind = userService.findUserByUsername(username);
+        Page<Post> posts = postRepository.searchPostsWithPage(cond, username, pageable);
 
         return posts.stream()
                 .map(post -> PostDto.of(post, userFind))

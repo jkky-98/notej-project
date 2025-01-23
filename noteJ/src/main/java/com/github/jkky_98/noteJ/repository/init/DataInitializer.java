@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -129,6 +130,18 @@ public class DataInitializer {
             seriesRepository.save(initSeries2);
             seriesRepository.save(initSeries3);
 
+            for (int i = 0; i < 100; i++) {
+                Post initPost = Post.builder()
+                        .title("testPostfor" + i)
+                        .content("testContent")
+                        .writable(true)
+                        .series(initSeries)
+                        .user(initSignUpUser)
+                        .postUrl("testPost-" + UUID.randomUUID())
+                        .build();
+
+                postRepository.save(initPost);
+            }
             postRepository.save(initPost1);
             postRepository.save(initPost2);
 

@@ -37,7 +37,7 @@
 
                 <!-- Post 목록 -->
                 <section>
-                    <div class="container">
+                    <div class="container" id="post-list">
                         <div class="row justify-content-center">
                             <div th:each="post : ${postsViewDto.posts}">
                                 <!-- 카드 전체를 클릭 가능하게 -->
@@ -64,8 +64,83 @@
                         </div>
                     </div>
                 </section>
+                <div id="loading" style="display:none;">Loading...</div>
             </div>
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:inline="javascript">
+        let currentPage = 0; // 현재 페이지 번호
+        const pageSize = 5; // 한 번에 로드할 게시물 수
+        let isLoading = false; // 중복 요청 방지 플래그
+
+        // 스크롤 이벤트 바인딩
+        $(window).on('scroll', function () {
+            if (shouldLoadMore()) {
+                isLoading = true;
+                loadMorePosts(currentPage + 1);
+            }
+        });
+
+        // 스크롤 조건 확인
+        function shouldLoadMore() {
+            const nearBottom = $(window).scrollTop() + $(window).height() >= $(document).height() - 100;
+            return nearBottom && !isLoading;
+        }
+
+        // AJAX로 추가 게시물 로드
+        function loadMorePosts(page) {
+            $('#loading').show();
+
+            $.ajax({
+                url: /*[[@{'/api/@' + ${postsViewDto.username} + '/posts'}]]*/,
+                type: 'GET',
+                data: {
+                    page: page,
+                    size: pageSize
+                },
+                success: function (data) {
+
+                    // 수정된 로직: data.content 대신 data 확인
+                    if (Array.isArray(data) && data.length > 0) {
+                        appendPosts(data); // 바로 data를 appendPosts에 전달
+                        currentPage = page;
+                    } else {
+                        $(window).off('scroll'); // 더 이상 데이터가 없으면 스크롤 이벤트 해제
+                    }
+
+                    isLoading = false;
+                    $('#loading').hide();
+                },
+                error: function (error) {
+                    console.error("Error during AJAX request: ", error);
+                    isLoading = false;
+                    $('#loading').hide();
+                }
+            });
+        }
+
+        // 게시물 HTML 추가
+        function appendPosts(posts) {
+            posts.forEach(post => {
+                $('#post-list .row').append(`
+                <a href="/@${post.username}/post/${post.postUrl}" class="card posts-style my-5 text-decoration-none">
+                    <img src="/image-print/${post.thumbnail || 'default/default_post.png'}" class="card-img-top thumbnail-posts-img" alt="Post Thumbnail" />
+                    <div class="card-body my-2 mx-2">
+                        <h3 class="card-title">${post.title}</h3>
+                        <p class="card-text">${post.postSummary}</p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">${post.createByDt}</small>
+                        <small class="text-muted"> . </small>
+                        <small class="text-muted">${post.commentCount}개의 댓글</small>
+                        <small class="text-muted"> . </small>
+                        <small class="text-muted">♥${post.likeCount}</small>
+                    </div>
+                </a>
+            `);
+            });
+        }
+    </script>
 </div>
 </html>
