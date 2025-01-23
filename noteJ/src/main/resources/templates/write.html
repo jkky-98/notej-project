@@ -216,6 +216,16 @@
                         body : formData,
                     });
 
+                    if (!response.ok) {
+                        // 상태 코드에 따라 에러 처리
+                        if (response.status === 429) {
+                            alert('너무 많은 사진 요청입니다 1분 뒤에 다시 시도해주세요.');
+                        } else {
+                            alert(`Image upload failed with status: ${response.status}`);
+                        }
+                        return;
+                    }
+
                     // 3. 컨트롤러에서 전달받은 디스크에 저장된 파일명
                     const filename = await response.text();
                     console.log('서버에 저장된 파일명 : ', filename);

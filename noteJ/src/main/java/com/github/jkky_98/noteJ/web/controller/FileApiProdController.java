@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.model.ObjectTagging;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.Tag;
+import com.github.jkky_98.noteJ.aop.RateLimit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,6 +70,7 @@ public class FileApiProdController {
      * @param filename 디스크에 업로드된 파일명
      * @return image byte array
      */
+    @RateLimit(maxRequests = 100, timeWindow = 60)
     @GetMapping(value = "/editor/image-print", produces = {MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public byte[] printEditorImage(@RequestParam final String filename) {
         S3Object s3Object = getS3Object(filename);
