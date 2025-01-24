@@ -4,22 +4,16 @@ import com.github.jkky_98.noteJ.domain.Post;
 import com.github.jkky_98.noteJ.domain.Series;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.PostRepository;
-import com.github.jkky_98.noteJ.repository.SeriesRepository;
-import com.github.jkky_98.noteJ.repository.UserRepository;
 import com.github.jkky_98.noteJ.web.controller.dto.PostDto;
-import com.github.jkky_98.noteJ.web.controller.dto.PostsSeriesViewDto;
 import com.github.jkky_98.noteJ.web.controller.dto.PostsViewDto;
 import com.github.jkky_98.noteJ.web.controller.form.PostsConditionForm;
 import com.github.jkky_98.noteJ.web.controller.dto.SeriesViewDto;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,15 +21,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostsService {
 
-    private final UserRepository userRepository;
-    private final SeriesRepository seriesRepository;
     private final PostRepository postRepository;
     private final UserService userService;
     private final ProfileService profileService;
     private final TagService tagService;
     private final FollowService followService;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<PostDto> getPosts(String username, PostsConditionForm cond) {
         User userFind = userService.findUserByUsername(username);
 

@@ -18,10 +18,9 @@
     </style>
 </div>
 <body>
-
+<div th:insert="~{fragments/header :: navigation}">
+</div>
 <form th:action="@{/settings}" method="post" enctype="multipart/form-data">
-    <div th:insert="~{fragments/header :: navigation}">
-    </div>
     <div class="container settings-container">
         <h1>설정</h1>
 
@@ -48,36 +47,6 @@
             <div class="section-title">블로그 제목</div>
             <input type="text" name="blogTitle" class="form-control" th:value="${settingDto.blogTitle}" placeholder="블로그 제목을 입력하세요">
         </div>
-
-        <!-- 테마 설정 -->
-        <div class="mb-3">
-            <div class="section-title">테마 설정</div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="theme" id="lightTheme"
-                       th:value="'LIGHT'"
-                       th:checked="${settingDto.theme == T(com.github.jkky_98.noteJ.domain.user.ThemeMode).LIGHT}">
-                <label class="form-check-label" for="lightTheme">
-                    Light Mode
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="theme" id="darkTheme"
-                       th:value="'DARK'"
-                       th:checked="${settingDto.theme == T(com.github.jkky_98.noteJ.domain.user.ThemeMode).DARK}">
-                <label class="form-check-label" for="darkTheme">
-                    Dark Mode
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="radio" name="theme" id="splitTheme"
-                       th:value="'SPLIT'"
-                       th:checked="${settingDto.theme == T(com.github.jkky_98.noteJ.domain.user.ThemeMode).SPLIT}">
-                <label class="form-check-label" for="splitTheme">
-                    Split Mode
-                </label>
-            </div>
-        </div>
-
 
         <!-- 소셜 정보 -->
         <div class="mb-3">

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- 좋아요 아이콘과 좋아요 수 -->
+<div th:fragment="likeList">
+    <div class="actions">
+        <button id="like-list-button" class="like-btn" data-bs-toggle="modal" data-bs-target="#exampleModal" style="background: none; border: none; cursor: pointer;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
+            </svg>
+        </button>
+        <span id="like-count" th:text="${postViewDto.likeCount}">0</span>
+
+        <!-- 모달 -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="modal-body">
+                        ...
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <style>
+            #likeUserLink:hover {
+                text-decoration: underline; /* 호버 시 밑줄 추가 */
+                cursor: pointer; /* 마우스를 올리면 포인터 커서 표시 */
+            }
+
+            #likeUserLink:hover #likeUserDiv {
+                background-color: #cfcece; /* 호버 시 배경색 변경 */
+            }
+
+            #likeUserDiv {
+                transition: background-color 0.3s; /* 배경색 변경 시 부드럽게 애니메이션 */
+            }
+        </style>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            const likeButton = $("#like-list-button");
+            const likeCountElement = $("#like-count");
+            const modalBody = $("#modal-body");
+
+            // 좋아요 버튼 클릭 이벤트
+            likeButton.on("click", function () {
+                // 현재 URL의 마지막 경로를 postId로 추출
+                const currentUrl = window.location.href; // 현재 URL 가져오기
+                const postUrl = currentUrl.substring(currentUrl.lastIndexOf("/") + 1); // 마지막 "/" 이후의 값 추출
+
+                // AJAX 요청
+                $.ajax({
+                    url: "/api/post/likes", // API 엔드포인트
+                    method: "GET", // GET 요청
+                    contentType: "application/json", // 요청 Content-Type
+                    data: { postUrl: postUrl }, // 요청 데이터
+                    success: function (data) {
+                        console.log(data);
+
+                        // 모달 내용 업데이트
+                        modalBody.empty(); // 기존 내용 초기화
+                        if (data && data.length > 0) {
+                            data.forEach((likeUser) => {
+                                const userCard = `
+                                    <a id="likeUserLink" href="/@${likeUser.usernameLike}/posts" style="text-decoration: none; color: inherit;">
+                                        <div id="likeUserDiv" style="display: flex; align-items: center; margin-bottom: 10px;">
+                                            <img src="/image-print/${likeUser.profilePicLike}" alt="프로필 이미지" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px;">
+                                            <div>
+                                                <p style="margin: 0;"><strong>${likeUser.usernameLike}</strong></p>
+                                                <p style="margin: 0; font-size: 12px; color: #888;">${likeUser.userDescLike}</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <hr>
+                                `;
+                                modalBody.append(userCard);
+                            });
+                        } else {
+                            modalBody.append("<p>아직 좋아요를 누른 사용자가 없습니다.</p>");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching likes:", error); // 에러 처리
+                        modalBody.empty();
+                        modalBody.append("<p>데이터를 가져오는 데 실패했습니다. 다시 시도해주세요.</p>");
+                    },
+                });
+            });
+        });
+    </script>
+</div>
+</html>

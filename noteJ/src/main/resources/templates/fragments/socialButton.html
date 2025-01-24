@@ -4,7 +4,7 @@
     <br/><br/>
     <div class="col-md-12">
       <!-- GitHub -->
-      <a th:if="${postsViewDto.profileForm.socialGitHub != null}"
+      <a th:if="${postsViewDto.profileForm.socialGitHub != null and !postsViewDto.profileForm.socialGitHub.isEmpty()}"
          th:href="${postsViewDto.profileForm.socialGitHub}"
          target="_blank"
          class="btn-social btn-github">
@@ -12,7 +12,7 @@
       </a>
 
       <!-- Email -->
-      <a th:if="${postsViewDto.profileForm.socialEmail != null}"
+      <a th:if="${postsViewDto.profileForm.socialEmail != null and !postsViewDto.profileForm.socialEmail.isEmpty()}"
          th:href="'mailto:' + ${postsViewDto.profileForm.socialEmail}"
          target="_blank"
          class="btn-social btn-email">
@@ -20,7 +20,7 @@
       </a>
 
       <!-- Facebook -->
-      <a th:if="${postsViewDto.profileForm.socialFacebook != null}"
+      <a th:if="${postsViewDto.profileForm.socialFacebook != null and !postsViewDto.profileForm.socialFacebook.isEmpty()}"
          th:href="${postsViewDto.profileForm.socialFacebook}"
          target="_blank"
          class="btn-social btn-facebook">
@@ -28,7 +28,7 @@
       </a>
 
       <!-- Twitter -->
-      <a th:if="${postsViewDto.profileForm.socialTwitter != null}"
+      <a th:if="${postsViewDto.profileForm.socialTwitter != null and !postsViewDto.profileForm.socialTwitter.isEmpty()}"
          th:href="${postsViewDto.profileForm.socialTwitter}"
          target="_blank"
          class="btn-social btn-twitter">

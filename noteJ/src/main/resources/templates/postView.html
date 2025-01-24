@@ -102,6 +102,9 @@
                 <span th:text="${postViewDto.username}">username</span>
                 <span> · </span>
                 <span th:text="@{'작성일 : ' + ${#temporals.format(postViewDto.createByDt, 'yyyy-MM-dd')} }">약 23시간 전</span>
+
+                <!-- 좋아요 아이콘과 좋아요 수 -->
+                <div th:insert="~{fragments/likeList :: likeList}">
             </div>
 
             <!-- Tags -->

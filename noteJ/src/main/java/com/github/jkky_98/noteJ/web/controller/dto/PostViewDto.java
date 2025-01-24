@@ -39,6 +39,7 @@ public class PostViewDto {
                                 .map(CommentsDto::of)
                                 .toList()
                 )
+                .likeCount(post.getLikes().size())
                 .build();
     }
 }

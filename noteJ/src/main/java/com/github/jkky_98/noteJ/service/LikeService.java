@@ -7,6 +7,7 @@ import com.github.jkky_98.noteJ.exception.LikeBadRequestClientException;
 import com.github.jkky_98.noteJ.exception.LikeSelfSaveClientException;
 import com.github.jkky_98.noteJ.repository.LikeRepository;
 import com.github.jkky_98.noteJ.service.dto.GetLikeStatusServiceDto;
+import com.github.jkky_98.noteJ.web.controller.dto.LikeListByPostDto;
 import com.github.jkky_98.noteJ.web.controller.dto.LikeStatusResponseDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,7 +38,7 @@ public class LikeService {
 
     @Transactional
     public void saveLike(String postUrl, boolean liked, Long sessionUserId) {
-        if (liked != false) {
+        if (liked) {
             log.error("좋아요 상태 : {}", liked);
             throw new LikeBadRequestClientException("좋아요 상태가 역전되어 있습니다.");
         }
@@ -44,7 +46,7 @@ public class LikeService {
         Post postFind = postService.findByPostUrl(postUrl);
         User userFind = userService.findUserById(sessionUserId);
 
-        if (postFind.getUser().getId() == userFind.getId()) {
+        if (postFind.getUser().getId().equals(userFind.getId())) {
             throw new LikeSelfSaveClientException("스스로에게 좋아요는 불가능 합니다.");
         }
 
@@ -57,7 +59,7 @@ public class LikeService {
 
     @Transactional
     public void deleteLike(String postUrl, boolean liked, Long sessionUserId) {
-        if (liked != true) {
+        if (!liked) {
             throw new LikeBadRequestClientException("좋아요 상태가 역전되어 있습니다.");
         }
 
@@ -69,5 +71,21 @@ public class LikeService {
 
         likeRepository.delete(like);
 
+    }
+
+    @Transactional(readOnly = true)
+    public List<LikeListByPostDto> getLikeListByPostUrl(String postUrl) {
+        Post post = postService.findByPostUrl(postUrl);
+
+        return post.getLikes().stream()
+                .map(like -> {
+                    User user = like.getUser();
+                    LikeListByPostDto likeListByPostDto = new LikeListByPostDto();
+                    likeListByPostDto.setUsernameLike(user.getUsername());
+                    likeListByPostDto.setProfilePicLike(user.getUserDesc().getProfilePic());
+                    likeListByPostDto.setUserDescLike(user.getUserDesc().getDescription());
+                    return likeListByPostDto;
+                })
+                .toList();
     }
 }

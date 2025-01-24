@@ -30,7 +30,8 @@ public class AuthorizationUsernamePasswordFilter implements Filter {
             "/editor-image-upload/**",
             "/@*/followings",
             "/@*/followers",
-            "/api/@*/posts/**"
+            "/api/@*/posts/**",
+            "/api/post/likes/**"
     };
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 

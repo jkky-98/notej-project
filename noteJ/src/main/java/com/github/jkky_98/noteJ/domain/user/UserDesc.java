@@ -41,8 +41,7 @@ public class UserDesc extends BaseTimeEntity {
     private boolean noteJAlarm;
 
     // 연관관계
-    @OneToOne(fetch = FetchType.LAZY,
-            mappedBy = "userDesc")
+    @OneToOne(mappedBy = "userDesc")
     private User user;
 
 
@@ -50,7 +49,6 @@ public class UserDesc extends BaseTimeEntity {
         // 다른 필드 업데이트
         description = form.getDescription();
         blogTitle = form.getBlogTitle();
-        theme = ThemeMode.valueOf(form.getTheme());
         profilePic = newProfilePicPath;
         socialEmail = form.getSocialEmail();
         socialGitHub = form.getSocialGitHub();
@@ -78,6 +76,7 @@ public class UserDesc extends BaseTimeEntity {
                 .noteJAlarm(true)
                 .profilePic("default/default-profile.png")
                 .theme(ThemeMode.LIGHT)
+                .description("")
                 .build();
     }
 }

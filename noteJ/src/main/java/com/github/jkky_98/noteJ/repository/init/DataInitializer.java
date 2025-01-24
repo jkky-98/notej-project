@@ -37,6 +37,7 @@ public class DataInitializer {
                     .noteJAlarm(true)
                     .profilePic("default/default-profile.png")
                     .theme(ThemeMode.LIGHT)
+                    .description("")
                     .build();
 
             User initSignUpUser = User.builder()
