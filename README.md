@@ -143,7 +143,7 @@ https://github.com/jkky-98/notej-project/commit/787e273dc97936401a10919403442183
 태그의 상태관리는 PostFile이라는 엔티티를 통해 관리하여 수정시 새로운 영속화 태그를 부착하거나 기존 영속화 태그를 임시태그로 변환하는 등의 작업이 가능했습니다.
 
 #### 관련 작성글
-https://velog.io/@aal2525/Toast-Editor-%EC%82%AC%EC%A7%84-%EC%A0%80%EC%9E%A5-%EC%B5%9C%EC%A0%81%ED%99%94
+[사진 저장용량 최적화 구현 과정](https://velog.io/@aal2525/Toast-Editor-%EC%82%AC%EC%A7%84-%EC%A0%80%EC%9E%A5-%EC%B5%9C%EC%A0%81%ED%99%94)
 
 #### 악성 사용자 막기
 
