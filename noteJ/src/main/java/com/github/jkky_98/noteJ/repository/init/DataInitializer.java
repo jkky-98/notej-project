@@ -31,7 +31,25 @@ public class DataInitializer {
         if (userRepository.count() == 0) {
 
             UserDesc initUserDesc = UserDesc.builder()
-                    .blogTitle("TestTitle")
+                    .blogTitle("MASTER")
+                    .socialEmail("aal2525@ajou.ac.kr")
+                    .commentAlarm(true)
+                    .noteJAlarm(true)
+                    .profilePic("2c666dc0-eeb6-45fb-bb14-5b7cc781b9d6.webp")
+                    .theme(ThemeMode.LIGHT)
+                    .description("MASTER")
+                    .build();
+
+            User initSignUpUser = User.builder()
+                    .username("master")
+                    .email("aal2525@ajou.ac.kr")
+                    .password("master")
+                    .userRole(UserRole.USER)
+                    .userDesc(initUserDesc)
+                    .build();
+
+            UserDesc initUserDesc2 = UserDesc.builder()
+                    .blogTitle("testuser2")
                     .socialEmail("example@google.com")
                     .commentAlarm(true)
                     .noteJAlarm(true)
@@ -40,12 +58,12 @@ public class DataInitializer {
                     .description("")
                     .build();
 
-            User initSignUpUser = User.builder()
-                    .username("testId")
+            User initSignUpUser2 = User.builder()
+                    .username("testuser2")
                     .email("example@google.com")
-                    .password("test@@")
+                    .password("apdlvmf4@@")
                     .userRole(UserRole.USER)
-                    .userDesc(initUserDesc)
+                    .userDesc(initUserDesc2)
                     .build();
 
             Series initSeries = Series.builder()
@@ -126,12 +144,13 @@ public class DataInitializer {
             PostTag postTag3 = PostTag.builder().post(initPost2).tag(tag3).build();
 
             userRepository.save(initSignUpUser);
+            userRepository.save(initSignUpUser2);
 
             seriesRepository.save(initSeries);
             seriesRepository.save(initSeries2);
             seriesRepository.save(initSeries3);
 
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 50; i++) {
                 Post initPost = Post.builder()
                         .title("testPostfor" + i)
                         .content("testContent")
@@ -143,6 +162,7 @@ public class DataInitializer {
 
                 postRepository.save(initPost);
             }
+
             postRepository.save(initPost1);
             postRepository.save(initPost2);
 

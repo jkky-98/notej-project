@@ -4,6 +4,7 @@ import com.github.jkky_98.noteJ.domain.*;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.file.FileStore;
 import com.github.jkky_98.noteJ.repository.*;
+import com.github.jkky_98.noteJ.service.dto.WriteServiceEntityGenerateDto;
 import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,7 @@ public class WriteServiceLocal implements WriteService {
     private final PostService postService;
 //    private final AmazonS3 amazonS3;
 
-    private static final String DEFAULT_POST_PIC =  "/storage/default/default_post.png";
+    private static final String DEFAULT_POST_PIC =  "default/default-post-v2.webp";
 
     /**
      * /write get 요청에 사용될 WriteForm을 구성
@@ -83,16 +84,25 @@ public class WriteServiceLocal implements WriteService {
         User userById = userService.findUserById(sessionUserId);
 
         // 썸네일 설정
-        String storedFileName = handleThumnail(form);
-
+        String thumnailPath = handleThumnail(form);
+        log.info("THUMnailPath : {}" , thumnailPath);
         // url, content 인코딩
-        log.info("[인코딩 전 Content 정보 확인] : {}" , form.getContent());
         encodingUrlAndContent(form);
-        log.info("[인코딩 후 Content 정보 확인] : {}" , form.getContent());
-        List<String> strings = extractImageFilenames(form.getContent());
-        log.info("[추출기 테스트 ] : {}", strings);
+
+        // 엔티티 생성을 위한 DTO 생성
+        WriteServiceEntityGenerateDto dto = new WriteServiceEntityGenerateDto();
+
+        dto.setTitle(form.getTitle());
+        dto.setContent(form.getContent());
+        dto.setUser(userById);
+        dto.setWritable(form.isOpen());
+        dto.setThumbnail(thumnailPath);
+        dto.setUrl(form.getUrl());
+        dto.setSeries(seriesService.getSeries(form.getSeries()));
+        dto.setPostSummary(form.getPostSummary());
+
         // Post Entity 생성
-        Post post = Post.of(form, userById, seriesService.getSeries(form.getSeries()), storedFileName);
+        Post post = Post.of(form, userById, seriesService.getSeries(form.getSeries()), thumnailPath);
 
         // Post save
         Post postSaved = postRepository.save(post);
@@ -128,7 +138,7 @@ public class WriteServiceLocal implements WriteService {
 
     private String handleThumnail(WriteForm form) throws IOException {
         String storedFileName = DEFAULT_POST_PIC;
-        if (form.getThumbnail() != null) {
+        if (form.getThumbnail() != null && !form.getThumbnail().isEmpty()) {
             storedFileName = fileStore.storeFile(form.getThumbnail());
         }
         return storedFileName;

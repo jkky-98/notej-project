@@ -39,7 +39,6 @@ public class WriteController {
         if (bindingResult.hasErrors()) {
             return "write";
         }
-        log.info("Tags : {}", writeForm.getTags());
         writeService.saveWrite(writeForm, sessionUser.getId());
         return "redirect:" + "/@" + sessionUser.getUsername() + "/posts";
     }
