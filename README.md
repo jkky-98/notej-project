@@ -125,7 +125,8 @@ None
 초기 로드 시 5개의 게시글 카드를 렌더링하며, AJAX 기반의 무한 스크롤 기능을 구현하여 사용자가 스크롤을 최하단으로 내릴 경우 추가로 5개의 게시글 카드를 가져오도록 구성하였습니다.
 
 또한, 쿼리 스트링을 통해 tagName, seriesName, search와 같은 조건별 조회 기능을 지원하며, 이를 Querydsl을 활용한 동적 조회 쿼리로 처리하여 효율적인 조건별 데이터 조회가 가능하도록 구현하였습니다.
-
+#### 관련 작성글
+[무한 스크롤 페이징 기능 구현 과정](https://velog.io/write?id=965f2736-9586-413c-812f-c9a523e860d6)
 
 ### 댓글, 대댓글 기능
 
@@ -140,12 +141,6 @@ https://github.com/jkky-98/notej-project/commit/787e273dc97936401a10919403442183
 이를 S3 객체 태그를 이용한 생명주기 관리를 통해 실제 게시글 저장 시점에 content에서 쓰이는 사진 객체에 대해 영속화 태그를 부착하고, 작성 시점 업로드된 태그에는 임시태그를 부착했습니다. 
 
 태그의 상태관리는 PostFile이라는 엔티티를 통해 관리하여 수정시 새로운 영속화 태그를 부착하거나 기존 영속화 태그를 임시태그로 변환하는 등의 작업이 가능했습니다.
-
-#### 수정 전 아키텍처
-![prev_img](https://github.com/user-attachments/assets/62f19242-9f82-4282-8a3f-e8c60f253ada)
-
-#### 수정 후 아키텍처
-![after_img](https://github.com/user-attachments/assets/f4c34602-7c3e-4c55-8ecd-de5cd9701bae)
 
 #### 관련 작성글
 https://velog.io/@aal2525/Toast-Editor-%EC%82%AC%EC%A7%84-%EC%A0%80%EC%9E%A5-%EC%B5%9C%EC%A0%81%ED%99%94
