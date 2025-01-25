@@ -49,7 +49,7 @@ public class WriteServiceProd implements WriteService{
     @Value("${cloud.aws.s3.bucket}")
     private String s3BucketName;
 
-    private static final String DEFAULT_POST_PIC =  "/storage/default/default_post.png";
+    private static final String DEFAULT_POST_PIC =  "default/thumb.webp";
 
     /**
      * /write get 요청에 사용될 WriteForm을 구성

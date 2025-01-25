@@ -35,7 +35,7 @@ public class WriteServiceLocal implements WriteService {
     private final PostService postService;
 //    private final AmazonS3 amazonS3;
 
-    private static final String DEFAULT_POST_PIC =  "default/default-post-v2.webp";
+    private static final String DEFAULT_POST_PIC =  "default/thumb.webp";
 
     /**
      * /write get 요청에 사용될 WriteForm을 구성

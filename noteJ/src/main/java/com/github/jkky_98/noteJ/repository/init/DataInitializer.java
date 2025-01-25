@@ -35,7 +35,7 @@ public class DataInitializer {
                     .socialEmail("aal2525@ajou.ac.kr")
                     .commentAlarm(true)
                     .noteJAlarm(true)
-                    .profilePic("2c666dc0-eeb6-45fb-bb14-5b7cc781b9d6.webp")
+                    .profilePic("default/real.jpeg")
                     .theme(ThemeMode.LIGHT)
                     .description("MASTER")
                     .build();
@@ -158,6 +158,8 @@ public class DataInitializer {
                         .series(initSeries)
                         .user(initSignUpUser)
                         .postUrl("testPost-" + UUID.randomUUID())
+                        .thumbnail("default/thumb.webp")
+                        .postSummary("요약 : " + i + "번째")
                         .build();
 
                 postRepository.save(initPost);
