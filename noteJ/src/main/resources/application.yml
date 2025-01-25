@@ -79,7 +79,7 @@ spring:
     activate:
       on-profile: blue
   datasource:
-    url: jdbc:mysql://${RDS_ENDPOINT}:3306/${RDS_NAME}?createDatabaseIfNotExist=true&useSSL=false
+    url: jdbc:mysql://${RDS_ENDPOINT}:3306/${RDS_NAME}?createDatabaseIfNotExist=true&useSSL=false&characterEncoding=UTF-8&useUnicode=true&serverTimezone=Asia/Seoul
     username: ${RDS_USERNAME}
     password: ${RDS_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -118,7 +118,7 @@ spring:
     activate:
       on-profile: green
   datasource:
-    url: jdbc:mysql://${RDS_ENDPOINT}:3306/${RDS_NAME}?createDatabaseIfNotExist=true&useSSL=false
+    url: jdbc:mysql://${RDS_ENDPOINT}:3306/${RDS_NAME}?createDatabaseIfNotExist=true&useSSL=false&characterEncoding=UTF-8&useUnicode=true&serverTimezone=Asia/Seoul
     username: ${RDS_USERNAME}
     password: ${RDS_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
