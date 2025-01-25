@@ -43,6 +43,7 @@ public class LikeService {
             throw new LikeBadRequestClientException("좋아요 상태가 역전되어 있습니다.");
         }
 
+        log.info("POST URL : {}", postUrl);
         Post postFind = postService.findByPostUrl(postUrl);
         User userFind = userService.findUserById(sessionUserId);
 

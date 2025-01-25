@@ -59,6 +59,9 @@ server:
   serverAddress: localhost
   tomcat:
     uri-encoding: utf-8
+  servlet:
+    encoding:
+      charset: UTF-8
 
 cloud:
   aws:
@@ -112,6 +115,9 @@ server:
   serverAddress: ${LIVE_SERVER_IP}
   tomcat:
     uri-encoding: utf-8
+  servlet:
+    encoding:
+      charset: UTF-8
 
 serverName: blue_server
 
@@ -153,6 +159,9 @@ server:
   serverAddress: ${LIVE_SERVER_IP}
   tomcat:
     uri-encoding: utf-8
+  servlet:
+    encoding:
+      charset: UTF-8
 
 serverName: green_server
 

@@ -19,7 +19,7 @@
     var like_cnt = $("#like-cnt");
     var fullUrl = window.location.href; // 전체 URL 가져오기
     var pathArray = fullUrl.split('/'); // '/'를 기준으로 URL 분리
-    var postUrl = pathArray[5]; // 마지막 경로를 postUrl로 설정 (예: "/posts/123" → "123")
+    var postUrl = decodeURIComponent(pathArray[5]); // 마지막 경로를 postUrl로 설정 (예: "/posts/123" → "123")
     var like_parent = document.querySelector('.like-container');
 
     var burst = new mojs.Burst({
