@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:insert="~{fragments/header :: header}"></div>
+
+<body>
+<div th:insert="~{fragments/header :: navigation}"></div>
+<div class="container mt-5">
+    <div th:each="post : ${postsNotOpen}">
+        <div class="card my-6 clickable-card"
+             style="cursor: pointer;"
+             th:data-url="'/edit/' + ${post.postUrl}">
+            <div class="card-header">
+                임시글
+            </div>
+            <div class="card-body">
+                <h3 class="card-title" th:text="${post.title}">title</h3>
+                <p class="card-text" th:text="${post.postSummary}">With supporting text below as a natural lead-in to additional content.</p>
+            </div>
+            <div class="card-footer text-muted" th:text="${#temporals.format(post.createDt, 'yyyy-MM-dd')}">
+                2 days ago
+            </div>
+        </div>
+        <hr>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        // 모든 클릭 가능한 카드에 이벤트 리스너 추가
+        const clickableCards = document.querySelectorAll('.clickable-card');
+
+        clickableCards.forEach(function (card) {
+            card.addEventListener('click', function () {
+                const url = card.getAttribute('data-url'); // 데이터 속성에서 URL 가져오기
+                window.location.href = url; // 리다이렉트
+            });
+        });
+    });
+</script>
+
+<!-- 스타일 추가 -->
+<style>
+    .clickable-card:hover {
+        background-color: #f8f9fa; /* 회색 배경 */
+        transition: background-color 0.2s ease-in-out;
+    }
+</style>
+
+</body>
+</html>

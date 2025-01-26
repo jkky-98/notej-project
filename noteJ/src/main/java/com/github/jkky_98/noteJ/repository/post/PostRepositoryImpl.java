@@ -39,6 +39,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .leftJoin(pt.tag, t).fetchJoin()
                 .leftJoin(p.series, s).fetchJoin()
                 .where(
+                        p.writable.eq(true),
                         searchCondition(form.getSearch(), p),
                         tagCondition(form.getTagName(), p, pt, t),
                         seriesCondition(form.getSeriesName(), p, s),
@@ -67,6 +68,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .leftJoin(pt.tag, t).fetchJoin()
                 .leftJoin(p.series, s).fetchJoin()
                 .where(
+                        p.writable.eq(true),
                         searchCondition(form.getSearch(), p),
                         tagCondition(form.getTagName(), p, pt, t),
                         seriesCondition(form.getSeriesName(), p, s),
@@ -85,7 +87,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         // Page 객체 반환
         return new PageImpl<>(content, pageable, total);
     }
-
 
     private BooleanExpression userCondition(String username, QUser u) {
         return username != null && !username.isEmpty()

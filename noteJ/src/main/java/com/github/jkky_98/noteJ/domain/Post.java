@@ -121,7 +121,7 @@ public class Post extends BaseEntity {
         return Post.builder()
                 .title(form.getTitle())
                 .content(form.getContent())
-                .writable(!form.isOpen())
+                .writable(form.isOpen())
                 .postSummary(form.getPostSummary())
                 .postUrl(form.getUrl())
                 .series(series)

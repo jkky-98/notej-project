@@ -3,6 +3,7 @@ package com.github.jkky_98.noteJ.web.controller;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.service.PostsService;
 import com.github.jkky_98.noteJ.service.SeriesService;
+import com.github.jkky_98.noteJ.web.controller.dto.PostNotOpenDto;
 import com.github.jkky_98.noteJ.web.controller.form.PostsConditionForm;
 import com.github.jkky_98.noteJ.web.session.SessionConst;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -63,5 +65,17 @@ public class PostsController {
         seriesService.saveSeries(sessionUser, seriesName);
 
         return "redirect:" + referer;
+    }
+
+    @GetMapping("/drafts")
+    public String getDrafts(
+            @SessionAttribute (name = SessionConst.LOGIN_USER, required = false) User sessionUser,
+            Model model
+            ) {
+        List<PostNotOpenDto> postsNotOpen = postsService.getPostsNotOpen(sessionUser);
+
+        model.addAttribute("postsNotOpen", postsNotOpen);
+
+        return "drafts";
     }
 }

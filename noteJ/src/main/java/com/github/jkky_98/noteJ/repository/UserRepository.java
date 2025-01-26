@@ -19,6 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "JOIN p.postTags pt " +
             "JOIN pt.tag t " +
             "WHERE u.username = :username " +
+            "AND p.writable = true " +
             "GROUP BY t.name")
     List<TagCountDto> findTagsByUser(@Param("username") String username);
 

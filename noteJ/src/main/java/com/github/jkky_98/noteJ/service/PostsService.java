@@ -5,6 +5,7 @@ import com.github.jkky_98.noteJ.domain.Series;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.PostRepository;
 import com.github.jkky_98.noteJ.web.controller.dto.PostDto;
+import com.github.jkky_98.noteJ.web.controller.dto.PostNotOpenDto;
 import com.github.jkky_98.noteJ.web.controller.dto.PostsViewDto;
 import com.github.jkky_98.noteJ.web.controller.form.PostsConditionForm;
 import com.github.jkky_98.noteJ.web.controller.dto.SeriesViewDto;
@@ -84,5 +85,16 @@ public class PostsService {
                 ),
                 username
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostNotOpenDto> getPostsNotOpen(User sessionUser) {
+        User userFind = userService.findUserById(sessionUser.getId());
+
+        List<Post> postAllNotOpen = postRepository.findAllByUserIdAndWritableFalse(userFind.getId());
+
+        return postAllNotOpen.stream()
+                .map(PostNotOpenDto::of)
+                .toList();
     }
 }
