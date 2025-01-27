@@ -64,17 +64,17 @@ jobs:
             echo "STOPPED_PORT=8080" >> $GITHUB_ENV
             echo "TARGET_UPSTREAM=blue" >> $GITHUB_ENV
           fi
-      # - name: Remove unused Docker images
-      #   uses: appleboy/ssh-action@master
-      #   with:
-      #     username: ubuntu
-      #     host: ${{ secrets.LIVE_SERVER_IP }}
-      #     key: ${{ secrets.EC2_SSH_KEY }}
-      #     script_stop: true
-      #     script: |
-      #       echo "Removing unused Docker images..."
-      #       sudo docker image prune -af
-      #       echo "Unused Docker images removed."    
+      - name: Remove unused Docker images
+        uses: appleboy/ssh-action@master
+        with:
+          username: ubuntu
+          host: ${{ secrets.LIVE_SERVER_IP }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          script: |
+            echo "Removing unused Docker images..."
+            sudo docker image prune -af
+            echo "Unused Docker images removed."    
           
       - name: Docker compose
         uses: appleboy/ssh-action@master
