@@ -192,6 +192,8 @@
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
 <!-- Tagify -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tagify/4.33.0/tagify.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <script th:inline="javascript">
     let writeFormContent = /*[[${writeForm.content ?: ''}]]*/ '';
 
@@ -337,9 +339,24 @@
                         // postUrl이 존재할 경우 리다이렉트
                         if (response) {
                             console.log("자동 업데이트 성공")
+                            new Toastify({
+                                text: "🦄 게시글 자동 저장 성공!",
+                                duration: 5000, // autoClose 5000ms
+                                gravity: "top", // top-right 위치 설정
+                                position: "right",
+                                stopOnFocus: true, // pauseOnHover
+                                close: true, // closeOnClick
+                                style: {
+                                    background: "linear-gradient(to right, #00b09b, #96c93d)", // 테마 스타일
+                                    color: "#fff",
+                                    borderRadius: "8px",
+                                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.15)",
+                                }
+                            }).showToast();
                         } else {
                             console.error("postUrl이 응답에 없습니다.");
                         }
+
                     } else {
                         console.error("자동 저장 실패:", xhr.statusText);
                     }
