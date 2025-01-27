@@ -31,7 +31,8 @@ public class AuthorizationUsernamePasswordFilter implements Filter {
             "/@*/followings",
             "/@*/followers",
             "/api/@*/posts/**",
-            "/api/post/likes/**"
+            "/api/post/likes/**",
+            "/env"
     };
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 

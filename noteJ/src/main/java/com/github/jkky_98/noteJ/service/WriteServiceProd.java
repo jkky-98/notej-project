@@ -221,6 +221,8 @@ public class WriteServiceProd implements WriteService{
                 log.info("delete thumbnail : {}", thumbnailDeleted);
                 fileStore.deleteFile(thumbnailDeleted); // 기존 파일 삭제
             }
+        } else {
+            post.updateThumbnail(DEFAULT_POST_PIC);
         }
     }
 
