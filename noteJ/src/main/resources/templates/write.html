@@ -193,7 +193,7 @@
 <script th:inline="javascript">
     let writeFormContent = /*[[${writeForm.content ?: ''}]]*/ '';
 
-    const editor = new toastui.Editor({
+    window.editor = new toastui.Editor({
         el: document.querySelector('#editor'), // 에디터를 적용할 요소 (컨테이너)
         height: 'auto',                        // 에디터 영역의 높이 값 (OOOpx || auto)
         initialEditType: 'markdown',            // 최초로 보여줄 에디터 타입 (markdown || wysiwyg)
@@ -262,6 +262,70 @@
         tagify.on('change', () => {
             hiddenInput.value = tagify.value.map(tag => tag.value);
         });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const autoSaveInterval = 10000; // 1분 (60,000ms)
+        const editor = window.editor; // Toast UI Editor 인스턴스 가져오기
+
+        function autoSave() {
+            if (document.hidden) {
+                console.log("브라우저가 비활성화 상태입니다. 자동 저장을 건너뜁니다.");
+                return;
+            }
+
+            const content = encodeURIComponent(editor.getMarkdown()); // 에디터에서 작성 중인 내용
+            const title = document.querySelector('input[name="title"]').value; // 제목 가져오기
+            const tags = document.querySelector('#tags').value; // 태그 가져오기
+            const tagsList = tags.split(','); // 쉼표를 기준으로 문자열 분리
+
+            // 제목이 빈값인 경우 실행 중단
+            if (!title) {
+                console.warn("제목이 비어있어 자동 저장을 건너뜁니다.");
+                return;
+            }
+
+            // Ajax 요청 생성
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/api/write/auto-save", true); // 비동기 POST 요청
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            // 요청 데이터 준비
+            const data = JSON.stringify({
+                title: title,
+                content: content,
+                tags: tagsList,
+            });
+
+            console.log(data);
+
+            // 요청 전송
+            xhr.send(data);
+
+            // 요청 상태 확인
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        console.log("자동 저장 성공:", xhr.responseText);
+
+                        const response = JSON.parse(xhr.responseText);
+
+                        // postUrl이 존재할 경우 리다이렉트
+                        if (response.postUrl) {
+                            window.location.href = `/edit/${response.postUrl}`;
+                        } else {
+                            console.error("postUrl이 응답에 없습니다.");
+                        }
+                    } else {
+                        console.error("자동 저장 실패:", xhr.statusText);
+                    }
+                }
+            };
+        }
+
+        // 1분마다 자동 저장 실행
+        setInterval(autoSave, autoSaveInterval);
     });
 </script>
 </body>

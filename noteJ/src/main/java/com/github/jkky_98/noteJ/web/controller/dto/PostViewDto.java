@@ -17,9 +17,11 @@ public class PostViewDto {
     private String postUrl;
     private String username;
     private LocalDateTime createByDt;
+    @Builder.Default
     private List<String> tags = new ArrayList<>();
     private String content;
     private int likeCount;
+    @Builder.Default
     private List<CommentsDto> comments = new ArrayList<>();
 
     public static PostViewDto of(Post post) {

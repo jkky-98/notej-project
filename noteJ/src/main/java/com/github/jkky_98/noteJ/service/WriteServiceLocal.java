@@ -5,6 +5,10 @@ import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.file.FileStore;
 import com.github.jkky_98.noteJ.repository.*;
 import com.github.jkky_98.noteJ.service.dto.WriteServiceEntityGenerateDto;
+import com.github.jkky_98.noteJ.web.controller.dto.AutoEditPostRequest;
+import com.github.jkky_98.noteJ.web.controller.dto.AutoEditPostResponse;
+import com.github.jkky_98.noteJ.web.controller.dto.AutoSavePostRequest;
+import com.github.jkky_98.noteJ.web.controller.dto.AutoSavePostResponse;
 import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,7 +70,7 @@ public class WriteServiceLocal implements WriteService {
     public WriteForm getWriteEdit(Long sessionUserId, String postUrl) {
         User user = userService.findUserById(sessionUserId);
 
-        Post postEdit = postService.findByPostUrl(postUrl);
+        Post postEdit = postService.findByPostUrl(decodingContent(postUrl));
 
         return WriteForm.of(postEdit, user);
     }
@@ -111,6 +115,39 @@ public class WriteServiceLocal implements WriteService {
         setTag(tagProvider(form.getTags()), postSaved);
 
     }
+
+    @Transactional
+    public AutoSavePostResponse autoSavePost(AutoSavePostRequest request, Long sessionUserId) {
+        User sessionUser = userService.findUserById(sessionUserId);
+
+        Post postTemp = Post.ofSavePostTemp(request, sessionUser);
+        postRepository.save(postTemp);
+
+        setTag(tagProvider(request.getTags()), postTemp);
+
+        AutoSavePostResponse autoSavePostResponse = new AutoSavePostResponse();
+        autoSavePostResponse.setPostUrl(postTemp.getPostUrl());
+        autoSavePostResponse.setUsername(sessionUser.getUsername());
+        return autoSavePostResponse;
+    }
+
+    @Transactional
+    public AutoEditPostResponse autoEditPost(AutoEditPostRequest request) {
+
+        Optional<Post> byPostUrl = postRepository.findByPostUrl(decodingContent(request.getPostUrl()));
+
+        byPostUrl.ifPresent(post -> {
+            if (post.getWritable()) {
+                return;
+            }
+            post.updateEditPostTemp(request);
+        });
+
+        AutoEditPostResponse autoEditPostResponse = new AutoEditPostResponse();
+        autoEditPostResponse.setPostUrl(request.getPostUrl());
+        return autoEditPostResponse;
+    }
+
     private static List<String> extractImageFilenames(String content) {
         // 정규식 패턴 (앞에 ![image alt attribute] 포함, 경로 수정)
         String regex = "!\\[image alt attribute\\]\\(/editor/editor-image-print\\?filename=([a-zA-Z0-9._-]+)\\)";
@@ -153,7 +190,7 @@ public class WriteServiceLocal implements WriteService {
     @Transactional
     public void saveEditWrite(WriteForm form, String postUrl) throws IOException {
         // Post 엔티티 조회
-        Post post = postService.findByPostUrl(postUrl);
+        Post post = postService.findByPostUrl(decodingContent(postUrl));
 
         // Series 업데이트
         post.updateSeries(seriesService.getSeries(form.getSeries()));
@@ -249,6 +286,9 @@ public class WriteServiceLocal implements WriteService {
         }
     }
 
+    private static String decodingContent(String content) {
+        return URLDecoder.decode(content, StandardCharsets.UTF_8);
+    }
 //    private static List<String> extractImageFilenames(String content) {
 //        // 정규식 패턴 (앞에 ![image alt attribute] 포함)
 //        String regex = "!\\[.*?\\]\\(/editor/image-print\\?filename=([a-zA-Z0-9._-]+)\\)";

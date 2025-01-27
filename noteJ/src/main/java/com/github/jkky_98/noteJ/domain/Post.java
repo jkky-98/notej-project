@@ -2,11 +2,17 @@ package com.github.jkky_98.noteJ.domain;
 
 import com.github.jkky_98.noteJ.domain.base.BaseEntity;
 import com.github.jkky_98.noteJ.domain.user.User;
+import com.github.jkky_98.noteJ.web.controller.dto.AutoEditPostRequest;
+import com.github.jkky_98.noteJ.web.controller.dto.AutoSavePostRequest;
 import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -128,5 +134,26 @@ public class Post extends BaseEntity {
                 .thumbnail(thumbnail)
                 .user(user)
                 .build();
+    }
+
+    public static Post ofSavePostTemp(AutoSavePostRequest request, User sessionUser) {
+        return Post.builder()
+                .title(request.getTitle())
+                .content(decodingContent(request.getContent()))
+                .postUrl(request.getTitle() + UUID.randomUUID())
+                .writable(false)
+                .user(sessionUser)
+                .build();
+    }
+
+    public void updateEditPostTemp(AutoEditPostRequest request) {
+        title = request.getTitle();
+        content = decodingContent(request.getContent());
+        postUrl = request.getTitle() + UUID.randomUUID();
+    }
+
+
+    private static String decodingContent(String content) {
+        return URLDecoder.decode(content, StandardCharsets.UTF_8);
     }
 }

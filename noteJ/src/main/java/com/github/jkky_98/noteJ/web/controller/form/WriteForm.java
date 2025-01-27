@@ -24,6 +24,7 @@ public class WriteForm {
     private boolean open;
     private String url;
     private String series;
+    @Builder.Default
     private List<String> seriesList = new ArrayList<>();
 
     public static WriteForm of(Post post, User user) {
@@ -35,7 +36,7 @@ public class WriteForm {
                 .content(post.getContent())
                 .open(post.getWritable())
                 .url(post.getPostUrl())
-                .series(post.getSeries().getSeriesName())
+                .series(post.getSeries() != null ? post.getSeries().getSeriesName() : "")
                 .seriesList(
                         user.getSeriesList().stream()
                                 .map(Series::getSeriesName)

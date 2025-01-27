@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<div th:insert="~{fragments/header :: header}"></div>
 <head>
     <meta charset="UTF-8">
     <title>글 작성</title>
@@ -194,7 +195,7 @@
 <script th:inline="javascript">
     let writeFormContent = /*[[${writeForm.content ?: ''}]]*/ '';
 
-    const editor = new toastui.Editor({
+    window.editor = new toastui.Editor({
         el: document.querySelector('#editor'), // 에디터를 적용할 요소 (컨테이너)
         height: 'auto',                        // 에디터 영역의 높이 값 (OOOpx || auto)
         initialEditType: 'markdown',            // 최초로 보여줄 에디터 타입 (markdown || wysiwyg)
@@ -242,6 +243,32 @@
     document.querySelector('#editor-content-provider').value = encodedContent;
     });
 </script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+        const input = document.querySelector('input[name=tag-input]');
+        const hiddenInput = document.querySelector('#tags');
+
+        // 서버에서 전달받은 태그 값 초기화 (예: ["spring", "태그1"])
+        const initialTags = /*[[${writeForm.tags}]]*/ '["spring", "태그1"]';
+
+        // Tagify 초기화 및 초기 태그 설정
+        const tagify = new Tagify(input, {
+            whitelist: initialTags, // 입력 가능한 태그에 초기값 포함
+        });
+
+        // 초기 태그 설정
+        tagify.addTags(initialTags);
+
+        // 숨겨진 필드에 초기 값 설정
+        hiddenInput.value = initialTags.join(',');
+
+        // 태그 변경 시 숨겨진 필드 업데이트
+        tagify.on('change', () => {
+            hiddenInput.value = tagify.value.map(tag => tag.value).join(',');
+        });
+    });
+</script>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         var input = document.querySelector('input[name=tag-input]');
@@ -253,6 +280,75 @@
         tagify.on('change', () => {
             hiddenInput.value = tagify.value.map(tag => tag.value);
         });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const autoSaveInterval = 10000; // 1분 (60,000ms)
+        const editor = window.editor; // Toast UI Editor 인스턴스 가져오기
+
+        function autoEdit() {
+            if (document.hidden) {
+                console.log("브라우저가 비활성화 상태입니다. 자동 저장을 건너뜁니다.");
+                return;
+            }
+
+            const content = encodeURIComponent(editor.getMarkdown()); // 에디터에서 작성 중인 내용
+            const title = document.querySelector('input[name="title"]').value; // 제목 가져오기
+            const tags = document.querySelector('#tags').value; // 태그 가져오기
+            const tagsList = tags.split(','); // 쉼표를 기준으로 문자열 분리
+            const postUrl = window.location.pathname.split('/').filter(Boolean).pop();
+
+            console.log(postUrl);
+
+            // 제목이 빈값인 경우 실행 중단
+            if (!title) {
+                console.warn("제목이 비어있어 자동 저장을 건너뜁니다.");
+                return;
+            }
+
+            // Ajax 요청 생성
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "/api/write/auto-edit", true); // 비동기 POST 요청
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            // 요청 데이터 준비
+            const data = JSON.stringify({
+                title: title,
+                content: content,
+                tags: tagsList,
+                postUrl: postUrl
+            });
+
+            console.log(data);
+
+            // 요청 전송
+            xhr.send(data);
+
+            // 요청 상태 확인
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        console.log("자동 저장 성공:", xhr.responseText);
+
+                        // JSON 데이터 파싱
+                        const response = JSON.parse(xhr.responseText);
+
+                        // postUrl이 존재할 경우 리다이렉트
+                        if (response) {
+                            console.log("자동 업데이트 성공")
+                        } else {
+                            console.error("postUrl이 응답에 없습니다.");
+                        }
+                    } else {
+                        console.error("자동 저장 실패:", xhr.statusText);
+                    }
+                }
+            };
+        }
+
+        // 1분마다 자동 저장 실행
+        setInterval(autoEdit, autoSaveInterval);
     });
 </script>
 </body>

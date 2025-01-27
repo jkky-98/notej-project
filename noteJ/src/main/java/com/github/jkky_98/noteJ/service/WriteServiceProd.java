@@ -12,6 +12,10 @@ import com.github.jkky_98.noteJ.repository.PostFileRepository;
 import com.github.jkky_98.noteJ.repository.PostRepository;
 import com.github.jkky_98.noteJ.repository.PostTagRepository;
 import com.github.jkky_98.noteJ.repository.TagRepository;
+import com.github.jkky_98.noteJ.web.controller.dto.AutoEditPostRequest;
+import com.github.jkky_98.noteJ.web.controller.dto.AutoEditPostResponse;
+import com.github.jkky_98.noteJ.web.controller.dto.AutoSavePostRequest;
+import com.github.jkky_98.noteJ.web.controller.dto.AutoSavePostResponse;
 import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +29,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -132,6 +137,37 @@ public class WriteServiceProd implements WriteService{
         setTagsForPost(tagProvider(form.getTags()), post);
 
         updateTagAndRepository(form, post);
+    }
+
+    @Transactional
+    public AutoSavePostResponse autoSavePost(AutoSavePostRequest request, Long sessionUserId) {
+        User sessionUser = userService.findUserById(sessionUserId);
+        Post postTemp = Post.ofSavePostTemp(request, sessionUser);
+        postRepository.save(postTemp);
+
+        setTagsForPost(tagProvider(request.getTags()), postTemp);
+
+        AutoSavePostResponse autoSavePostResponse = new AutoSavePostResponse();
+        autoSavePostResponse.setPostUrl(postTemp.getPostUrl());
+        autoSavePostResponse.setUsername(sessionUser.getUsername());
+        return autoSavePostResponse;
+    }
+
+    @Transactional
+    public AutoEditPostResponse autoEditPost(AutoEditPostRequest request) {
+
+        Optional<Post> byPostUrl = postRepository.findByPostUrl(decodingContent(request.getPostUrl()));
+
+        byPostUrl.ifPresent(post -> {
+            if (post.getWritable()) {
+                return;
+            }
+            post.updateEditPostTemp(request);
+        });
+
+        AutoEditPostResponse autoEditPostResponse = new AutoEditPostResponse();
+        autoEditPostResponse.setPostUrl(request.getPostUrl());
+        return autoEditPostResponse;
     }
 
     private void updateTagAndRepository(WriteForm form, Post post) {
@@ -314,5 +350,9 @@ public class WriteServiceProd implements WriteService{
 
     private void updateTagToDelete(String fileName, String s3BucketName) {
         updateTag(fileName, s3BucketName, "permanent", "delete");
+    }
+
+    private static String decodingContent(String content) {
+        return URLDecoder.decode(content, StandardCharsets.UTF_8);
     }
 }
