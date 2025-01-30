@@ -76,4 +76,5 @@ public class AuthorizationUsernamePasswordFilter implements Filter {
         }
         return true;
     }
+
 }

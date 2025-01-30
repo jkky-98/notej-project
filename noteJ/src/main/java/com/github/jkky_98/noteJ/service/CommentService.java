@@ -4,6 +4,7 @@ import com.github.jkky_98.noteJ.domain.Comment;
 import com.github.jkky_98.noteJ.domain.Post;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.CommentRepository;
+import com.github.jkky_98.noteJ.repository.PostRepository;
 import com.github.jkky_98.noteJ.web.controller.CommentController;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,6 +24,23 @@ public class CommentService {
     private final PostService postService;
     private final UserService userService;
     private final NotificationService notificationService;
+
+    @Transactional(readOnly = true)
+    public List<Comment> getCommentsByPost(Long postId) {
+        List<Comment> rootComments = commentRepository.findByPostIdAndParentIsNull(postId);
+        List<Comment> sortedComments = new ArrayList<>();
+        for (Comment root : rootComments) {
+            dfs(root, sortedComments);
+        }
+        return sortedComments;
+    }
+
+    private void dfs(Comment comment, List<Comment> sortedComments) {
+        sortedComments.add(comment);
+        for (Comment child : comment.getChildrens()) {
+            dfs(child, sortedComments);
+        }
+    }
 
     @Transactional
     public void saveComment(CommentController.SaveCommentRequest saveCommentRequest) {
