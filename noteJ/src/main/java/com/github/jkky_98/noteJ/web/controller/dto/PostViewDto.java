@@ -1,5 +1,6 @@
 package com.github.jkky_98.noteJ.web.controller.dto;
 
+import com.github.jkky_98.noteJ.domain.Comment;
 import com.github.jkky_98.noteJ.domain.Post;
 import lombok.*;
 

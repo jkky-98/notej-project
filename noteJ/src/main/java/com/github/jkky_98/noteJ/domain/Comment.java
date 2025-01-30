@@ -5,6 +5,8 @@ import com.github.jkky_98.noteJ.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Entity
@@ -32,6 +34,10 @@ public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id") // Self-referencing Foreign Key
     private Comment parent;
+
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Comment> childrens = new ArrayList<>();
 
     public void updatePost(Post post) {
         this.post = post;

@@ -1,5 +1,6 @@
 <div class="comments-container" th:fragment="comments">
   <h3>댓글</h3>
+
   <!-- Comment Form -->
   <form th:action="${currentUrl}" th:method="post" class="mb-4"
         th:object="${commentForm}" th:if="${sessionUser != null}">
@@ -15,7 +16,7 @@
               th:field="*{content}"
               rows="3"
               placeholder="댓글을 입력하세요...">
-                </textarea>
+    </textarea>
 
     <button type="submit" class="btn btn-primary btn-sm">댓글 작성</button>
   </form>
@@ -27,57 +28,54 @@
 
   <!-- Comment List -->
   <div class="comment-list">
-    <div class="comment" th:each="comment : ${postViewDto.comments}" th:if="${comment.parentsId == null}">
-      <!-- 부모 댓글 -->
-      <div class="card mb-3">
-        <div class="card-body">
-          <div class="comment-meta d-flex justify-content-between">
-            <div>
-              <strong th:text="${comment.createBy}">작성자</strong>
-              <span class="text-muted" th:text="${#temporals.format(comment.createByDt, 'yyyy-MM-dd HH:mm')}">작성 시간</span>
-            </div>
-          </div>
-          <div class="comment-content mt-2" th:text="${comment.content}">
-            댓글 내용
-          </div>
-          <!-- 대댓글 달기 버튼 -->
-          <div class="comment-actions mt-3">
-            <a class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse"
-               th:href="'#replyForm-' + ${comment.id}"
-               role="button"
-               aria-expanded="false"
-               th:attr="aria-controls='replyForm-' + ${comment.id}">
-              대댓글 달기
-            </a>
-          </div>
-          <!-- 대댓글 작성 폼 -->
-          <div class="collapse mt-3" th:id="'replyForm-' + ${comment.id}">
-            <form th:action="${currentUrl}" th:method="post" th:object="${commentForm}">
-              <input type="hidden" name="parentsId" th:value="${comment.id}" />
-              <textarea class="form-control mb-2" th:field="*{content}" rows="3" placeholder="대댓글을 입력하세요..."></textarea>
-              <button type="submit" class="btn btn-primary btn-sm">대댓글 작성</button>
-            </form>
-          </div>
-        </div>
-      </div>
-      <!-- 대댓글 리스트 -->
-      <div class="replies" style="margin-left: 20px;">
-        <div class="comment" th:each="reply : ${postViewDto.comments}" th:if="${reply.parentsId == comment.id}">
-          <div class="card mb-2">
-            <div class="card-body">
-              <div class="comment-meta d-flex justify-content-between">
-                <div>
-                  <strong th:text="${reply.createBy}">작성자</strong>
-                  <span class="text-muted" th:text="${#temporals.format(reply.createByDt, 'yyyy-MM-dd HH:mm')}">작성 시간</span>
-                </div>
-              </div>
-              <div class="comment-content mt-2" th:text="${reply.content}">
-                대댓글 내용
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <ul class="list-unstyled">
+      <li th:each="comment : ${postViewDto.comments}" th:if="${comment.parentsId == null}">
+        <div th:replace="~{fragments/comments :: commentBlock(${comment})}"></div>
+      </li>
+    </ul>
   </div>
 </div>
+
+<!-- 댓글 블록 템플릿 조각 -->
+<th:block th:fragment="commentBlock(comment)">
+  <div class="card mb-3">
+    <div class="card-body">
+      <div class="comment-meta d-flex justify-content-between">
+        <div>
+          <strong th:text="${comment.createBy}">작성자</strong>
+          <span class="text-muted" th:text="${#temporals.format(comment.createByDt, 'yyyy-MM-dd HH:mm')}">작성 시간</span>
+        </div>
+      </div>
+      <div class="comment-content mt-2" th:text="${comment.content}">
+        댓글 내용
+      </div>
+
+      <!-- 대댓글 작성 버튼 -->
+      <div class="comment-actions mt-3">
+        <a class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse"
+           th:href="'#replyForm-' + ${comment.id}"
+           role="button"
+           aria-expanded="false"
+           th:attr="aria-controls='replyForm-' + ${comment.id}">
+          대댓글 달기
+        </a>
+      </div>
+
+      <!-- 대댓글 작성 폼 -->
+      <div class="collapse mt-3" th:id="'replyForm-' + ${comment.id}">
+        <form th:action="${currentUrl}" method="post">
+          <input type="hidden" name="parentsId" th:value="${comment.id}" />
+          <textarea class="form-control mb-2" name="content" rows="3" placeholder="답글을 입력하세요..."></textarea>
+          <button type="submit" class="btn btn-primary btn-sm">등록</button>
+        </form>
+      </div>
+
+      <!-- 대댓글 리스트 (재귀적 호출) -->
+      <ul th:if="${not #lists.isEmpty(comment.childrens)}" class="list-unstyled ms-4 mt-3">
+        <li th:each="child : ${comment.childrens}">
+          <div th:replace="~{fragments/comments :: commentBlock(${child})}"></div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</th:block>

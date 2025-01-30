@@ -289,51 +289,5 @@ public class WriteServiceLocal implements WriteService {
     private static String decodingContent(String content) {
         return URLDecoder.decode(content, StandardCharsets.UTF_8);
     }
-//    private static List<String> extractImageFilenames(String content) {
-//        // 정규식 패턴 (앞에 ![image alt attribute] 포함)
-//        String regex = "!\\[.*?\\]\\(/editor/image-print\\?filename=([a-zA-Z0-9._-]+)\\)";
-//        Pattern pattern = Pattern.compile(regex);
-//        Matcher matcher = pattern.matcher(content);
-//
-//        // 결과를 저장할 리스트
-//        List<String> imageFilenames = new ArrayList<>();
-//
-//        // 정규식 매칭
-//        while (matcher.find()) {
-//            // 첫 번째 그룹에서 파일명 추출
-//            String filename = matcher.group(1);
-//            imageFilenames.add(filename);
-//        }
-//
-//        return imageFilenames;
-//    }
 
-//    private void removeStatusDeleteTag(String fileName, String s3BucketName) {
-//        try {
-//            // 현재 태그 정보 가져오기
-//            GetObjectTaggingRequest getTaggingRequest = new GetObjectTaggingRequest(s3BucketName, fileName);
-//            GetObjectTaggingResult taggingResult = amazonS3.getObjectTagging(getTaggingRequest);
-//            List<com.amazonaws.services.s3.model.Tag> existingTags = taggingResult.getTagSet();
-//
-//            // "status=delete" 태그 제거
-//            List<com.amazonaws.services.s3.model.Tag> updatedTags = new ArrayList<>();
-//            for (com.amazonaws.services.s3.model.Tag tag : existingTags) {
-//                if (!"Status".equals(tag.getKey()) || !"delete".equals(tag.getValue())) {
-//                    updatedTags.add(tag);
-//                }
-//            }
-//
-//            // 업데이트된 태그 설정
-//            SetObjectTaggingRequest setTaggingRequest = new SetObjectTaggingRequest(
-//                    s3BucketName,
-//                    fileName,
-//                    new ObjectTagging(updatedTags)
-//            );
-//            amazonS3.setObjectTagging(setTaggingRequest);
-//
-//            log.info("S3 파일 태그 업데이트 완료: {} -> 태그 'status=delete' 제거", fileName);
-//        } catch (Exception e) {
-//            log.error("S3 파일 태그 업데이트 실패: {}", e.getMessage());
-//            throw new RuntimeException("S3 파일 태그 업데이트 실패", e);
-//        }
 }
