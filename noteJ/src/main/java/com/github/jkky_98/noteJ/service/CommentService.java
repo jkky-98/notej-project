@@ -4,7 +4,6 @@ import com.github.jkky_98.noteJ.domain.Comment;
 import com.github.jkky_98.noteJ.domain.Post;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.CommentRepository;
-import com.github.jkky_98.noteJ.repository.PostRepository;
 import com.github.jkky_98.noteJ.web.controller.CommentController;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -108,5 +107,8 @@ public class CommentService {
         );
     }
 
-
+    @Transactional
+    public void deleteComment(Long commentId) {
+        commentRepository.deleteById(commentId);
+    }
 }

@@ -3,6 +3,7 @@ package com.github.jkky_98.noteJ.web.controller;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.service.CommentService;
 import com.github.jkky_98.noteJ.service.PostService;
+import com.github.jkky_98.noteJ.web.controller.dto.CommentDeleteRequest;
 import com.github.jkky_98.noteJ.web.controller.dto.PostViewDto;
 import com.github.jkky_98.noteJ.web.controller.form.CommentForm;
 import com.github.jkky_98.noteJ.web.session.SessionConst;
@@ -45,6 +46,15 @@ public class CommentController {
 
         commentService.saveComment(SaveCommentRequest.of(commentForm, sessionUser, postUrl, username));
         return "redirect:" + (referer != null ? referer : "/");
+    }
+
+    @PostMapping("/comments/delete")
+    public String deleteComment(@SessionAttribute(SessionConst.LOGIN_USER) User sessionUser,
+                                CommentDeleteRequest commentDeleteRequest,
+                                @RequestHeader("Referer") String referer
+    ) {
+        commentService.deleteComment(commentDeleteRequest.getCommentId());
+        return "redirect:" + referer;
     }
 
     private static String removeQueryStringInReferer(String referer) {

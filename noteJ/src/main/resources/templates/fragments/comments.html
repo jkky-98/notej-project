@@ -45,6 +45,33 @@
           <strong th:text="${comment.createBy}">작성자</strong>
           <span class="text-muted" th:text="${#temporals.format(comment.createByDt, 'yyyy-MM-dd HH:mm')}">작성 시간</span>
         </div>
+        <!-- 삭제 버튼 (작성자 본인만 보이도록) -->
+        <div th:if="${sessionUser.username == comment.createBy}">
+          <form th:action="@{/comments/delete}" method="post" class="d-inline">
+            <input type="hidden" name="commentId" th:value="${comment.id}" />
+            <button type="submit" class="btn btn-danger btn-sm delete-comments">삭제</button>
+          </form>
+        </div>
+        <script th:inline="javascript">
+          document.querySelectorAll('.delete-comments').forEach(button => {
+            button.addEventListener('click', function (event) {
+              event.preventDefault(); // 기본 폼 제출 동작 막기
+              Swal.fire({
+                icon: 'warning',
+                title: '댓글을 삭제 하시겠습니까?',
+                text: '댓글을 삭제합니다.',
+                showCancelButton: true,
+                confirmButtonText: '댓글 삭제',
+                cancelButtonText: '취소',
+                reverseButtons: true,
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  this.closest('form').submit(); // 확인 버튼 클릭 시 폼 제출
+                }
+              });
+            });
+          });
+        </script>
       </div>
       <div class="comment-content mt-2" th:text="${comment.content}">
         댓글 내용
