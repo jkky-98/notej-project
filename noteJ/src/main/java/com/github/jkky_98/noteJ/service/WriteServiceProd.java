@@ -20,6 +20,7 @@ import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,6 +92,7 @@ public class WriteServiceProd implements WriteService{
     }
 
     @Transactional
+    @CacheEvict(value = "tagCache", allEntries = true)
     public void saveWrite(WriteForm form, Long sessionUserId) throws IOException {
 
         User userById = userService.findUserById(sessionUserId);
@@ -118,6 +120,7 @@ public class WriteServiceProd implements WriteService{
     }
 
     @Transactional
+    @CacheEvict(value = "tagCache", allEntries = true)
     public void saveEditWrite(WriteForm form, String postUrl) throws IOException {
 
         Post post = postService.findByPostUrl(postUrl);

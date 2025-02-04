@@ -6,6 +6,7 @@ import com.github.jkky_98.noteJ.repository.*;
 import com.github.jkky_98.noteJ.web.controller.dto.PostViewDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,6 +61,7 @@ public class PostService {
     }
 
     @Transactional
+    @CacheEvict(value = "tagCache", allEntries = true)
     public void removePost(Long postId) {
         Post post = findById(postId);
 
@@ -114,6 +116,7 @@ public class PostService {
     }
 
     @Transactional
+    @CacheEvict(value = "tagCache", allEntries = true)
     public void deletePost(String postUrl, String username, User sessionUser) {
         Long postIdDeleted = deleteValidPost(postUrl, username, sessionUser);
         removePost(postIdDeleted);
