@@ -12,6 +12,7 @@ import com.github.jkky_98.noteJ.web.controller.dto.AutoSavePostResponse;
 import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,6 +83,7 @@ public class WriteServiceLocal implements WriteService {
      * @throws IOException
      */
     @Transactional
+    @CacheEvict(value = "tagCache", allEntries = true)
     public void saveWrite(WriteForm form, Long sessionUserId) throws IOException {
 
         // 사용자 정보를 조회
@@ -188,6 +190,7 @@ public class WriteServiceLocal implements WriteService {
      * @throws IOException
      */
     @Transactional
+    @CacheEvict(value = "tagCache", allEntries = true)
     public void saveEditWrite(WriteForm form, String postUrl) throws IOException {
         // Post 엔티티 조회
         Post post = postService.findByPostUrl(decodingContent(postUrl));
@@ -242,6 +245,7 @@ public class WriteServiceLocal implements WriteService {
      * @param tags
      * @param postSaved
      */
+
     private void setTag(List<Tag> tags, Post postSaved) {
         List<Tag> tagsSaved = tagRepository.saveAll(tags);
         List<PostTag> postTagsForBulkSave = tagsSaved.stream()

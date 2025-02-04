@@ -7,6 +7,7 @@ import com.github.jkky_98.noteJ.repository.NotificationRepository;
 import com.github.jkky_98.noteJ.web.controller.dto.NotificationDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ import java.util.Optional;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final UserService userService;
 
     /**
      * Follow 신청 알림 보내기
@@ -76,12 +78,16 @@ public class NotificationService {
 
     /**
      * 안 읽은 알림 수 가져오기
-     * @param sessionUser
+     * @param sessionUserId
      * @return
      */
-    @Transactional
-    public Long getNotificationCountNotRead(User sessionUser) {
-        return notificationRepository.countUnreadNotificationsByReceiver(sessionUser);
+    @Transactional(readOnly = true)
+    @Cacheable(value = "navigationAlarm", key = "#sessionUserId")
+    public Long getNotificationCountNotRead(Long sessionUserId) {
+
+        User user = userService.findUserById(sessionUserId);
+
+        return notificationRepository.countUnreadNotificationsByReceiver(user);
     }
 
     /**

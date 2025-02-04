@@ -108,5 +108,8 @@ public class CommentService {
         );
     }
 
-
+    @Transactional
+    public void deleteComment(Long commentId) {
+        commentRepository.deleteById(commentId);
+    }
 }

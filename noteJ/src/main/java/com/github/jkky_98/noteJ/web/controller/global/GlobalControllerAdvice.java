@@ -1,25 +1,26 @@
 package com.github.jkky_98.noteJ.web.controller.global;
 
 import com.github.jkky_98.noteJ.domain.user.User;
-import com.github.jkky_98.noteJ.domain.user.UserDesc;
-import com.github.jkky_98.noteJ.repository.UserRepository;
+import com.github.jkky_98.noteJ.service.GlobalService;
 import com.github.jkky_98.noteJ.service.NotificationService;
-import com.github.jkky_98.noteJ.web.controller.dto.NotificationDto;
 import com.github.jkky_98.noteJ.web.controller.form.UserViewForm;
 import com.github.jkky_98.noteJ.web.session.SessionConst;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.SessionAttribute;
+
 
 @ControllerAdvice
 @RequiredArgsConstructor
+@Slf4j
 public class GlobalControllerAdvice {
 
-    private final UserRepository userRepository;
     private final NotificationService notificationService;
+    private final GlobalService globalService;
 
     @ModelAttribute("currentUrl")
     public String currentUrl(HttpServletRequest request) {
@@ -32,49 +33,36 @@ public class GlobalControllerAdvice {
         return request.getRequestURI();
     }
 
+
     @ModelAttribute
-    public void addSessionUserToModel(HttpSession session, Model model) {
+    public void addSessionUserToModel(
+            @SessionAttribute(value = SessionConst.LOGIN_USER, required = false) User loginUser,
+            Model model, HttpServletRequest request) {
+
+        String requestUri = request.getRequestURI();
+
+        // 특정 URL에서는 실행하지 않음
+        if (    requestUri.startsWith("/api/") ||
+                requestUri.startsWith("/editor/") ||
+                requestUri.startsWith("/image-print/")
+        )
+        {
+            return;
+        }
+
         // 세션에서 사용자 ID 가져오기
-        User sessionUser = (User) session.getAttribute(SessionConst.LOGIN_USER);
-        if (sessionUser == null) {
+        if (loginUser == null) {
             return; // 세션에 사용자 정보가 없으면 바로 반환
         }
 
-        // User 엔티티를 데이터베이스에서 다시 조회하여 초기화된 상태로 가져오기
-        User fullyInitializedUser = userRepository.findById(sessionUser.getId())
-                .orElse(null);
-        if (fullyInitializedUser == null) {
-            return; // 데이터베이스에 사용자가 없으면 반환
-        }
-
-        // UserViewForm에 데이터 매핑
-        UserViewForm userViewForm = getUserViewForm(fullyInitializedUser);
-        model.addAttribute("sessionUser", userViewForm);
+        UserViewForm navigationWithSessionUser = globalService.getNavigationWithSessionUser(loginUser.getId());
+        log.info("[캐시 되었는지 확인] UserViewForm: {} (hashCode: {})", navigationWithSessionUser, System.identityHashCode(navigationWithSessionUser));
+        model.addAttribute("sessionUser", navigationWithSessionUser);
 
         // 알림 수 가져오기
-        Long notificationCountNotRead = notificationService.getNotificationCountNotRead(sessionUser);
+        Long notificationCountNotRead = notificationService.getNotificationCountNotRead(loginUser.getId());
+        log.info("[알람 캐시] Long: {} (hashCode: {})", notificationCountNotRead, System.identityHashCode(notificationCountNotRead));
         model.addAttribute("notificationCountNotRead", notificationCountNotRead);
     }
-
-    private static UserViewForm getUserViewForm(User fullyInitializedUser) {
-        UserDesc userDesc = fullyInitializedUser.getUserDesc(); // UserDesc 가져오기
-        UserViewForm userViewForm = new UserViewForm();
-
-        // 필드 매핑
-        userViewForm.setUsername(fullyInitializedUser.getUsername());
-        userViewForm.setEmail(fullyInitializedUser.getEmail());
-        userViewForm.setProfilePic(userDesc != null && userDesc.getProfilePic() != null
-                ? userDesc.getProfilePic()
-                : null); // 기본 프로필 이미지
-        userViewForm.setUserDesc(userDesc != null && userDesc.getDescription() != null
-                ? userDesc.getDescription()
-                : "No description available"); // 기본 설명
-        userViewForm.setBlogTitle(userDesc != null && userDesc.getBlogTitle() != null
-                ? userDesc.getBlogTitle()
-                : "Untitled Blog"); // 기본 블로그 제목
-
-        return userViewForm;
-    }
-
 
 }
