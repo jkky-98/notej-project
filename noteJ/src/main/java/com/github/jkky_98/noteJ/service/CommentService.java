@@ -25,36 +25,12 @@ public class CommentService {
     private final UserService userService;
     private final NotificationService notificationService;
 
-    @Transactional(readOnly = true)
-    public List<Comment> getCommentsByPost(Long postId) {
-        List<Comment> rootComments = commentRepository.findByPostIdAndParentIsNull(postId);
-        List<Comment> sortedComments = new ArrayList<>();
-        for (Comment root : rootComments) {
-            dfs(root, sortedComments);
-        }
-        return sortedComments;
-    }
-
-    private void dfs(Comment comment, List<Comment> sortedComments) {
-        sortedComments.add(comment);
-        for (Comment child : comment.getChildrens()) {
-            dfs(child, sortedComments);
-        }
-    }
-
     @Transactional
     public void saveComment(CommentController.SaveCommentRequest saveCommentRequest) {
         Comment comment = createCommentEntity(saveCommentRequest);
         Comment savedComment = commentRepository.save(comment);
         log.info("[CommentService.saveComment] PostUrl : {}, Comment 등록 id: {}", saveCommentRequest.getPostUrl(), savedComment.getId());
 
-        // 코멘트 알림 (포스트 작성자에게)
-        if (validSameUserComment(saveCommentRequest)) {
-            User userGetNotification = userService.findUserByUsername(saveCommentRequest.getUsername());
-            User userSendNotification = userService.findUserById(saveCommentRequest.getSessionUser().getId());
-            Post post = postService.findByPostUrl(saveCommentRequest.getPostUrl());
-            notificationService.sendCommentPostNotification(userGetNotification, userSendNotification, post.getTitle());
-        }
         // 대댓글 알림 (대댓글의 부모 댓글을 작성한 유저에게)
         // 조건 : 부모 comment_id 존재, 부모 comment의 user가 sessionUser가 아니어야함.
         if (validReplyComment(saveCommentRequest)) {
@@ -64,9 +40,24 @@ public class CommentService {
             User userSendNotification = userService.findUserById(saveCommentRequest.getSessionUser().getId());
             Post post = postService.findByPostUrl(saveCommentRequest.getPostUrl());
             notificationService.sendCommentParentsNotification(commentParent.getUser(), userSendNotification, post.getTitle());
+
+            if (isEqualsParentCommentUserisPostUser(saveCommentRequest, commentParent)) {
+                return;
+            }
         }
 
+        // 코멘트 알림 (포스트 작성자에게)
+        if (validSameUserComment(saveCommentRequest)) {
+            User userGetNotification = userService.findUserByUsername(saveCommentRequest.getUsername());
+            User userSendNotification = userService.findUserById(saveCommentRequest.getSessionUser().getId());
+            Post post = postService.findByPostUrl(saveCommentRequest.getPostUrl());
+            notificationService.sendCommentPostNotification(userGetNotification, userSendNotification, post.getTitle());
+        }
 
+    }
+
+    private static boolean isEqualsParentCommentUserisPostUser(CommentController.SaveCommentRequest saveCommentRequest, Comment commentParent) {
+        return commentParent.getUser().getUsername().equals(saveCommentRequest.getUsername());
     }
 
     private boolean validReplyComment(CommentController.SaveCommentRequest saveCommentRequest) {
