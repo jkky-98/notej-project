@@ -24,6 +24,23 @@ public class FollowService {
     private final NotificationService notificationService;
     private final UserService userService;
 
+    @Transactional(readOnly = true)
+    public FollowingListForm getFollowingList(String usernameBlog) {
+        User userBlog = userService.findUserByUsername(usernameBlog);
+
+        FollowingListForm followingListForm = new FollowingListForm();
+
+        fillUsersFollowingListIntoFollowingListForm(
+                userBlog, followingListForm
+        );
+
+        followingListForm.setProfilePostUser(
+                FollowListPostProfileDto.ofFollowing(userBlog)
+        );
+
+        return followingListForm;
+    }
+
     @Transactional
     public void follow(String myUsername, String myFollowingUsername) {
         User userMe = userService.findUserByUsername(myUsername);
@@ -32,7 +49,7 @@ public class FollowService {
         Follow follow = validFollowUser(userMe, userMyFollowing);
         // 저장
         followRepository.save(follow);
-        // 상대방에 팔로우 알림 보내기
+        // 팔로우 당한 상대방에 팔로우 알림 보내기
         notificationService.sendFollowNotification(userMyFollowing, userMe);
     }
 
@@ -77,10 +94,15 @@ public class FollowService {
         User sessionUser = userService.findUserByUsername(sessionUsername);
         User userMyFollowing = userService.findUserByUsername(myFollowingUsername);
 
-        Follow follow = sessionUser.getFollowingList().stream()
-                .filter(myFollowing -> myFollowing.matchFollowing(userMyFollowing))
+        Follow follow = sessionUser.getFollowingList()
+                .stream()
+                .filter(
+                        myFollowing -> myFollowing.matchFollowing(userMyFollowing)
+                )
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("요청에 대한 팔로잉 관계를 찾을 수 없습니다."));
+                .orElseThrow(
+                        () -> new IllegalArgumentException("요청에 대한 팔로잉 관계를 찾을 수 없습니다.")
+                );
 
         sessionUser.getFollowingList().remove(follow);
         userMyFollowing.getFollowerList().remove(follow);
@@ -97,34 +119,34 @@ public class FollowService {
     }
 
     @Transactional(readOnly = true)
-    public FollowingListForm getFollowingList(String usernameBlog) {
-        User userBlog = userService.findUserByUsername(usernameBlog);
-        FollowingListForm followingListForm = new FollowingListForm();
-
-        userBlog.getFollowingList().stream()
-                .map(Follow::getFollowing)
-                .forEach(follwing -> {
-                    followingListForm.getFollowings().add(FollowingListViewDto.of(follwing));
-                });
-
-        followingListForm.setProfilePostUser(FollowListPostProfileDto.ofFollowing(userBlog));
-
-        return followingListForm;
-    }
-
-    @Transactional(readOnly = true)
     public FollowerListForm getFollowerList(String usernameBlog) {
         User userBlog = userService.findUserByUsername(usernameBlog);
         FollowerListForm followerListForm = new FollowerListForm();
 
+        fillUsersFollowerListIntoFollwerListForm(
+                userBlog, followerListForm
+        );
+
+        followerListForm.setProfilePostUser(
+                FollowListPostProfileDto.ofFollower(userBlog)
+        );
+
+        return followerListForm;
+    }
+
+    private static void fillUsersFollowerListIntoFollwerListForm(User userBlog, FollowerListForm followerListForm) {
         userBlog.getFollowerList().stream()
                 .map(Follow::getFollower)
                 .forEach(follower -> {
                     followerListForm.getFollowers().add(FollowerListViewDto.of(follower));
                 });
+    }
 
-        followerListForm.setProfilePostUser(FollowListPostProfileDto.ofFollower(userBlog));
-
-        return followerListForm;
+    private static void fillUsersFollowingListIntoFollowingListForm(User userBlog, FollowingListForm followingListForm) {
+        userBlog.getFollowingList().stream()
+                .map(Follow::getFollowing)
+                .forEach(follwing -> {
+                    followingListForm.getFollowings().add(FollowingListViewDto.of(follwing));
+                });
     }
 }

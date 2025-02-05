@@ -11,7 +11,6 @@ public class FollowingListViewDto {
     private String followingUserUsername;
     private String followingUserDescription;
     private String followingUserProfilePic;
-    private boolean followStatus;
 
     public static FollowingListViewDto of(User following) {
         return FollowingListViewDto.builder()
