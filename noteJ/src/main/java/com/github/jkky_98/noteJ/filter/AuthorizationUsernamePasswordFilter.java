@@ -32,7 +32,8 @@ public class AuthorizationUsernamePasswordFilter implements Filter {
             "/@*/followers",
             "/api/@*/posts/**",
             "/api/post/likes/**",
-            "/env"
+            "/env",
+            "/favicon.ico"
     };
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 
@@ -49,8 +50,10 @@ public class AuthorizationUsernamePasswordFilter implements Filter {
 
         try {
             if (isLoginCheckPath(requestURI)) {
+                log.info("하이하이하이");
                 HttpSession session = httpRequest.getSession(false);
                 if (session == null || session.getAttribute(SessionConst.LOGIN_USER) == null) {
+                    log.info("여기까지 오니?");
                     httpResponse.sendRedirect("/login?redirectURL=" + URLEncoder.encode(requestURI, "UTF-8"));
                     return;
                 }
@@ -75,6 +78,7 @@ public class AuthorizationUsernamePasswordFilter implements Filter {
                 return false;
             }
         }
+        log.info("무엇이 트루이니 : {}", requestURI);
         return true;
     }
 

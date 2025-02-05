@@ -24,12 +24,30 @@ public class GlobalControllerAdvice {
 
     @ModelAttribute("currentUrl")
     public String currentUrl(HttpServletRequest request) {
+        String requestUri = request.getRequestURI();
+        // 특정 URL에서는 실행하지 않음
+        if (    requestUri.startsWith("/api/") ||
+                requestUri.startsWith("/editor/") ||
+                requestUri.startsWith("/image-print/")
+        )
+        {
+            return null;
+        }
         String queryString = request.getQueryString();
         return request.getRequestURI() + (queryString != null ? "?" + queryString : "");
     }
 
     @ModelAttribute("currentUri")
     public String currentUri(HttpServletRequest request) {
+        String requestUri = request.getRequestURI();
+        // 특정 URL에서는 실행하지 않음
+        if (    requestUri.startsWith("/api/") ||
+                requestUri.startsWith("/editor/") ||
+                requestUri.startsWith("/image-print/")
+        )
+        {
+            return null;
+        }
         return request.getRequestURI();
     }
 
@@ -56,12 +74,10 @@ public class GlobalControllerAdvice {
         }
 
         UserViewForm navigationWithSessionUser = globalService.getNavigationWithSessionUser(loginUser.getId());
-        log.info("[캐시 되었는지 확인] UserViewForm: {} (hashCode: {})", navigationWithSessionUser, System.identityHashCode(navigationWithSessionUser));
         model.addAttribute("sessionUser", navigationWithSessionUser);
 
         // 알림 수 가져오기
         Long notificationCountNotRead = notificationService.getNotificationCountNotRead(loginUser.getId());
-        log.info("[알람 캐시] Long: {} (hashCode: {})", notificationCountNotRead, System.identityHashCode(notificationCountNotRead));
         model.addAttribute("notificationCountNotRead", notificationCountNotRead);
     }
 

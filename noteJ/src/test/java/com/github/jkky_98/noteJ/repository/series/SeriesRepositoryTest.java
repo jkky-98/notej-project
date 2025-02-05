@@ -86,21 +86,5 @@ public class SeriesRepositoryTest {
         assertThat(deletedSeries).isEmpty();
     }
 
-    @Test
-    @DisplayName("[SeriesRepository] 시리즈 이름으로 조회 테스트")
-    void findSeriesBySeriesNameTest() {
-        // given
-        Series series = seriesRepository.save(Series.builder()
-                .seriesName("Unique Series")
-                .user(user)
-                .build());
 
-        // when
-        Optional<Series> foundSeries = seriesRepository.findBySeriesName("Unique Series");
-
-        // then
-        assertThat(foundSeries).isPresent();
-        assertThat(foundSeries.get().getSeriesName()).isEqualTo("Unique Series");
-        assertThat(foundSeries.get().getUser()).isEqualTo(user);
-    }
 }

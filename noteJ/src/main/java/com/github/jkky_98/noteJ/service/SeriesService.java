@@ -26,8 +26,8 @@ public class SeriesService {
         return userFind.getSeriesList();
     }
     @Transactional
-    public Series getSeries(String seriesName) {
-        return seriesRepository.findBySeriesName(seriesName).orElseThrow(() -> new EntityNotFoundException("Series not found"));
+    public Series getSeries(String seriesName, User user) {
+        return seriesRepository.findBySeriesNameAndUser(seriesName, user).orElseThrow(() -> new EntityNotFoundException("Series not found"));
     }
 
     @Transactional

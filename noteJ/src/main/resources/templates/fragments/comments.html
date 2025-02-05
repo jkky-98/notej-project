@@ -46,7 +46,7 @@
           <span class="text-muted" th:text="${#temporals.format(comment.createByDt, 'yyyy-MM-dd HH:mm')}">작성 시간</span>
         </div>
         <!-- 삭제 버튼 (작성자 본인만 보이도록) -->
-        <div th:if="${sessionUser.username == comment.createBy}">
+        <div th:if="${sessionUser?.username == comment.createBy}">
           <form th:action="@{/comments/delete}" method="post" class="d-inline">
             <input type="hidden" name="commentId" th:value="${comment.id}" />
             <button type="submit" class="btn btn-danger btn-sm delete-comments">삭제</button>

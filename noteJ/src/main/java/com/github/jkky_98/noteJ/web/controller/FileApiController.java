@@ -83,7 +83,6 @@ public class FileApiController {
 
     @GetMapping(value = "/image-print/{fileUrl}", produces = {MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public ResponseEntity<byte[]> printImage(@PathVariable final String fileUrl) {
-        log.info("fileUrl:{}", fileUrl);
 
         // 이미지 파일 전체 경로
         String fileFullPath = Paths.get(uploadDir, fileUrl).toString();
@@ -118,14 +117,12 @@ public class FileApiController {
 
     @GetMapping(value = "/image-print/default/{fileUrl}", produces = {MediaType.IMAGE_GIF_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
     public ResponseEntity<byte[]> printDefaultImage(@PathVariable final String fileUrl) {
-        log.info("fileUrl:{}", fileUrl);
 
         String fileUrlFinal = "default/" + fileUrl;
 
         // 이미지 파일 전체 경로
         String fileFullPath = Paths.get(uploadDir, fileUrlFinal).toString();
         File uploadedFile = new File(fileFullPath);
-        log.info("fileFullPath:{}", fileFullPath);
         if (!uploadedFile.exists()) {
             log.error("File not found: {}", fileFullPath);
             return ResponseEntity.notFound().build();

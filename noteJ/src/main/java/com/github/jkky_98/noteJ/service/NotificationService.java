@@ -7,6 +7,7 @@ import com.github.jkky_98.noteJ.repository.NotificationRepository;
 import com.github.jkky_98.noteJ.web.controller.dto.NotificationDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +39,7 @@ public class NotificationService {
     }
 
     @Transactional
+
     public void sendLikePostNotification(User userGetNotification, User userSendNotification, String postTitle) {
         Notification notification = Notification.ofLike(userSendNotification, userGetNotification, postTitle);
         notificationRepository.save(notification);
@@ -82,7 +84,6 @@ public class NotificationService {
      * @return
      */
     @Transactional(readOnly = true)
-    @Cacheable(value = "navigationAlarm", key = "#sessionUserId")
     public Long getNotificationCountNotRead(Long sessionUserId) {
 
         User user = userService.findUserById(sessionUserId);

@@ -44,7 +44,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String loginForm(@Validated @ModelAttribute("loginForm") LoginForm form,
+    public String saveLoginForm(@Validated @ModelAttribute("loginForm") LoginForm form,
                             BindingResult bindingResult,
                             @RequestParam String redirectURL,
                             HttpSession session) {

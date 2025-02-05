@@ -4,11 +4,8 @@ import com.github.jkky_98.noteJ.domain.Post;
 import com.github.jkky_98.noteJ.domain.Series;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.PostRepository;
-import com.github.jkky_98.noteJ.web.controller.dto.PostDto;
-import com.github.jkky_98.noteJ.web.controller.dto.PostNotOpenDto;
-import com.github.jkky_98.noteJ.web.controller.dto.PostsViewDto;
+import com.github.jkky_98.noteJ.web.controller.dto.*;
 import com.github.jkky_98.noteJ.web.controller.form.PostsConditionForm;
-import com.github.jkky_98.noteJ.web.controller.dto.SeriesViewDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,13 +48,13 @@ public class PostsService {
 
 
     @Transactional(readOnly = true)
-    public PostsViewDto getPostsViewDto(String username, PostsConditionForm postsConditionForm, Optional<User> sessionUser) {
+    public PostsViewDto getPostsViewDto(PostsRequestDto dto) {
         return PostsViewDto.ofPosts(
-                profileService.getProfile(username),
-                getPosts(username, postsConditionForm),
-                tagService.getAllTag(username),
-                followService.isFollowing(sessionUser, username),
-                username
+                profileService.getProfile(dto.getUsernamePost()),
+                getPosts(dto.getUsernamePost(), dto.getCondition()),
+                tagService.getAllTag(dto.getUsernamePost()),
+                followService.isFollowing(dto.getUser(), dto.getUsernamePost()),
+                dto.getUsernamePost()
         );
     }
 

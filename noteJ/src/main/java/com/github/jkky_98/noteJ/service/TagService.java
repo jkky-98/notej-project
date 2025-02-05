@@ -20,10 +20,8 @@ public class TagService {
 
     @Transactional(readOnly = true)
     @Cacheable(value = "tagCache", key = "#username")
-    // toDo: 태그 변경이되는 곳에서 CacheEvict 필요
     public List<TagCountDto> getAllTag(String username) {
         User userFind = userService.findUserByUsername(username);
-
         return userRepository.findTagsByUser(userFind.getUsername());
     }
 }

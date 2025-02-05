@@ -66,7 +66,7 @@ public class WriteController {
             return "edit";
         }
 
-        writeService.saveEditWrite(form, postUrl);
+        writeService.saveEditWrite(form, postUrl, sessionUser);
         return "redirect:" + "/@" + sessionUser.getUsername() + "/posts";
     }
 

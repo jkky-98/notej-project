@@ -10,4 +10,5 @@ public class AutoSavePostRequest {
     private String title;
     private String content;
     private List<String> tags;
+    private String seriesName;
 }

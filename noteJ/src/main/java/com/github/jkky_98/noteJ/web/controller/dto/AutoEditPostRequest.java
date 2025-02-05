@@ -11,4 +11,5 @@ public class AutoEditPostRequest {
     private String content;
     private List<String> tags;
     private String postUrl;
+    private String seriesName;
 }

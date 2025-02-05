@@ -95,20 +95,8 @@ public class WriteServiceLocal implements WriteService {
         // url, content 인코딩
         encodingUrlAndContent(form);
 
-        // 엔티티 생성을 위한 DTO 생성
-        WriteServiceEntityGenerateDto dto = new WriteServiceEntityGenerateDto();
-
-        dto.setTitle(form.getTitle());
-        dto.setContent(form.getContent());
-        dto.setUser(userById);
-        dto.setWritable(form.isOpen());
-        dto.setThumbnail(thumnailPath);
-        dto.setUrl(form.getUrl());
-        dto.setSeries(seriesService.getSeries(form.getSeries()));
-        dto.setPostSummary(form.getPostSummary());
-
         // Post Entity 생성
-        Post post = Post.of(form, userById, seriesService.getSeries(form.getSeries()), thumnailPath);
+        Post post = Post.of(form, userById, seriesService.getSeries(form.getSeries(), userById), thumnailPath);
 
         // Post save
         Post postSaved = postRepository.save(post);
@@ -121,8 +109,9 @@ public class WriteServiceLocal implements WriteService {
     @Transactional
     public AutoSavePostResponse autoSavePost(AutoSavePostRequest request, Long sessionUserId) {
         User sessionUser = userService.findUserById(sessionUserId);
+        Series series = seriesService.getSeries(request.getSeriesName(), sessionUser);
 
-        Post postTemp = Post.ofSavePostTemp(request, sessionUser);
+        Post postTemp = Post.ofSavePostTemp(request, sessionUser, series);
         postRepository.save(postTemp);
 
         setTag(tagProvider(request.getTags()), postTemp);
@@ -134,7 +123,7 @@ public class WriteServiceLocal implements WriteService {
     }
 
     @Transactional
-    public AutoEditPostResponse autoEditPost(AutoEditPostRequest request) {
+    public AutoEditPostResponse autoEditPost(AutoEditPostRequest request, Long sessionUserId) {
 
         Optional<Post> byPostUrl = postRepository.findByPostUrl(decodingContent(request.getPostUrl()));
 
@@ -142,7 +131,9 @@ public class WriteServiceLocal implements WriteService {
             if (post.getWritable()) {
                 return;
             }
-            post.updateEditPostTemp(request);
+            User sessionUser = userService.findUserById(sessionUserId);
+            Series series = seriesService.getSeries(request.getSeriesName(), sessionUser);
+            post.updateEditPostTemp(request, series);
         });
 
         AutoEditPostResponse autoEditPostResponse = new AutoEditPostResponse();
@@ -191,12 +182,12 @@ public class WriteServiceLocal implements WriteService {
      */
     @Transactional
     @CacheEvict(value = "tagCache", allEntries = true)
-    public void saveEditWrite(WriteForm form, String postUrl) throws IOException {
+    public void saveEditWrite(WriteForm form, String postUrl, User sessionUser) throws IOException {
         // Post 엔티티 조회
         Post post = postService.findByPostUrl(decodingContent(postUrl));
 
         // Series 업데이트
-        post.updateSeries(seriesService.getSeries(form.getSeries()));
+        post.updateSeries(seriesService.getSeries(form.getSeries(), sessionUser));
 
         // url, content 인코딩
         encodingUrlAndContent(form);

@@ -35,7 +35,7 @@ public class WriteApiController {
             @RequestBody AutoEditPostRequest autoEditPostRequest,
             @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser
     ) throws IOException {
-        AutoEditPostResponse autoEditPostResponse = writeService.autoEditPost(autoEditPostRequest);
+        AutoEditPostResponse autoEditPostResponse = writeService.autoEditPost(autoEditPostRequest, sessionUser.getId());
         return ResponseEntity.ok(autoEditPostResponse);
     }
 }

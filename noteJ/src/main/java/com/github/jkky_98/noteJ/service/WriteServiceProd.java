@@ -100,7 +100,7 @@ public class WriteServiceProd implements WriteService{
         String storedFileName = handleThumnail(form);
         encodingUrlAndContent(form);
 
-        Post post = Post.of(form, userById, seriesService.getSeries(form.getSeries()), storedFileName);
+        Post post = Post.of(form, userById, seriesService.getSeries(form.getSeries(), userById), storedFileName);
         Post postSaved = postRepository.save(post);
         setTagsForPost(tagProvider(form.getTags()), postSaved);
 
@@ -121,10 +121,10 @@ public class WriteServiceProd implements WriteService{
 
     @Transactional
     @CacheEvict(value = "tagCache", allEntries = true)
-    public void saveEditWrite(WriteForm form, String postUrl) throws IOException {
+    public void saveEditWrite(WriteForm form, String postUrl, User sessionUser) throws IOException {
 
         Post post = postService.findByPostUrl(postUrl);
-        post.updateSeries(seriesService.getSeries(form.getSeries()));
+        post.updateSeries(seriesService.getSeries(form.getSeries(), sessionUser));
 
         // url, content 인코딩
         encodingUrlAndContent(form);
@@ -145,7 +145,9 @@ public class WriteServiceProd implements WriteService{
     @Transactional
     public AutoSavePostResponse autoSavePost(AutoSavePostRequest request, Long sessionUserId) {
         User sessionUser = userService.findUserById(sessionUserId);
-        Post postTemp = Post.ofSavePostTemp(request, sessionUser);
+        Series series = seriesService.getSeries(request.getSeriesName(), sessionUser);
+
+        Post postTemp = Post.ofSavePostTemp(request, sessionUser, series);
         postRepository.save(postTemp);
 
         setTagsForPost(tagProvider(request.getTags()), postTemp);
@@ -157,7 +159,7 @@ public class WriteServiceProd implements WriteService{
     }
 
     @Transactional
-    public AutoEditPostResponse autoEditPost(AutoEditPostRequest request) {
+    public AutoEditPostResponse autoEditPost(AutoEditPostRequest request, Long sessionUserId) {
 
         Optional<Post> byPostUrl = postRepository.findByPostUrl(decodingContent(request.getPostUrl()));
 
@@ -165,7 +167,9 @@ public class WriteServiceProd implements WriteService{
             if (post.getWritable()) {
                 return;
             }
-            post.updateEditPostTemp(request);
+            User sessionUser = userService.findUserById(sessionUserId);
+            Series series = seriesService.getSeries(request.getSeriesName(), sessionUser);
+            post.updateEditPostTemp(request, series);
         });
 
         AutoEditPostResponse autoEditPostResponse = new AutoEditPostResponse();

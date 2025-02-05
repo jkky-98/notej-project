@@ -136,20 +136,22 @@ public class Post extends BaseEntity {
                 .build();
     }
 
-    public static Post ofSavePostTemp(AutoSavePostRequest request, User sessionUser) {
+    public static Post ofSavePostTemp(AutoSavePostRequest request, User sessionUser, Series series) {
         return Post.builder()
                 .title(request.getTitle())
                 .content(decodingContent(request.getContent()))
                 .postUrl(request.getTitle() + UUID.randomUUID())
                 .writable(false)
                 .user(sessionUser)
+                .series(series)
                 .build();
     }
 
-    public void updateEditPostTemp(AutoEditPostRequest request) {
+    public void updateEditPostTemp(AutoEditPostRequest request, Series series) {
         title = request.getTitle();
         content = decodingContent(request.getContent());
         postUrl = request.getTitle() + UUID.randomUUID();
+        series = series;
     }
 
 

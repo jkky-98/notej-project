@@ -170,7 +170,6 @@
             <div class="btn-actions">
                 <a href="/" class="btn btn-outline-secondary">나가기</a>
                 <div>
-                    <button type="button" class="btn btn-outline-success me-2">임시저장</button>
                     <button type="submit" class="btn btn-success">출간하기</button>
                 </div>
             </div>
@@ -279,6 +278,7 @@
             const title = document.querySelector('input[name="title"]').value; // 제목 가져오기
             const tags = document.querySelector('#tags').value; // 태그 가져오기
             const tagsList = tags.split(','); // 쉼표를 기준으로 문자열 분리
+            const seriesName = document.querySelector('#seriesNameList').value;
 
             // 제목이 빈값인 경우 실행 중단
             if (!title) {
@@ -296,6 +296,7 @@
                 title: title,
                 content: content,
                 tags: tagsList,
+                seriesName: seriesName
             });
 
             console.log(data);
