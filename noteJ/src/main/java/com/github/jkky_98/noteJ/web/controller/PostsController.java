@@ -44,32 +44,6 @@ public class PostsController {
         return "posts";
     }
 
-    @GetMapping("/@{username}/posts/series")
-    public String postsSeries(
-            @PathVariable("username") String username,
-            @SessionAttribute (name = SessionConst.LOGIN_USER, required = false) User sessionUser,
-            Model model
-            ) {
-        model.addAttribute("postsViewDto",
-                postsService.getSeriesTabs(
-                        username,
-                        Optional.ofNullable(sessionUser)
-                )
-        );
-        return "series";
-    }
-
-    @PostMapping("/@{username}/posts/series")
-    public String postsSeriesSaveSeries(
-            @RequestParam String seriesName,
-            @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser,
-            @RequestHeader(value = "Referer", required = false, defaultValue = "/") String referer
-            ) {
-        seriesService.saveSeries(sessionUser, seriesName);
-
-        return "redirect:" + referer;
-    }
-
     @GetMapping("/drafts")
     public String getDrafts(
             @SessionAttribute (name = SessionConst.LOGIN_USER, required = false) User sessionUser,

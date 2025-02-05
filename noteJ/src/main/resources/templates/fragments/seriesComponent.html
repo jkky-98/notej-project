@@ -4,15 +4,18 @@
 <div th:fragment="seriesComponent">
     <div class="container mt-4" th:object="${postsViewDto}">
         <div class="row row-cols-1 row-cols-md-2 g-4 d-flex justify-content-center" th:if="${sessionUser != null and sessionUser.username == username}">
-            <form th:action="@{'/@' + ${username} + '/posts/series'}" method="post">
+            <form th:action="@{'/@' + ${username} + '/posts/series'}" th:object="${saveSeriesForm}" method="post">
                 <div class="input-group mb-3">
-                    <input type="text" name="seriesName" class="form-control" placeholder="생성할 시리즈를 입력하세요." aria-label="생성할 시리즈를 입력하세요." aria-describedby="button-addon2">
+                    <input type="text" name="seriesName" th:field="*{seriesName}" class="form-control" placeholder="생성할 시리즈를 입력하세요." aria-label="생성할 시리즈를 입력하세요." aria-describedby="button-addon2">
                     <button class="btn btn-primary" type="submit" id="button-addon2">시리즈 생성</button>
                 </div>
+
+                <!-- 에러 메시지 출력 -->
+                <div class="text-danger mb-2" th:if="${#fields.hasErrors('seriesName')}" th:errors="*{seriesName}"}></div>
             </form>
         </div>
         <div class="row row-cols-1 row-cols-md-2 g-4">
-            <!-- 카드 1 -->
+            <!-- 카드 순회 -->
             <div class="col" th:each="series : *{seriesList}">
                 <div class="card h-100">
                     <div class="card-body">
@@ -20,8 +23,23 @@
                     </div>
                     <div class="card-footer text-end">
                         <small style="color: black;" th:text="@{${series.count} + '개의 포스트'}"></small>
-                        <small class="text-muted" th:text="@{' . 최근 수정일: ' + ${#temporals.format(series.lastUpdateDt, 'yyyy-MM-dd')} }"></small>
-                        <a th:href="@{'/@' + ${username} + '/posts'(seriesName=${series.seriesName})}" class="btn btn-primary btn-sm">View More</a>
+                        <small class="text-muted"
+                               th:if="${series.lastUpdateDt != null}"
+                               th:text="@{' . 최근 수정일: ' + ${#temporals.format(series.lastUpdateDt, 'yyyy-MM-dd')} }">
+                        </small>
+                        <small class="text-muted" th:unless="${series.lastUpdateDt != null}"> . 최근 수정일: </small>
+                        <a th:href="@{'/@' + ${username} + '/posts'(seriesName=${series.seriesName})}" class="btn btn-primary btn-sm">View</a>
+
+                        <!-- 🔥 삭제 버튼 (sessionUser가 로그인했고, sessionUser.username이 username과 같을 때만 렌더링) -->
+                        <form th:if="${sessionUser != null and sessionUser.username == username}"
+                              th:action="@{'/@' + ${username} + '/posts/series/delete'}"
+                              method="post"
+                              class="d-inline">
+                            <input type="hidden" name="seriesName" th:value="${series.seriesName}">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('정말 삭제하시겠습니까? 시리즈를 삭제할 경우 시리즈 내의 모든 게시글이 삭제됩니다.');">
+                                삭제
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
