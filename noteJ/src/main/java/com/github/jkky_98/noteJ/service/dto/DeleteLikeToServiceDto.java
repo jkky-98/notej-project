@@ -1,11 +1,12 @@
 package com.github.jkky_98.noteJ.service.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @AllArgsConstructor
-public class GetLikeStatusServiceDto{
+public class DeleteLikeToServiceDto {
     private String postUrl;
-    private Long sessionUserId;
+    private boolean liked;
+    private Long userId;
 }

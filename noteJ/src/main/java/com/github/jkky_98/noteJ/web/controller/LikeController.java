@@ -2,8 +2,11 @@ package com.github.jkky_98.noteJ.web.controller;
 
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.service.LikeService;
-import com.github.jkky_98.noteJ.service.dto.GetLikeStatusServiceDto;
-import com.github.jkky_98.noteJ.web.controller.dto.LikeRequestDto;
+import com.github.jkky_98.noteJ.service.dto.DeleteLikeToServiceDto;
+import com.github.jkky_98.noteJ.service.dto.GetLikeStatusToServiceDto;
+import com.github.jkky_98.noteJ.service.dto.SaveLikeToServiceDto;
+import com.github.jkky_98.noteJ.web.controller.form.LikeDeleteRequestForm;
+import com.github.jkky_98.noteJ.web.controller.form.LikeSaveRequestForm;
 import com.github.jkky_98.noteJ.web.controller.dto.LikeStatusResponseDto;
 import com.github.jkky_98.noteJ.web.session.SessionConst;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +26,7 @@ public class LikeController {
             @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser
     ) {
         LikeStatusResponseDto likeStatus = likeService.getLikeStatus(
-                new GetLikeStatusServiceDto(
+                new GetLikeStatusToServiceDto(
                         postUrl,
                         sessionUser.getId()
                 )
@@ -34,20 +37,22 @@ public class LikeController {
 
     @PostMapping("/save")
     public ResponseEntity<?> saveLike(
-            @RequestBody LikeRequestDto data,
+            @RequestBody LikeSaveRequestForm form,
             @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser
     ) {
-        likeService.saveLike(data.getPostUrl(), data.isLiked(), sessionUser.getId());
+        SaveLikeToServiceDto dto = new SaveLikeToServiceDto(form.getPostUrl(), form.isLiked(), sessionUser.getId());
+        likeService.saveLike(dto);
 
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/delete")
     public ResponseEntity<?> deleteLike(
-            @RequestBody LikeRequestDto data,
+            @RequestBody LikeDeleteRequestForm form,
             @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser
     ) {
-        likeService.deleteLike(data.getPostUrl(), data.isLiked(), sessionUser.getId());
+        DeleteLikeToServiceDto dto = new DeleteLikeToServiceDto(form.getPostUrl(), form.isLiked(), sessionUser.getId());
+        likeService.deleteLike(dto);
 
         return ResponseEntity.ok().build();
     }

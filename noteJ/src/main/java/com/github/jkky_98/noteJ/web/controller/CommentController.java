@@ -3,7 +3,7 @@ package com.github.jkky_98.noteJ.web.controller;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.service.CommentService;
 import com.github.jkky_98.noteJ.service.PostService;
-import com.github.jkky_98.noteJ.service.dto.SaveCommentRequest;
+import com.github.jkky_98.noteJ.service.dto.SaveCommentToServiceDto;
 import com.github.jkky_98.noteJ.web.controller.dto.CommentDeleteRequest;
 import com.github.jkky_98.noteJ.web.controller.dto.PostViewDto;
 import com.github.jkky_98.noteJ.web.controller.form.CommentForm;
@@ -42,7 +42,7 @@ public class CommentController {
         }
 
         commentService.saveComment(
-                SaveCommentRequest.of(commentForm, sessionUser, postUrl, username)
+                SaveCommentToServiceDto.of(commentForm, sessionUser, postUrl, username)
         );
 
         referer = RefererUtil.removeQueryStringInReferer(referer);

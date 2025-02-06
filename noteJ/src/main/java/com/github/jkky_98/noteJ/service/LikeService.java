@@ -6,7 +6,9 @@ import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.exception.LikeBadRequestClientException;
 import com.github.jkky_98.noteJ.exception.LikeSelfSaveClientException;
 import com.github.jkky_98.noteJ.repository.LikeRepository;
-import com.github.jkky_98.noteJ.service.dto.GetLikeStatusServiceDto;
+import com.github.jkky_98.noteJ.service.dto.DeleteLikeToServiceDto;
+import com.github.jkky_98.noteJ.service.dto.GetLikeStatusToServiceDto;
+import com.github.jkky_98.noteJ.service.dto.SaveLikeToServiceDto;
 import com.github.jkky_98.noteJ.web.controller.dto.LikeListByPostDto;
 import com.github.jkky_98.noteJ.web.controller.dto.LikeStatusResponseDto;
 import jakarta.persistence.EntityNotFoundException;
@@ -29,25 +31,25 @@ public class LikeService {
     private final NotificationService notificationService;
 
     @Transactional
-    public LikeStatusResponseDto getLikeStatus(final GetLikeStatusServiceDto dto) {
-        User userFind = userService.findUserById(dto.getSessionUserId());
-        boolean isLike = likeRepository.existsByUserAndPostPostUrl(userFind, dto.getPostUrl());
+    public LikeStatusResponseDto getLikeStatus(final GetLikeStatusToServiceDto request) {
+        User userFind = userService.findUserById(request.getSessionUserId());
+        Post postFind = postService.findByPostUrl(request.getPostUrl());
+        boolean isLike = likeRepository.existsByUserAndPost(userFind, postFind);
 
         return LikeStatusResponseDto.of(isLike);
     }
 
     @Transactional
-    public void saveLike(String postUrl, boolean liked, Long sessionUserId) {
-        if (liked) {
-            log.error("좋아요 상태 : {}", liked);
+    public void saveLike(SaveLikeToServiceDto dto) {
+        if (dto.isLiked()) {
+            log.error("좋아요 상태 : {}", dto.isLiked());
             throw new LikeBadRequestClientException("좋아요 상태가 역전되어 있습니다.");
         }
 
-        log.info("POST URL : {}", postUrl);
-        Post postFind = postService.findByPostUrl(postUrl);
-        User userFind = userService.findUserById(sessionUserId);
+        Post postFind = postService.findByPostUrl(dto.getPostUrl());
+        User userFind = userService.findUserById(dto.getUserId());
 
-        if (postFind.getUser().getId().equals(userFind.getId())) {
+        if (isSelfLike(postFind, userFind)) {
             throw new LikeSelfSaveClientException("스스로에게 좋아요는 불가능 합니다.");
         }
 
@@ -55,17 +57,21 @@ public class LikeService {
         likeRepository.save(like);
 
         // 좋아요 알림 처리
-        notificationService.sendLikePostNotification(postFind.getUser(), userFind, postFind.getTitle());
+        notificationService.sendLikePostNotification(
+                postFind.getUser(),
+                userFind,
+                postFind.getTitle()
+        );
     }
 
     @Transactional
-    public void deleteLike(String postUrl, boolean liked, Long sessionUserId) {
-        if (!liked) {
+    public void deleteLike(DeleteLikeToServiceDto dto) {
+        if (!dto.isLiked()) {
             throw new LikeBadRequestClientException("좋아요 상태가 역전되어 있습니다.");
         }
 
-        Post postFind = postService.findByPostUrl(postUrl);
-        User userFind = userService.findUserById(sessionUserId);
+        Post postFind = postService.findByPostUrl(dto.getPostUrl());
+        User userFind = userService.findUserById(dto.getUserId());
 
         Optional<Like> likeByUserAndPost = likeRepository.findByUserAndPost(userFind, postFind);
         Like like = likeByUserAndPost.orElseThrow(() -> new EntityNotFoundException("like not found"));
@@ -81,12 +87,12 @@ public class LikeService {
         return post.getLikes().stream()
                 .map(like -> {
                     User user = like.getUser();
-                    LikeListByPostDto likeListByPostDto = new LikeListByPostDto();
-                    likeListByPostDto.setUsernameLike(user.getUsername());
-                    likeListByPostDto.setProfilePicLike(user.getUserDesc().getProfilePic());
-                    likeListByPostDto.setUserDescLike(user.getUserDesc().getDescription());
-                    return likeListByPostDto;
+                    return LikeListByPostDto.ofFromUser(user);
                 })
                 .toList();
+    }
+
+    private static boolean isSelfLike(Post postFind, User userFind) {
+        return postFind.getUser().getId().equals(userFind.getId());
     }
 }

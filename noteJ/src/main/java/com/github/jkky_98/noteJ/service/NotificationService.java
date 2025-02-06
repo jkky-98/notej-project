@@ -68,11 +68,14 @@ public class NotificationService {
 
     /**
      * 유저 알림 모두 조회
-     * @param sessionUser
+     * @param sessionUserId
      * @return
      */
     @Transactional(readOnly = true)
-    public List<NotificationDto> getNotification(User sessionUser, Optional<Boolean> status) {
+    public List<NotificationDto> getNotification(Long sessionUserId, Optional<Boolean> status) {
+
+        User sessionUser = userService.findUserById(sessionUserId);
+
         List<Notification> notifications = filterNotificationsByStatus(sessionUser, status);
 
         return convertNotificationsToDto(notifications);
@@ -136,8 +139,8 @@ public class NotificationService {
     private List<Notification> filterNotificationsByStatus(User sessionUser, Optional<Boolean> status) {
         List<Notification> notifications = status
                 .filter(s -> !s) // status가 false일 경우 필터 통과
-                .map(s -> notificationRepository.findAllUnreadNotificationsByReceiver(sessionUser))
-                .orElseGet(() -> notificationRepository.findAllNotificationsByReceiver(sessionUser)); // Optional이 empty거나 다른 값인 경우
+                .map(s -> notificationRepository.findAllUnreadNotificationsByReceiver(sessionUser)) // status = false일 경우 읽지않은 알림만
+                .orElseGet(() -> notificationRepository.findAllNotificationsByReceiver(sessionUser)); // status가 null일 경우
         return notifications;
     }
 }

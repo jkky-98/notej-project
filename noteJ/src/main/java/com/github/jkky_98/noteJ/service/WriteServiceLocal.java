@@ -4,7 +4,6 @@ import com.github.jkky_98.noteJ.domain.*;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.file.FileStore;
 import com.github.jkky_98.noteJ.repository.*;
-import com.github.jkky_98.noteJ.service.dto.WriteServiceEntityGenerateDto;
 import com.github.jkky_98.noteJ.web.controller.dto.AutoEditPostRequest;
 import com.github.jkky_98.noteJ.web.controller.dto.AutoEditPostResponse;
 import com.github.jkky_98.noteJ.web.controller.dto.AutoSavePostRequest;

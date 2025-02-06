@@ -24,19 +24,22 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    @GetMapping()
-    public String notifications(Model model,
-                                @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser,
-                                @RequestParam(value = "status", required = false) Optional<Boolean> status
+    @GetMapping("")
+    public String notifications(
+            Model model,
+            @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser,
+            @RequestParam(value = "status", required = false) Optional<Boolean> status
     ) {
-        List<NotificationDto> notifications = notificationService.getNotification(sessionUser, status);
+        List<NotificationDto> notifications = notificationService.getNotification(sessionUser.getId(), status);
         model.addAttribute("notifications", notifications);
         return "notifications";
     }
 
     // 2. 모두 읽음 처리
     @PostMapping("/read-all")
-    public ResponseEntity<?> markAllAsRead(@SessionAttribute(SessionConst.LOGIN_USER) User sessionUser) {
+    public ResponseEntity<?> markAllAsRead(
+            @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser
+    ) {
         notificationService.readNotificationAll(sessionUser);
         Map<String, String> response = new HashMap<>();
         response.put("message", "All notifications marked as read.");
