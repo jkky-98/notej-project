@@ -7,13 +7,13 @@ import lombok.Data;
 import java.util.Optional;
 
 @Data
-public class PostsRequestDto {
+public class GetPostsToServiceDto {
     private String usernamePost;
     private PostsConditionForm condition;
     private Optional<User> user;
 
-    public static PostsRequestDto of(String usernamePost, PostsConditionForm condition, Optional<User> user) {
-        PostsRequestDto dto = new PostsRequestDto();
+    public static GetPostsToServiceDto of(String usernamePost, PostsConditionForm condition, Optional<User> user) {
+        GetPostsToServiceDto dto = new GetPostsToServiceDto();
         dto.setUsernamePost(usernamePost);
         dto.setCondition(condition);
         dto.setUser(user);

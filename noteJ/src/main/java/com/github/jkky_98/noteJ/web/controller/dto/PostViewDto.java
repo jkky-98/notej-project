@@ -1,6 +1,5 @@
 package com.github.jkky_98.noteJ.web.controller.dto;
 
-import com.github.jkky_98.noteJ.domain.Comment;
 import com.github.jkky_98.noteJ.domain.Post;
 import lombok.*;
 
@@ -23,9 +22,9 @@ public class PostViewDto {
     private String content;
     private int likeCount;
     @Builder.Default
-    private List<CommentsDto> comments = new ArrayList<>();
+    private List<CommentsForm> comments = new ArrayList<>();
 
-    public static PostViewDto of(Post post) {
+    public static PostViewDto ofFromPost(Post post) {
         return PostViewDto.builder()
                 .title(post.getTitle())
                 .postUrl(post.getPostUrl())
@@ -39,7 +38,7 @@ public class PostViewDto {
                 )
                 .comments(
                         post.getComments().stream()
-                                .map(CommentsDto::of)
+                                .map(CommentsForm::of)
                                 .toList()
                 )
                 .likeCount(post.getLikes().size())

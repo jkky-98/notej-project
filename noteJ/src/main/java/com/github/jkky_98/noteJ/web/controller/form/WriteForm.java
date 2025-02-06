@@ -22,7 +22,6 @@ public class WriteForm {
     private MultipartFile thumbnail;
     private String postSummary;
     private boolean open;
-    private String url;
     private String series;
     @Builder.Default
     private List<String> seriesList = new ArrayList<>();
@@ -35,7 +34,6 @@ public class WriteForm {
                         .toList())
                 .content(post.getContent())
                 .open(post.getWritable())
-                .url(post.getPostUrl())
                 .series(post.getSeries() != null ? post.getSeries().getSeriesName() : "")
                 .seriesList(
                         user.getSeriesList().stream()

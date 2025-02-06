@@ -91,16 +91,22 @@ public class WriteServiceProd implements WriteService{
         return WriteForm.of(postEdit, user);
     }
 
+    private static String generateUrl(WriteForm form) {
+        return form.getTitle() + "-" + UUID.randomUUID();
+    }
+
     @Transactional
-    @CacheEvict(value = "tagCache", allEntries = true)
+    @CacheEvict(value = "tagCache", key = "#sessionUserId")
     public void saveWrite(WriteForm form, Long sessionUserId) throws IOException {
 
         User userById = userService.findUserById(sessionUserId);
 
         String storedFileName = handleThumnail(form);
-        encodingUrlAndContent(form);
+        encodedContent(form);
 
-        Post post = Post.of(form, userById, seriesService.getSeries(form.getSeries(), userById), storedFileName);
+        String url = generateUrl(form);
+
+        Post post = Post.of(form, userById, seriesService.getSeries(form.getSeries(), userById), storedFileName, url);
         Post postSaved = postRepository.save(post);
         setTagsForPost(tagProvider(form.getTags()), postSaved);
 
@@ -120,14 +126,14 @@ public class WriteServiceProd implements WriteService{
     }
 
     @Transactional
-    @CacheEvict(value = "tagCache", allEntries = true)
+    @CacheEvict(value = "tagCache", key = "#sessionUser.id")
     public void saveEditWrite(WriteForm form, String postUrl, User sessionUser) throws IOException {
 
         Post post = postService.findByPostUrl(postUrl);
         post.updateSeries(seriesService.getSeries(form.getSeries(), sessionUser));
 
         // url, content 인코딩
-        encodingUrlAndContent(form);
+        encodedContent(form);
 
         // thumnail, series 빼고 업데이트
         post.updatePostWithoutThumbnailAndSeries(form);
@@ -205,11 +211,6 @@ public class WriteServiceProd implements WriteService{
                         .forEach(postFile -> updateTagToDelete(postFile, s3BucketName));
     }
 
-    private void encodingUrlAndContent(WriteForm form) {
-        urlProvider(form); // url 설정
-        encodedContent(form); // content 인코딩
-    }
-
     private String handleThumnail(WriteForm form) throws IOException {
         String storedFileName = DEFAULT_POST_PIC;
         if (form.getThumbnail() != null) {
@@ -279,18 +280,6 @@ public class WriteServiceProd implements WriteService{
         return tags.stream()
                 .map(Tag::of)
                 .toList();
-    }
-
-    /**
-     * url 생성기(title + UUID)
-     * @param form
-     */
-    private void urlProvider(WriteForm form) {
-        if (form.getUrl() == null || form.getUrl().isEmpty()) {
-            // UUID를 생성하고 제목과 결합
-            String uniqueUrl = form.getTitle() + "-" + UUID.randomUUID();
-            form.setUrl(uniqueUrl);
-        }
     }
 
     private static List<String> extractImageFilenames(String content) {

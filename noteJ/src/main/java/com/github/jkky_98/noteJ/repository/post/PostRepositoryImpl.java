@@ -23,7 +23,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public List<Post> searchPosts(PostsConditionForm form, String username) {
+    public List<Post> searchPosts(PostsConditionForm form, Long userId) {
 
         QPost p = new QPost("p");
         QPostTag pt =  new QPostTag("pt");
@@ -43,7 +43,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         searchCondition(form.getSearch(), p),
                         tagCondition(form.getTagName(), p, pt, t),
                         seriesCondition(form.getSeriesName(), p, s),
-                        userCondition(username, u)
+                        userCondition(userId, u)
                 )
                 .orderBy(p.createDt.desc()) // 최신 날짜 순으로 정렬
                 .limit(5)
@@ -52,7 +52,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
-    public Page<Post> searchPostsWithPage(PostsConditionForm form, String username, Pageable pageable) {
+    public Page<Post> searchPostsWithPage(PostsConditionForm form, Long userId, Pageable pageable) {
         QPost p = new QPost("p");
         QPostTag pt = new QPostTag("pt");
         QTag t = new QTag("t");
@@ -72,7 +72,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         searchCondition(form.getSearch(), p),
                         tagCondition(form.getTagName(), p, pt, t),
                         seriesCondition(form.getSeriesName(), p, s),
-                        userCondition(username, u)
+                        userCondition(userId, u)
                 )
                 .distinct();
 
@@ -88,9 +88,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         return new PageImpl<>(content, pageable, total);
     }
 
-    private BooleanExpression userCondition(String username, QUser u) {
-        return username != null && !username.isEmpty()
-                ? u.username.eq(username)
+    private BooleanExpression userCondition(Long userId, QUser u) {
+        return userId != null
+                ? u.id.eq(userId)
                 : null;
     }
 

@@ -7,7 +7,7 @@ import com.github.jkky_98.noteJ.service.dto.GetLikeStatusToServiceDto;
 import com.github.jkky_98.noteJ.service.dto.SaveLikeToServiceDto;
 import com.github.jkky_98.noteJ.web.controller.form.LikeDeleteRequestForm;
 import com.github.jkky_98.noteJ.web.controller.form.LikeSaveRequestForm;
-import com.github.jkky_98.noteJ.web.controller.dto.LikeStatusResponseDto;
+import com.github.jkky_98.noteJ.web.controller.dto.LikeStatusForm;
 import com.github.jkky_98.noteJ.web.session.SessionConst;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +21,11 @@ public class LikeController {
     private final LikeService likeService;
 
     @GetMapping("/status")
-    public LikeStatusResponseDto getLikeStatus(
+    public LikeStatusForm getLikeStatus(
             @RequestParam String postUrl,
             @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser
     ) {
-        LikeStatusResponseDto likeStatus = likeService.getLikeStatus(
+        LikeStatusForm likeStatus = likeService.getLikeStatus(
                 new GetLikeStatusToServiceDto(
                         postUrl,
                         sessionUser.getId()

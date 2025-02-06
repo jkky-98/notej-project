@@ -7,14 +7,14 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class FollowerListViewDto {
+public class FollowerListViewForm {
     private String followerUserUsername;
     private String followerUserDescription;
     private String followerUserProfilePic;
     private boolean followStatus;
 
-    public static FollowerListViewDto of(User follower) {
-        return FollowerListViewDto.builder()
+    public static FollowerListViewForm of(User follower) {
+        return FollowerListViewForm.builder()
                 .followerUserDescription(follower.getUserDesc().getDescription())
                 .followerUserProfilePic(follower.getUserDesc().getProfilePic())
                 .followerUserUsername(follower.getUsername())

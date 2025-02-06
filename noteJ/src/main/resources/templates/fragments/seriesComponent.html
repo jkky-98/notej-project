@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <div th:fragment="seriesComponent">
-    <div class="container mt-4" th:object="${postsViewDto}">
+    <div class="container mt-4" th:object="${postsForm}">
         <div class="row row-cols-1 row-cols-md-2 g-4 d-flex justify-content-center" th:if="${sessionUser != null and sessionUser.username == username}">
             <form th:action="@{'/@' + ${username} + '/posts/series'}" th:object="${saveSeriesForm}" method="post">
                 <div class="input-group mb-3">

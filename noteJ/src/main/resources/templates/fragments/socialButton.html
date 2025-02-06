@@ -4,32 +4,32 @@
     <br/><br/>
     <div class="col-md-12">
       <!-- GitHub -->
-      <a th:if="${postsViewDto.profileForm.socialGitHub != null and !postsViewDto.profileForm.socialGitHub.isEmpty()}"
-         th:href="${postsViewDto.profileForm.socialGitHub}"
+      <a th:if="${postsForm.profileForm.socialGitHub != null and !postsForm.profileForm.socialGitHub.isEmpty()}"
+         th:href="${postsForm.profileForm.socialGitHub}"
          target="_blank"
          class="btn-social btn-github">
         <i class="fa fa-github-alt"></i>
       </a>
 
       <!-- Email -->
-      <a th:if="${postsViewDto.profileForm.socialEmail != null and !postsViewDto.profileForm.socialEmail.isEmpty()}"
-         th:href="'mailto:' + ${postsViewDto.profileForm.socialEmail}"
+      <a th:if="${postsForm.profileForm.socialEmail != null and !postsForm.profileForm.socialEmail.isEmpty()}"
+         th:href="'mailto:' + ${postsForm.profileForm.socialEmail}"
          target="_blank"
          class="btn-social btn-email">
         <i class="fa fa-envelope"></i>
       </a>
 
       <!-- Facebook -->
-      <a th:if="${postsViewDto.profileForm.socialFacebook != null and !postsViewDto.profileForm.socialFacebook.isEmpty()}"
-         th:href="${postsViewDto.profileForm.socialFacebook}"
+      <a th:if="${postsForm.profileForm.socialFacebook != null and !postsForm.profileForm.socialFacebook.isEmpty()}"
+         th:href="${postsForm.profileForm.socialFacebook}"
          target="_blank"
          class="btn-social btn-facebook">
         <i class="fa fa-facebook"></i>
       </a>
 
       <!-- Twitter -->
-      <a th:if="${postsViewDto.profileForm.socialTwitter != null and !postsViewDto.profileForm.socialTwitter.isEmpty()}"
-         th:href="${postsViewDto.profileForm.socialTwitter}"
+      <a th:if="${postsForm.profileForm.socialTwitter != null and !postsForm.profileForm.socialTwitter.isEmpty()}"
+         th:href="${postsForm.profileForm.socialTwitter}"
          target="_blank"
          class="btn-social btn-twitter">
         <i class="fa fa-twitter"></i>

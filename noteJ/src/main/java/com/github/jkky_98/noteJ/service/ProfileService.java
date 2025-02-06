@@ -15,9 +15,9 @@ public class ProfileService {
     private final UserService userService;
 
     @Transactional(readOnly = true)
-    public ProfileForm getProfile(String username) {
+    public ProfileForm getProfile(Long userId) {
         // 사용자 정보를 조회
-        User userFind = userService.findUserByUsername(username);
+        User userFind = userService.findUserById(userId);
 
         UserDesc userDesc = userFind.getUserDesc();
 

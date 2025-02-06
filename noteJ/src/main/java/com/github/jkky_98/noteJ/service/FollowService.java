@@ -3,9 +3,9 @@ package com.github.jkky_98.noteJ.service;
 import com.github.jkky_98.noteJ.domain.Follow;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.FollowRepository;
-import com.github.jkky_98.noteJ.web.controller.dto.FollowListPostProfileDto;
-import com.github.jkky_98.noteJ.web.controller.dto.FollowerListViewDto;
-import com.github.jkky_98.noteJ.web.controller.dto.FollowingListViewDto;
+import com.github.jkky_98.noteJ.web.controller.dto.FollowListPostProfileForm;
+import com.github.jkky_98.noteJ.web.controller.dto.FollowerListViewForm;
+import com.github.jkky_98.noteJ.web.controller.dto.FollowingListViewForm;
 import com.github.jkky_98.noteJ.web.controller.form.FollowerListForm;
 import com.github.jkky_98.noteJ.web.controller.form.FollowingListForm;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class FollowService {
         );
 
         followingListForm.setProfilePostUser(
-                FollowListPostProfileDto.ofFollowing(userBlog)
+                FollowListPostProfileForm.ofFollowing(userBlog)
         );
 
         return followingListForm;
@@ -79,13 +79,11 @@ public class FollowService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isFollowing(Optional<User> sessionUser, String myFollowingUsername) {
-
-        User userMyFollowing = userService.findUserByUsername(myFollowingUsername);
+    public boolean isFollowing(Optional<User> sessionUser, User myFollowingUser) {
 
         // 세션 사용자와의 관계 확인
         return sessionUser
-                .map(user -> checkIfUserIsFollowing(user, userMyFollowing))
+                .map(user -> checkIfUserIsFollowing(user, myFollowingUser))
                 .orElse(false);
     }
 
@@ -128,7 +126,7 @@ public class FollowService {
         );
 
         followerListForm.setProfilePostUser(
-                FollowListPostProfileDto.ofFollower(userBlog)
+                FollowListPostProfileForm.ofFollower(userBlog)
         );
 
         return followerListForm;
@@ -138,7 +136,7 @@ public class FollowService {
         userBlog.getFollowerList().stream()
                 .map(Follow::getFollower)
                 .forEach(follower -> {
-                    followerListForm.getFollowers().add(FollowerListViewDto.of(follower));
+                    followerListForm.getFollowers().add(FollowerListViewForm.of(follower));
                 });
     }
 
@@ -146,7 +144,7 @@ public class FollowService {
         userBlog.getFollowingList().stream()
                 .map(Follow::getFollowing)
                 .forEach(follwing -> {
-                    followingListForm.getFollowings().add(FollowingListViewDto.of(follwing));
+                    followingListForm.getFollowings().add(FollowingListViewForm.of(follwing));
                 });
     }
 }

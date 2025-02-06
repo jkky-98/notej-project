@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class NotificationDto {
+public class NotificationForm {
     private Long id;
     private boolean status;
     private String message;
@@ -17,8 +17,8 @@ public class NotificationDto {
     private String usernameSender;
     private LocalDateTime createTime;
 
-    public static NotificationDto of(Notification notification) {
-        return NotificationDto.builder()
+    public static NotificationForm of(Notification notification) {
+        return NotificationForm.builder()
                 .id(notification.getId())
                 .message(notification.getMessage())
                 .type(notification.getType().name())

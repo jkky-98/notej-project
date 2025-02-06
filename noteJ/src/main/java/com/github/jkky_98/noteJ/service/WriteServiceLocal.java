@@ -82,7 +82,7 @@ public class WriteServiceLocal implements WriteService {
      * @throws IOException
      */
     @Transactional
-    @CacheEvict(value = "tagCache", allEntries = true)
+    @CacheEvict(value = "tagCache", key = "#sessionUserId")
     public void saveWrite(WriteForm form, Long sessionUserId) throws IOException {
 
         // 사용자 정보를 조회
@@ -90,12 +90,15 @@ public class WriteServiceLocal implements WriteService {
 
         // 썸네일 설정
         String thumnailPath = handleThumnail(form);
-        log.info("THUMnailPath : {}" , thumnailPath);
-        // url, content 인코딩
-        encodingUrlAndContent(form);
+
+        // content 인코딩
+        encodedContent(form);
+
+        // url생성
+        String url = generateUrl(form);
 
         // Post Entity 생성
-        Post post = Post.of(form, userById, seriesService.getSeries(form.getSeries(), userById), thumnailPath);
+        Post post = Post.of(form, userById, seriesService.getSeries(form.getSeries(), userById), thumnailPath, url);
 
         // Post save
         Post postSaved = postRepository.save(post);
@@ -103,6 +106,10 @@ public class WriteServiceLocal implements WriteService {
         // Post에 딸린 Tag 생성 및 저장
         setTag(tagProvider(form.getTags()), postSaved);
 
+    }
+
+    private static String generateUrl(WriteForm form) {
+        return form.getTitle() + "-" + UUID.randomUUID();
     }
 
     @Transactional
@@ -160,11 +167,6 @@ public class WriteServiceLocal implements WriteService {
         return imageFilenames;
     }
 
-    private void encodingUrlAndContent(WriteForm form) {
-        urlProvider(form); // url 설정
-        encodedContent(form); // content 인코딩
-    }
-
     private String handleThumnail(WriteForm form) throws IOException {
         String storedFileName = DEFAULT_POST_PIC;
         if (form.getThumbnail() != null && !form.getThumbnail().isEmpty()) {
@@ -180,7 +182,7 @@ public class WriteServiceLocal implements WriteService {
      * @throws IOException
      */
     @Transactional
-    @CacheEvict(value = "tagCache", allEntries = true)
+    @CacheEvict(value = "tagCache", key = "#sessionUser.id")
     public void saveEditWrite(WriteForm form, String postUrl, User sessionUser) throws IOException {
         // Post 엔티티 조회
         Post post = postService.findByPostUrl(decodingContent(postUrl));
@@ -188,8 +190,8 @@ public class WriteServiceLocal implements WriteService {
         // Series 업데이트
         post.updateSeries(seriesService.getSeries(form.getSeries(), sessionUser));
 
-        // url, content 인코딩
-        encodingUrlAndContent(form);
+        // content 인코딩
+        encodedContent(form);
 
         // thumnail, series 빼고 업데이트
         post.updatePostWithoutThumbnailAndSeries(form);
@@ -266,18 +268,6 @@ public class WriteServiceLocal implements WriteService {
         return tags.stream()
                 .map(Tag::of)
                 .toList();
-    }
-
-    /**
-     * url 생성기(title + UUID)
-     * @param form
-     */
-    private void urlProvider(WriteForm form) {
-        if (form.getUrl() == null || form.getUrl().isEmpty()) {
-            // UUID를 생성하고 제목과 결합
-            String uniqueUrl = form.getTitle() + "-" + UUID.randomUUID();
-            form.setUrl(uniqueUrl);
-        }
     }
 
     private static String decodingContent(String content) {

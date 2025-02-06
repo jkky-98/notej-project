@@ -92,14 +92,14 @@
             background-color: red;
         }
     </style>
-    <div class="profile-container" th:object="${postsViewDto.profileForm}">
+    <div class="profile-container" th:object="${postsForm.profileForm}">
         <!-- 프로필 사진이 있는 경우 -->
-        <img th:if="${postsViewDto.profileForm.profilePic != null}"
-             th:src="@{/image-print/{path}(path=${postsViewDto.profileForm.profilePic})}"
+        <img th:if="${postsForm.profileForm.profilePic != null}"
+             th:src="@{/image-print/{path}(path=${postsForm.profileForm.profilePic})}"
              alt="Profile Picture" class="profile-avatar">
 
         <!-- 기본 프로필 사진 -->
-        <img th:if="${postsViewDto.profileForm.profilePic == null}"
+        <img th:if="${postsForm.profileForm.profilePic == null}"
              th:src="@{/image-print/{path}(path='default/default-profile.png')}"
              alt="Default Profile Picture" class="profile-avatar">
 
@@ -114,23 +114,23 @@
 
         <!-- 팔로워/팔로잉 -->
         <div class="profile-stats">
-            <a th:href="@{|/@${postsViewDto.username}/followers|}" class="text-decoration-none me-3">
+            <a th:href="@{|/@${postsForm.username}/followers|}" class="text-decoration-none me-3">
                 <span th:text="'팔로워: ' + *{followers}">팔로워: 0</span>
             </a>
-            <a th:href="@{|/@${postsViewDto.username}/followings|}" class="text-decoration-none">
+            <a th:href="@{|/@${postsForm.username}/followings|}" class="text-decoration-none">
                 <span th:text="'팔로잉: ' + *{followings}">팔로잉: 0</span>
             </a>
         </div>
 
         <!-- 팔로우/언팔로우 버튼 -->
-        <div th:if="${sessionUser != null and postsViewDto.username != sessionUser.username}">
-            <form th:action="@{/follow}" method="post" th:if="${!postsViewDto.followStatus}">
-                <input type="hidden" name="targetUsername" th:value="${postsViewDto.username}">
+        <div th:if="${sessionUser != null and postsForm.username != sessionUser.username}">
+            <form th:action="@{/follow}" method="post" th:if="${!postsForm.followStatus}">
+                <input type="hidden" name="targetUsername" th:value="${postsForm.username}">
                 <button type="submit" class="follow-btn">팔로우</button>
             </form>
 
-            <form th:action="@{/unfollow}" method="post" th:if="${postsViewDto.followStatus}">
-                <input type="hidden" name="targetUsername" th:value="${postsViewDto.username}">
+            <form th:action="@{/unfollow}" method="post" th:if="${postsForm.followStatus}">
+                <input type="hidden" name="targetUsername" th:value="${postsForm.username}">
                 <button type="submit" class="unfollow-btn" data-default-text="팔로잉" data-hover-text="언팔로우">팔로잉</button>
             </form>
         </div>

@@ -1,15 +1,11 @@
 package com.github.jkky_98.noteJ.service;
 
-import com.github.jkky_98.noteJ.domain.Post;
 import com.github.jkky_98.noteJ.domain.PostHits;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.PostHitsRepository;
 import com.github.jkky_98.noteJ.repository.UserRepository;
-import com.github.jkky_98.noteJ.web.controller.dto.PostStatsDto;
-import com.github.jkky_98.noteJ.web.session.SessionUtils;
+import com.github.jkky_98.noteJ.web.controller.dto.PostStatsForm;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,12 +19,12 @@ public class PostStatsService {
 
     private final PostHitsRepository postHitsRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
 
-    public PostStatsDto getPostStats(String postUrl, User sessionUser) {
+    public PostStatsForm getPostStats(String postUrl, User sessionUser) {
         // 세션 사용자 확인
-        User user = userRepository.findById(sessionUser.getId())
-                .orElseThrow(() -> new EntityNotFoundException("User not Found"));
-
+        User user = userService.findUserById(sessionUser.getId());
+        // toDo: 조회수 로직 수정 필요
         // 조회수 가져오기
         List<PostHits> allPostHits = postHitsRepository.findAllPostHitsByPostId(postUrl);
         System.out.println("fdasfasdffdsa " + allPostHits);
@@ -55,12 +51,12 @@ public class PostStatsService {
                 .count();
 
         // DTO 반환
-        PostStatsDto postStatsDto = new PostStatsDto();
-        postStatsDto.setTotalViews(totalHits);
-        postStatsDto.setTodayViews(todayHits);
-        postStatsDto.setYesterdayViews(yesterdayHits);
+        PostStatsForm postStatsForm = new PostStatsForm();
+        postStatsForm.setTotalViews(totalHits);
+        postStatsForm.setTodayViews(todayHits);
+        postStatsForm.setYesterdayViews(yesterdayHits);
 
-        return postStatsDto;
+        return postStatsForm;
     }
 
     // 세션 사용자와 다른 사용자인지 확인

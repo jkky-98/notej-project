@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface PostRepositoryCustom {
 
-    List<Post> searchPosts(PostsConditionForm form, String username);
-    Page<Post> searchPostsWithPage(PostsConditionForm form, String username, Pageable pageable);
+    List<Post> searchPosts(PostsConditionForm form, Long userId);
+    Page<Post> searchPostsWithPage(PostsConditionForm form, Long userId, Pageable pageable);
 }

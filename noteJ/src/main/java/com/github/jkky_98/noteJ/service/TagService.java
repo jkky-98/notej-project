@@ -19,9 +19,9 @@ public class TagService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "tagCache", key = "#username")
-    public List<TagCountDto> getAllTag(String username) {
-        User userFind = userService.findUserByUsername(username);
+    @Cacheable(value = "tagCache", key = "#userId")
+    public List<TagCountDto> getAllTag(Long userId) {
+        User userFind = userService.findUserById(userId);
         return userRepository.findTagsByUser(userFind.getUsername());
     }
 }

@@ -4,7 +4,8 @@ import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.service.PostsService;
 import com.github.jkky_98.noteJ.service.SeriesService;
 import com.github.jkky_98.noteJ.web.controller.dto.PostNotOpenDto;
-import com.github.jkky_98.noteJ.web.controller.dto.PostsRequestDto;
+import com.github.jkky_98.noteJ.web.controller.dto.GetPostsToServiceDto;
+import com.github.jkky_98.noteJ.web.controller.dto.PostsForm;
 import com.github.jkky_98.noteJ.web.controller.form.PostsConditionForm;
 import com.github.jkky_98.noteJ.web.session.SessionConst;
 import lombok.RequiredArgsConstructor;
@@ -31,15 +32,15 @@ public class PostsController {
                         Model model
                         ) {
 
-        model.addAttribute("postsViewDto",
-                postsService.getPostsViewDto(
-                        PostsRequestDto.of(
-                                usernamePost,
-                                postsConditionForm,
-                                Optional.ofNullable(sessionUser)
-                        )
-                )
+        GetPostsToServiceDto getPostsToServiceDto = GetPostsToServiceDto.of(
+                usernamePost,
+                postsConditionForm,
+                Optional.ofNullable(sessionUser)
         );
+
+        PostsForm postsForm = postsService.getPosts(getPostsToServiceDto);
+
+        model.addAttribute("postsForm", postsForm);
 
         return "posts";
     }

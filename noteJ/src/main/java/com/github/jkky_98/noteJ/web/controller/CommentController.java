@@ -4,7 +4,7 @@ import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.service.CommentService;
 import com.github.jkky_98.noteJ.service.PostService;
 import com.github.jkky_98.noteJ.service.dto.SaveCommentToServiceDto;
-import com.github.jkky_98.noteJ.web.controller.dto.CommentDeleteRequest;
+import com.github.jkky_98.noteJ.web.controller.dto.CommentDeleteForm;
 import com.github.jkky_98.noteJ.web.controller.dto.PostViewDto;
 import com.github.jkky_98.noteJ.web.controller.form.CommentForm;
 import com.github.jkky_98.noteJ.web.session.SessionConst;
@@ -35,7 +35,7 @@ public class CommentController {
     ) {
 
         if (bindingResult.hasErrors()) {
-            PostViewDto postViewDto = postService.getPost(username, postUrl);
+            PostViewDto postViewDto = postService.getPost(postUrl);
 
             model.addAttribute("postViewDto", postViewDto);
             return "postView";
@@ -53,7 +53,7 @@ public class CommentController {
     @PostMapping("/comments/delete")
     public String deleteComment(
             @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser,
-            CommentDeleteRequest commentDeleteRequest,
+            CommentDeleteForm commentDeleteRequest,
             @RequestHeader("Referer") String referer
     ) {
         commentService.deleteComment(

@@ -20,15 +20,10 @@ public class PostsApiController {
     @GetMapping("/@{username}/posts")
     public ResponseEntity<List<PostDto>> posts(
                         @PathVariable("username") String usernamePost,
-                        @RequestParam("tagName") String tagName,
-                        @RequestParam("search") String search,
-                        @RequestParam("seriesName") String seriesName,
+                        @ModelAttribute PostsConditionForm form,
                         Pageable pageable
     ) {
-        PostsConditionForm form = new PostsConditionForm();
-        form.setTagName(tagName);
-        form.setSearch(search);
-        form.setSeriesName(seriesName);
+
 
         List<PostDto> postsWithPageableDto = postsService.getPostsWithPageable(usernamePost, form, pageable);
 

@@ -15,7 +15,7 @@
                         전체보기
                     </a>
                     <!-- 각 태그 반복 -->
-                    <a th:each="tag : ${postsViewDto.tags}"
+                    <a th:each="tag : ${postsForm.tags}"
                        th:href="@{${currentUri}(tagName=${tag.tagName})}"
                        class="list-group-item list-group-item-action">
                         <span th:text="${tag.tagName}"></span>
@@ -39,7 +39,7 @@
                 <section>
                     <div class="container" id="post-list">
                         <div class="row justify-content-center">
-                            <div th:each="post : ${postsViewDto.posts}">
+                            <div th:each="post : ${postsForm.posts}">
                                 <!-- 카드 전체를 클릭 가능하게 -->
                                 <a th:href="@{'/@' + ${post.username} + '/post/' + ${post.postUrl}}" class="card posts-style my-5 text-decoration-none">
                                     <!-- 포스트 썸네일 -->
@@ -110,7 +110,7 @@
             };
 
             $.ajax({
-                url: /*[[@{'/api/@' + ${postsViewDto.username} + '/posts'}]]*/,
+                url: /*[[@{'/api/@' + ${postsForm.username} + '/posts'}]]*/,
                 type: 'GET',
                 data: queryParams,
                 success: function (data) {

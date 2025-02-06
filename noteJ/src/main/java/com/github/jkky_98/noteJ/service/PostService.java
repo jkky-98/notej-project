@@ -3,6 +3,7 @@ package com.github.jkky_98.noteJ.service;
 import com.github.jkky_98.noteJ.domain.*;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.*;
+import com.github.jkky_98.noteJ.service.dto.DeletePostToServiceDto;
 import com.github.jkky_98.noteJ.web.controller.dto.PostViewDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -35,25 +36,12 @@ public class PostService {
         return postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("Post not found"));
     }
 
-    /**
-     * 게시글 살펴보기 GET 요청시
-     * @param usernamePost
-     * @param postUrl
-     * @return
-     */
     @Transactional(readOnly = true)
-    public PostViewDto getPost(String usernamePost, String postUrl) {
+    public PostViewDto getPost(String postUrl) {
 
-        Post post = postRepository.findPostByUsernameAndPostUrl(usernamePost, postUrl);
+        Post post = postRepository.findByPostUrl(postUrl).orElseThrow(() -> new EntityNotFoundException("Post not found"));
 
-        /**
-         * 요구사항
-         * PostViewDto
-         * Post 정보 가져야 함.
-         * Comment 정보 가져야 함.
-         * Like 정보 가져야 함.
-         */
-        return PostViewDto.of(post);
+        return PostViewDto.ofFromPost(post);
     }
 
     public Post findByUserUsernameAndPostUrl(String username, String postUrl) {
@@ -61,19 +49,28 @@ public class PostService {
     }
 
     @Transactional
-    @CacheEvict(value = "tagCache", allEntries = true)
     public void removePost(Long postId) {
         Post post = findById(postId);
 
-        // 2. Post에 연결된 PostTag의 Tag delete 처리
+        Long userIdPost = post.getUser().getId();
+
+        // Post에 연결된 PostTag의 Tag delete 처리
         List<Tag> tagsRemoved = post.getPostTags().stream()
                 .map(
                         postTag -> postTag.getTag()
                 ).toList();
         tagRepository.deleteAll(tagsRemoved);
 
-        // 4. Post 삭제
+        // Post 삭제
         postRepository.delete(post);
+
+        // tag 캐시 삭제
+        evictTagCache(userIdPost);
+    }
+
+    @CacheEvict(value = "tagCache", key = "#userId")
+    public void evictTagCache(Long userId) {
+        // 캐시만 삭제하는 목적이므로 내부 로직은 비워둠
     }
 
     @Transactional
@@ -95,17 +92,11 @@ public class PostService {
                 });
     }
 
-    /**
-     * Post 적절성 검토 후 postId 뱉음.
-     * @param postUrl
-     * @param username
-     * @param sessionUser
-     * @return
-     */
+
     @Transactional
-    public Long deleteValidPost(String postUrl, String username, User sessionUser) {
-        User userFind = userService.findUserById(sessionUser.getId());
-        Post postFind = findByUserUsernameAndPostUrl(username, postUrl);
+    public Long deleteValidPostAndGetRemovedPostId(String postUrl, Long sessionUserId) {
+        User userFind = userService.findUserById(sessionUserId);
+        Post postFind = findByPostUrl(postUrl);
 
         // 세션 로그인 유저와 post유저의 유저네임 일치해야 함.
         if (userFind.getId() != postFind.getUser().getId()) {
@@ -116,9 +107,11 @@ public class PostService {
     }
 
     @Transactional
-    @CacheEvict(value = "tagCache", allEntries = true)
-    public void deletePost(String postUrl, String username, User sessionUser) {
-        Long postIdDeleted = deleteValidPost(postUrl, username, sessionUser);
+    public void deletePost(DeletePostToServiceDto dto) {
+        Long postIdDeleted = deleteValidPostAndGetRemovedPostId(
+                dto.getPostUrl(), dto.getSessionUserId()
+        );
+
         removePost(postIdDeleted);
     }
 }

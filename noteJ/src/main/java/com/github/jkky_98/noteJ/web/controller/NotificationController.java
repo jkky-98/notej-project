@@ -2,7 +2,7 @@ package com.github.jkky_98.noteJ.web.controller;
 
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.service.NotificationService;
-import com.github.jkky_98.noteJ.web.controller.dto.NotificationDto;
+import com.github.jkky_98.noteJ.web.controller.dto.NotificationForm;
 import com.github.jkky_98.noteJ.web.session.SessionConst;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ public class NotificationController {
             @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser,
             @RequestParam(value = "status", required = false) Optional<Boolean> status
     ) {
-        List<NotificationDto> notifications = notificationService.getNotification(sessionUser.getId(), status);
+        List<NotificationForm> notifications = notificationService.getNotification(sessionUser.getId(), status);
         model.addAttribute("notifications", notifications);
         return "notifications";
     }

@@ -10,7 +10,7 @@ import com.github.jkky_98.noteJ.service.dto.DeleteLikeToServiceDto;
 import com.github.jkky_98.noteJ.service.dto.GetLikeStatusToServiceDto;
 import com.github.jkky_98.noteJ.service.dto.SaveLikeToServiceDto;
 import com.github.jkky_98.noteJ.web.controller.dto.LikeListByPostDto;
-import com.github.jkky_98.noteJ.web.controller.dto.LikeStatusResponseDto;
+import com.github.jkky_98.noteJ.web.controller.dto.LikeStatusForm;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +31,12 @@ public class LikeService {
     private final NotificationService notificationService;
 
     @Transactional
-    public LikeStatusResponseDto getLikeStatus(final GetLikeStatusToServiceDto request) {
+    public LikeStatusForm getLikeStatus(final GetLikeStatusToServiceDto request) {
         User userFind = userService.findUserById(request.getSessionUserId());
         Post postFind = postService.findByPostUrl(request.getPostUrl());
         boolean isLike = likeRepository.existsByUserAndPost(userFind, postFind);
 
-        return LikeStatusResponseDto.of(isLike);
+        return LikeStatusForm.of(isLike);
     }
 
     @Transactional

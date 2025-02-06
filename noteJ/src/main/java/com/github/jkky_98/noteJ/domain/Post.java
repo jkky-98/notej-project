@@ -114,7 +114,6 @@ public class Post extends BaseEntity {
         title = form.getTitle();
         content = form.getContent();
         postSummary = form.getPostSummary();
-        postUrl = form.getUrl();
         writable = form.isOpen();
     }
 
@@ -123,13 +122,13 @@ public class Post extends BaseEntity {
     }
 
     // 정적 팩토리 메서드
-    public static Post of(WriteForm form, User user, Series series, String thumbnail) {
+    public static Post of(WriteForm form, User user, Series series, String thumbnail, String url) {
         return Post.builder()
                 .title(form.getTitle())
                 .content(form.getContent())
                 .writable(form.isOpen())
                 .postSummary(form.getPostSummary())
-                .postUrl(form.getUrl())
+                .postUrl(url)
                 .series(series)
                 .thumbnail(thumbnail)
                 .user(user)

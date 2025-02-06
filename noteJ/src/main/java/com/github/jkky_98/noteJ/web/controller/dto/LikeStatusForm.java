@@ -6,11 +6,11 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class LikeStatusResponseDto {
+public class LikeStatusForm {
     private boolean liked;
 
-    public static LikeStatusResponseDto of(boolean liked) {
-        return LikeStatusResponseDto.builder()
+    public static LikeStatusForm of(boolean liked) {
+        return LikeStatusForm.builder()
                 .liked(liked)
                 .build();
     }

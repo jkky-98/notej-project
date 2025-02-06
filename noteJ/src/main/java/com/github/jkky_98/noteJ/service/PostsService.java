@@ -6,6 +6,7 @@ import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.PostRepository;
 import com.github.jkky_98.noteJ.web.controller.dto.*;
 import com.github.jkky_98.noteJ.web.controller.form.PostsConditionForm;
+import com.github.jkky_98.noteJ.web.controller.form.ProfileForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,10 +27,10 @@ public class PostsService {
     private final FollowService followService;
 
     @Transactional(readOnly = true)
-    public List<PostDto> getPosts(String username, PostsConditionForm cond) {
-        User userFind = userService.findUserByUsername(username);
+    public List<PostDto> getPosts(Long userId, PostsConditionForm cond) {
+        User userFind = userService.findUserById(userId);
 
-        List<Post> posts = postRepository.searchPosts(cond, username);
+        List<Post> posts = postRepository.searchPosts(cond, userFind.getId());
 
         return posts.stream()
                 .map(post -> PostDto.of(post, userFind))
@@ -39,7 +40,7 @@ public class PostsService {
     @Transactional
     public List<PostDto> getPostsWithPageable(String username, PostsConditionForm cond, Pageable pageable) {
         User userFind = userService.findUserByUsername(username);
-        Page<Post> posts = postRepository.searchPostsWithPage(cond, username, pageable);
+        Page<Post> posts = postRepository.searchPostsWithPage(cond, userFind.getId(), pageable);
 
         return posts.stream()
                 .map(post -> PostDto.of(post, userFind))
@@ -48,25 +49,33 @@ public class PostsService {
 
 
     @Transactional(readOnly = true)
-    public PostsViewDto getPostsViewDto(PostsRequestDto dto) {
-        return PostsViewDto.ofPosts(
-                profileService.getProfile(dto.getUsernamePost()),
-                getPosts(dto.getUsernamePost(), dto.getCondition()),
-                tagService.getAllTag(dto.getUsernamePost()),
-                followService.isFollowing(dto.getUser(), dto.getUsernamePost()),
+    public PostsForm getPosts(GetPostsToServiceDto dto) {
+
+        User userPost = userService.findUserByUsername(dto.getUsernamePost());
+
+        ProfileForm profile = profileService.getProfile(userPost.getId());
+        List<TagCountDto> allTag = tagService.getAllTag(userPost.getId());
+        boolean following = followService.isFollowing(dto.getUser(), userPost);
+        List<PostDto> posts = getPosts(userPost.getId(), dto.getCondition());
+
+        return PostsForm.ofPosts(
+                profile,
+                posts,
+                allTag,
+                following,
                 dto.getUsernamePost()
         );
     }
 
     @Transactional(readOnly = true)
-    public PostsViewDto getSeriesTabs(String username, Optional<User> sessionUser) {
+    public PostsForm getSeriesTabs(String username, Optional<User> sessionUser) {
         User userFind = userService.findUserByUsername(username);
 
         // User의 Series 목록 가져오기
         List<Series> seriesList = userFind.getSeriesList();
 
-        return PostsViewDto.ofSeries(
-                profileService.getProfile(username),
+        return PostsForm.ofSeries(
+                profileService.getProfile(userFind.getId()),
                 seriesList.stream()
                         .map(series -> SeriesViewDto.of(
                                 series.getSeriesName(),
@@ -78,7 +87,7 @@ public class PostsService {
                         .toList(),
                 followService.isFollowing(
                         sessionUser,
-                        username
+                        userFind
                 ),
                 username
         );

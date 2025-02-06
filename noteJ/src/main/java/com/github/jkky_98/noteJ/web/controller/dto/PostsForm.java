@@ -9,7 +9,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class PostsViewDto {
+public class PostsForm {
     private ProfileForm profileForm;
     private List<PostDto> posts;
     private List<TagCountDto> tags;
@@ -17,8 +17,8 @@ public class PostsViewDto {
     private String username;
     private List<SeriesViewDto> seriesList;
 
-    public static PostsViewDto ofPosts(ProfileForm profileForm, List<PostDto> posts, List<TagCountDto> tagAlls, boolean followStatus, String username) {
-        return PostsViewDto.builder()
+    public static PostsForm ofPosts(ProfileForm profileForm, List<PostDto> posts, List<TagCountDto> tagAlls, boolean followStatus, String username) {
+        return PostsForm.builder()
                 .profileForm(profileForm)
                 .posts(posts)
                 .tags(tagAlls)
@@ -27,8 +27,8 @@ public class PostsViewDto {
                 .build();
     }
 
-    public static PostsViewDto ofSeries(ProfileForm profileForm, List<SeriesViewDto> seriesList, boolean followStatus, String username) {
-        return PostsViewDto.builder()
+    public static PostsForm ofSeries(ProfileForm profileForm, List<SeriesViewDto> seriesList, boolean followStatus, String username) {
+        return PostsForm.builder()
                 .profileForm(profileForm)
                 .seriesList(seriesList)
                 .followStatus(followStatus)

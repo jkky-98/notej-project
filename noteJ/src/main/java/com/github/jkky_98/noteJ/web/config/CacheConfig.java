@@ -1,6 +1,5 @@
 package com.github.jkky_98.noteJ.web.config;
 
-import com.github.jkky_98.noteJ.web.controller.dto.TagCountDto;
 import com.github.jkky_98.noteJ.web.controller.form.UserViewForm;
 import org.springframework.boot.autoconfigure.cache.JCacheManagerCustomizer;
 import org.springframework.cache.annotation.EnableCaching;
@@ -30,8 +29,8 @@ public class CacheConfig {
                     .setStoreByValue(false)
                     .setExpiryPolicyFactory(ModifiedExpiryPolicy.factoryOf(new Duration(TimeUnit.HOURS, 1))));
 
-            cacheManager.createCache("tagCache", new MutableConfiguration<String, List>()
-                    .setTypes(String.class, List.class)
+            cacheManager.createCache("tagCache", new MutableConfiguration<Long, List>()
+                    .setTypes(Long.class, List.class)
                     .setStoreByValue(false)
                     .setExpiryPolicyFactory(ModifiedExpiryPolicy.factoryOf(new Duration(TimeUnit.HOURS, 6))));
         };

@@ -4,11 +4,9 @@ import com.github.jkky_98.noteJ.domain.Notification;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.exception.UnauthenticatedUserException;
 import com.github.jkky_98.noteJ.repository.NotificationRepository;
-import com.github.jkky_98.noteJ.web.controller.dto.NotificationDto;
+import com.github.jkky_98.noteJ.web.controller.dto.NotificationForm;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,7 +70,7 @@ public class NotificationService {
      * @return
      */
     @Transactional(readOnly = true)
-    public List<NotificationDto> getNotification(Long sessionUserId, Optional<Boolean> status) {
+    public List<NotificationForm> getNotification(Long sessionUserId, Optional<Boolean> status) {
 
         User sessionUser = userService.findUserById(sessionUserId);
 
@@ -130,9 +128,9 @@ public class NotificationService {
     }
 
 
-    private List<NotificationDto> convertNotificationsToDto(List<Notification> notifications) {
+    private List<NotificationForm> convertNotificationsToDto(List<Notification> notifications) {
         return notifications.stream()
-                .map(NotificationDto::of)
+                .map(NotificationForm::of)
                 .toList();
     }
 
