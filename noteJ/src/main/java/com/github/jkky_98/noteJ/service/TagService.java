@@ -22,6 +22,6 @@ public class TagService {
     @Cacheable(value = "tagCache", key = "#userId")
     public List<TagCountDto> getAllTag(Long userId) {
         User userFind = userService.findUserById(userId);
-        return userRepository.findTagsByUser(userFind.getUsername());
+        return userRepository.findTagsByUser(userFind.getId());
     }
 }

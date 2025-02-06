@@ -348,7 +348,7 @@ public class UserRepositoryTest {
         postTagRepository.saveAll(List.of(postTag1, postTag2, postTag3)); // PostTag 저장
 
         // when
-        List<TagCountDto> results = userRepository.findTagsByUser("test_user");
+        List<TagCountDto> results = userRepository.findTagsByUser(1L);
         System.out.println(results);
 
         // then
