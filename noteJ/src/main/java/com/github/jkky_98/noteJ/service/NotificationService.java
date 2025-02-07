@@ -7,6 +7,8 @@ import com.github.jkky_98.noteJ.repository.NotificationRepository;
 import com.github.jkky_98.noteJ.web.controller.dto.NotificationForm;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,7 @@ public class NotificationService {
      * @param userSendNotification
      */
     @Transactional
+    @CacheEvict(value = "navigationAlarm", key = "#userGetNotification.id")
     public void sendFollowNotification(User userGetNotification, User userSendNotification) {
         // 알림 엔티티 생성 for 팔로우
         Notification notification = Notification.ofFollow(userSendNotification, userGetNotification);
@@ -37,7 +40,7 @@ public class NotificationService {
     }
 
     @Transactional
-
+    @CacheEvict(value = "navigationAlarm", key = "#userGetNotification.id")
     public void sendLikePostNotification(User userGetNotification, User userSendNotification, String postTitle) {
         Notification notification = Notification.ofLike(userSendNotification, userGetNotification, postTitle);
         notificationRepository.save(notification);
@@ -47,6 +50,7 @@ public class NotificationService {
     }
 
     @Transactional
+    @CacheEvict(value = "navigationAlarm", key = "#userGetNotification.id")
     public void sendCommentPostNotification(User userGetNotification, User userSendNotification, String postTitle) {
         Notification notification = Notification.ofComment(userSendNotification, userGetNotification, postTitle);
         notificationRepository.save(notification);
@@ -85,6 +89,7 @@ public class NotificationService {
      * @return
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "navigationAlarm", key="#sessionUserId")
     public Long getNotificationCountNotRead(Long sessionUserId) {
 
         User user = userService.findUserById(sessionUserId);
@@ -96,7 +101,7 @@ public class NotificationService {
      * 알림 단건 읽기
      * @param notificationId
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public void readNotificationOne(Long notificationId) {
         Notification notification = notificationRepository.findById(notificationId).orElseThrow(() -> new EntityNotFoundException("notification entity not found"));
         notification.readNotification();
@@ -106,7 +111,7 @@ public class NotificationService {
      * 알림 모두 읽기
      * @param sessionUser
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public void readNotificationAll(User sessionUser) {
         if (sessionUser == null) {
             throw new UnauthenticatedUserException("not authenticated");
