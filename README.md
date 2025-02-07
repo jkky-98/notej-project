@@ -24,7 +24,7 @@
     * [댓글 대댓글 기능](#댓글-대댓글-기능)
     * [자바8 스트림 람다 문법 도입](#자바8-스트림-람다-문법-도입)
     * [사진 저장용량 최적화](#사진-저장용량-최적화)
-    * [Ehcache 적용](#Ehcache-적용)
+    * [Ehcache 적용](#ehcache-적용)
 ## 개발 환경
 - IntelliJ
 - GitHub
@@ -35,7 +35,8 @@
 - Java 17 openjdk
 - SpringBoot 3.4.0
 - Spring Data JPA
-- QueryDSL
+- QueryDSL 5.0.0
+- Ehcache 3.10.8
 
 #### 빌드 Tool
 - Gradle
@@ -46,7 +47,7 @@
 - Thymeleaf
 - BootStrap5
 
-#### 데이터베이스
+#### 데이터베이스
 - H2(dev)
 - Mysql(prod)
 
@@ -56,6 +57,7 @@
 - GitHub Actions
 - Docker
 - AWS RDS
+- AWS Route53
 
 ### 기타 라이브러리
 - Lombok
@@ -67,10 +69,21 @@
 - MVC 프레임워크 기반 백엔드 서버 구축
 
 ## 시스템 아키텍처
-None
+![noteJ-system-architecture drawio](https://github.com/user-attachments/assets/4f3a8d30-a8cb-4721-ad5b-7bd20c578989)
 
 ### 패키징 구조 예시
-
+| 패키지명             | 설명 |
+|----------------------|-------------------------------|
+| `NoteJApplication.java` | Spring Boot 애플리케이션 메인 실행 클래스 |
+| `aop`               | AOP(Aspect-Oriented Programming) 관련 코드 |
+| `deploy`            | 배포 관련 스크립트 및 설정 파일 |
+| `domain`            | 엔티티(Entity) 및 도메인 모델 관련 클래스 |
+| `exception`         | 전역 예외 처리 및 커스텀 예외 클래스 |
+| `file`              | 파일 업로드/다운로드 관련 처리 |
+| `filter`            | 인증 인가 필터 |
+| `repository`        | 데이터베이스 접근 계층 (JPA) |
+| `service`           | 비즈니스 로직을 담당하는 서비스 계층 |
+| `web`               | 컨트롤러 및 API 요청 처리 관련 클래스 |
 ## E-R Diagram
 
 ## 프로젝트 목적
