@@ -6,6 +6,8 @@ import com.github.jkky_98.noteJ.repository.*;
 import com.github.jkky_98.noteJ.service.dto.DeletePostToServiceDto;
 import com.github.jkky_98.noteJ.web.controller.dto.PostViewDto;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final UserService userService;
+    private final ViewLogService viewLogService;
 
     @Transactional(readOnly = true)
     public Post findByPostUrl(String postUrl) {
@@ -41,11 +44,9 @@ public class PostService {
 
         Post post = postRepository.findByPostUrl(postUrl).orElseThrow(() -> new EntityNotFoundException("Post not found"));
 
-        return PostViewDto.ofFromPost(post);
-    }
+        PostViewDto postViewDto = PostViewDto.ofFromPost(post);
 
-    public Post findByUserUsernameAndPostUrl(String username, String postUrl) {
-        return postRepository.findByUserUsernameAndPostUrl(username, postUrl).orElseThrow(() -> new EntityNotFoundException("Post not found"));
+        return postViewDto;
     }
 
     @Transactional

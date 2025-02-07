@@ -39,6 +39,11 @@ public class Post extends BaseEntity {
 
     private Boolean writable;
 
+    @Version
+    private Integer version;
+
+    private int viewCount;
+
     //연관관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "series_id")
@@ -59,10 +64,6 @@ public class Post extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostTag> postTags = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<PostHits> postHits = new ArrayList<>(); // 조회 기록
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -106,6 +107,10 @@ public class Post extends BaseEntity {
     public void updateSeries(Series series) {
         this.series = series;
         series.getPosts().add(this);
+    }
+
+    public void increaseViewCount() {
+        viewCount++;
     }
 
     // updateThumbnail 따로 필요
