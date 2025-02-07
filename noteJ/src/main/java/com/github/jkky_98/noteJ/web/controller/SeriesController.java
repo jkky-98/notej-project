@@ -29,7 +29,7 @@ public class SeriesController {
             @SessionAttribute(name = SessionConst.LOGIN_USER, required = false) User sessionUser,
             Model model
     ) {
-        model.addAttribute("postsViewDto",
+        model.addAttribute("postsForm",
                 postsService.getSeriesTabs(
                         username,
                         Optional.ofNullable(sessionUser)
