@@ -11,6 +11,7 @@ import com.github.jkky_98.noteJ.service.dto.GetLikeStatusToServiceDto;
 import com.github.jkky_98.noteJ.service.dto.SaveLikeToServiceDto;
 import com.github.jkky_98.noteJ.web.controller.dto.LikeListByPostDto;
 import com.github.jkky_98.noteJ.web.controller.dto.LikeStatusForm;
+import com.github.jkky_98.noteJ.web.controller.form.LikeCardForm;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -94,5 +95,14 @@ public class LikeService {
 
     private static boolean isSelfLike(Post postFind, User userFind) {
         return postFind.getUser().getId().equals(userFind.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public List<LikeCardForm> getLikeCards(Long userId) {
+        User user = userService.findUserById(userId);
+
+        return user.getLikes().stream()
+                .map(like -> LikeCardForm.ofFromPost(like.getPost()))
+                .toList();
     }
 }

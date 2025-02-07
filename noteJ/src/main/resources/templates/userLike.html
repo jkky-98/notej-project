@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Include the header fragment -->
+<div th:insert="~{fragments/header :: header}"></div>
+<body>
+<!-- Include the navigation fragment -->
+<div th:insert="~{fragments/header :: navigation}"></div>
+
+<!-- 카드 리스트 -->
+<div class="container mt-4">
+    <div class="row">
+        <!-- Thymeleaf 반복문 -->
+        <div class="col-md-4 mb-4" th:each="card : ${likeCards}">
+            <div class="card" style="width: 18rem;">
+                <img th:src="@{/image-print/{path}(path=${card.postThumbnailUrl})}" class="card-img-top" alt="이미지">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${card.postTitle}">카드 제목</h5>
+                    <p class="card-text" th:text="${card.postDescription}">카드 설명</p>
+                    <a th:href="${card.postUrl}" class="btn btn-primary">자세히 보기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
