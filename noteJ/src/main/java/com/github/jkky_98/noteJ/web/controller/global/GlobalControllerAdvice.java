@@ -60,6 +60,7 @@ public class GlobalControllerAdvice {
         String requestUri = request.getRequestURI();
 
         // 특정 URL에서는 실행하지 않음
+        // toDO: 이거 고민 필요하다....
         if (    requestUri.startsWith("/api/") ||
                 requestUri.startsWith("/editor/") ||
                 requestUri.startsWith("/image-print/")
