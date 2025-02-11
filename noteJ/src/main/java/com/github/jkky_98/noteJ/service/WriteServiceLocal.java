@@ -1,6 +1,7 @@
 package com.github.jkky_98.noteJ.service;
 
 import com.github.jkky_98.noteJ.domain.*;
+import com.github.jkky_98.noteJ.domain.mapper.PostMapper;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.file.FileStore;
 import com.github.jkky_98.noteJ.repository.*;
@@ -9,6 +10,7 @@ import com.github.jkky_98.noteJ.web.controller.dto.AutoEditPostResponse;
 import com.github.jkky_98.noteJ.web.controller.dto.AutoSavePostRequest;
 import com.github.jkky_98.noteJ.web.controller.dto.AutoSavePostResponse;
 import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -40,6 +42,7 @@ public class WriteServiceLocal implements WriteService {
 //    private final AmazonS3 amazonS3;
 
     private static final String DEFAULT_POST_PIC =  "default/thumb.webp";
+    private final PostMapper postMapper;
 
     /**
      * /write get 요청에 사용될 WriteForm을 구성
@@ -117,34 +120,33 @@ public class WriteServiceLocal implements WriteService {
         User sessionUser = userService.findUserById(sessionUserId);
         Series series = seriesService.getSeries(request.getSeriesName(), sessionUser);
 
-        Post postTemp = Post.ofSavePostTemp(request, sessionUser, series);
+//        Post postTemp = Post.ofSavePostTemp(request, sessionUser, series);
+        Post postTemp = postMapper.toPostForAutoSave(request, sessionUser, series);
         postRepository.save(postTemp);
 
         setTag(tagProvider(request.getTags()), postTemp);
 
-        AutoSavePostResponse autoSavePostResponse = new AutoSavePostResponse();
-        autoSavePostResponse.setPostUrl(postTemp.getPostUrl());
-        autoSavePostResponse.setUsername(sessionUser.getUsername());
-        return autoSavePostResponse;
+//        AutoSavePostResponse autoSavePostResponse = new AutoSavePostResponse();
+//        autoSavePostResponse.setPostUrl(postTemp.getPostUrl());
+//        autoSavePostResponse.setUsername(sessionUser.getUsername());
+        return postMapper.toAutoSaveResponse(postTemp);
     }
 
     @Transactional
     public AutoEditPostResponse autoEditPost(AutoEditPostRequest request, Long sessionUserId) {
 
-        Optional<Post> byPostUrl = postRepository.findByPostUrl(decodingContent(request.getPostUrl()));
+        Post post = postRepository.findByPostUrl(decodingContent(request.getPostUrl())).orElseThrow(() -> new EntityNotFoundException("post not found"));
 
-        byPostUrl.ifPresent(post -> {
-            if (post.getWritable()) {
-                return;
-            }
-            User sessionUser = userService.findUserById(sessionUserId);
-            Series series = seriesService.getSeries(request.getSeriesName(), sessionUser);
-            post.updateEditPostTemp(request, series);
-        });
 
-        AutoEditPostResponse autoEditPostResponse = new AutoEditPostResponse();
-        autoEditPostResponse.setPostUrl(request.getPostUrl());
-        return autoEditPostResponse;
+        if (post.getWritable()) {
+            throw new RuntimeException("공개된 post는 AutoEdit될 수 없습니다.");
+        }
+
+        User sessionUser = userService.findUserById(sessionUserId);
+        Series series = seriesService.getSeries(request.getSeriesName(), sessionUser);
+        post.updateEditPostTemp(request, series);
+
+        return postMapper.toAutoEditResponse(post);
     }
 
     private static List<String> extractImageFilenames(String content) {
