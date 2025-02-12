@@ -25,21 +25,21 @@ public class WriteForm {
     private String series;
     @Builder.Default
     private List<String> seriesList = new ArrayList<>();
-
-    public static WriteForm of(Post post, User user) {
-        return WriteForm.builder()
-                .title(post.getTitle())
-                .tags(post.getPostTags().stream()
-                        .map(postTag -> postTag.getTag().getName())
-                        .toList())
-                .content(post.getContent())
-                .open(post.getWritable())
-                .series(post.getSeries() != null ? post.getSeries().getSeriesName() : "")
-                .seriesList(
-                        user.getSeriesList().stream()
-                                .map(Series::getSeriesName)
-                                .toList()
-                )
-                .build();
-    }
+//
+//    public static WriteForm of(Post post, User user) {
+//        return WriteForm.builder()
+//                .title(post.getTitle())
+//                .tags(post.getPostTags().stream()
+//                        .map(postTag -> postTag.getTag().getName())
+//                        .toList())
+//                .content(post.getContent())
+//                .open(post.getWritable())
+//                .series(post.getSeries() != null ? post.getSeries().getSeriesName() : "")
+//                .seriesList(
+//                        user.getSeriesList().stream()
+//                                .map(Series::getSeriesName)
+//                                .toList()
+//                )
+//                .build();
+//    }
 }

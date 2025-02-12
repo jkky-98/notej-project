@@ -6,6 +6,9 @@ import com.amazonaws.services.s3.model.GetObjectTaggingResult;
 import com.amazonaws.services.s3.model.ObjectTagging;
 import com.amazonaws.services.s3.model.SetObjectTaggingRequest;
 import com.github.jkky_98.noteJ.domain.*;
+import com.github.jkky_98.noteJ.domain.mapper.PostFileMapper;
+import com.github.jkky_98.noteJ.domain.mapper.PostMapper;
+import com.github.jkky_98.noteJ.domain.mapper.TagMapper;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.file.FileStore;
 import com.github.jkky_98.noteJ.repository.PostFileRepository;
@@ -31,10 +34,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+
+import static com.github.jkky_98.noteJ.service.util.DefaultConst.DEFAULT_POST_PIC;
 
 @Service
 @RequiredArgsConstructor
@@ -51,18 +54,18 @@ public class WriteServiceProd implements WriteService{
     private final PostService postService;
     private final AmazonS3 amazonS3;
     private final PostFileRepository postFileRepository;
-
+    private final PostMapper postMapper;
+    private final TagMapper tagMapper;
+    private final PostFileMapper postFileMapper;
     @Value("${cloud.aws.s3.bucket}")
     private String s3BucketName;
-
-    private static final String DEFAULT_POST_PIC =  "default/thumb.webp";
 
     /**
      * /write get 요청에 사용될 WriteForm을 구성
      * @param form
      * @param sessionUserId
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public void getWrite(WriteForm form, Long sessionUserId) {
 
         User userById = userService.findUserById(sessionUserId);
@@ -82,47 +85,53 @@ public class WriteServiceProd implements WriteService{
      * @param postUrl
      * @return
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public WriteForm getWriteEdit(Long sessionUserId, String postUrl) {
         User user = userService.findUserById(sessionUserId);
 
         Post postEdit = postService.findByPostUrl(postUrl);
 
-        return WriteForm.of(postEdit, user);
-    }
-
-    private static String generateUrl(WriteForm form) {
-        return form.getTitle() + "-" + UUID.randomUUID();
+        return postMapper.toWriteForm(postEdit, user);
     }
 
     @Transactional
     @CacheEvict(value = "tagCache", key = "#sessionUserId")
     public void saveWrite(WriteForm form, Long sessionUserId) throws IOException {
 
-        User userById = userService.findUserById(sessionUserId);
+        User sessionUser = userService.findUserById(sessionUserId);
 
-        String storedFileName = handleThumnail(form);
-        encodedContent(form);
+        String thumbnailPath = handleThumnail(form);
 
-        String url = generateUrl(form);
+        Series series = seriesService.getSeries(form.getSeries(), sessionUser);
 
-        Post post = Post.of(form, userById, seriesService.getSeries(form.getSeries(), userById), storedFileName, url);
+        Post post = postMapper.toPostSaveWrite(
+                form,
+                sessionUser,
+                series,
+                thumbnailPath
+        );
+
         Post postSaved = postRepository.save(post);
-        setTagsForPost(tagProvider(form.getTags()), postSaved);
 
+        List<Tag> tagList = tagMapper.toTagList(form.getTags());
+        setTags(tagList, postSaved);
+
+        updateTagS3Prod(form, postSaved);
+
+    }
+
+    private void updateTagS3Prod(WriteForm form, Post postSaved) {
         // content에서 영구화 시킬 url List 추출
         List<String> imageFilenames = extractImageFilenames(form.getContent());
-        log.info("[content에서 사진 filename 추출] : {}", imageFilenames);
         // S3 파일 태그 제거상태 -> 영구상태
         imageFilenames.forEach(filename -> updateTagToPermanent(filename, s3BucketName));
 
         // PostFile 추가
         List<PostFile> postFiles = imageFilenames.stream()
-                .map(urlImage -> PostFile.of(postSaved, urlImage))
+                .map(urlImage -> postFileMapper.toPostFile(postSaved, urlImage))
                 .toList();
 
         postFileRepository.saveAll(postFiles);
-
     }
 
     @Transactional
@@ -132,20 +141,30 @@ public class WriteServiceProd implements WriteService{
         Post post = postService.findByPostUrl(postUrl);
         post.updateSeries(seriesService.getSeries(form.getSeries(), sessionUser));
 
-        // url, content 인코딩
-        encodedContent(form);
+        // content 인코딩
+        form.setContent(
+                decodingContent(form.getContent())
+        );
 
         // thumnail, series 빼고 업데이트
         post.updatePostWithoutThumbnailAndSeries(form);
 
         // 기존 Post-PostTag 관계 제거
-        post.getPostTags().forEach(postTag -> postTag.getTag().getPostTags().remove(postTag));
-        post.getPostTags().clear(); // Post와의 관계 끊기
+        disconnectPostWithPostTag(post);
 
-        editThumnail(form, post);
-        setTagsForPost(tagProvider(form.getTags()), post);
+        // post thumbnail 업데이트
+        editThumbnail(form, post);
+
+        // Tag 업데이트
+        List<Tag> tags = tagMapper.toTagList(form.getTags());
+        setTags(tags, post);
 
         updateTagAndRepository(form, post);
+    }
+
+    private static void disconnectPostWithPostTag(Post post) {
+        post.getPostTags().forEach(postTag -> postTag.getTag().getPostTags().remove(postTag));
+        post.getPostTags().clear(); // Post와의 관계 끊기
     }
 
     @Transactional
@@ -153,34 +172,31 @@ public class WriteServiceProd implements WriteService{
         User sessionUser = userService.findUserById(sessionUserId);
         Series series = seriesService.getSeries(request.getSeriesName(), sessionUser);
 
-        Post postTemp = Post.ofSavePostTemp(request, sessionUser, series);
+        Post postTemp = postMapper.toPostForAutoSave(request, sessionUser, series);
         postRepository.save(postTemp);
 
-        setTagsForPost(tagProvider(request.getTags()), postTemp);
+        List<Tag> tagList = tagMapper.toTagList(request.getTags());
+        setTags(tagList, postTemp);
 
-        AutoSavePostResponse autoSavePostResponse = new AutoSavePostResponse();
-        autoSavePostResponse.setPostUrl(postTemp.getPostUrl());
-        autoSavePostResponse.setUsername(sessionUser.getUsername());
-        return autoSavePostResponse;
+        return postMapper.toAutoSaveResponse(postTemp);
     }
+
+
 
     @Transactional
     public AutoEditPostResponse autoEditPost(AutoEditPostRequest request, Long sessionUserId) {
 
-        Optional<Post> byPostUrl = postRepository.findByPostUrl(decodingContent(request.getPostUrl()));
+        Post post = postService.findByPostUrl(decodingContent(request.getPostUrl()));
 
-        byPostUrl.ifPresent(post -> {
-            if (post.getWritable()) {
-                return;
-            }
-            User sessionUser = userService.findUserById(sessionUserId);
-            Series series = seriesService.getSeries(request.getSeriesName(), sessionUser);
-            post.updateEditPostTemp(request, series);
-        });
+        if (post.getWritable()) {
+            throw new RuntimeException("공개된 post는 AutoEdit될 수 없습니다.");
+        }
 
-        AutoEditPostResponse autoEditPostResponse = new AutoEditPostResponse();
-        autoEditPostResponse.setPostUrl(request.getPostUrl());
-        return autoEditPostResponse;
+        User sessionUser = userService.findUserById(sessionUserId);
+        Series series = seriesService.getSeries(request.getSeriesName(), sessionUser);
+        post.updateEditPostTemp(request, series);
+
+        return postMapper.toAutoEditResponse(post);
     }
 
     private void updateTagAndRepository(WriteForm form, Post post) {
@@ -196,7 +212,7 @@ public class WriteServiceProd implements WriteService{
     private void updateRepositoryWriteEdit(Post post, List<String> imageFilenames) {
         postFileRepository.deleteByPostId(post.getId());
         postFileRepository.saveAll(imageFilenames.stream()
-                .map(urlImage -> PostFile.of(post, urlImage))
+                .map(urlImage -> postFileMapper.toPostFile(post, urlImage))
                 .toList());
     }
 
@@ -219,30 +235,29 @@ public class WriteServiceProd implements WriteService{
         return storedFileName;
     }
 
-    private void editThumnail(WriteForm form, Post post) throws IOException {
-        if (form.getThumbnail() != null && !form.getThumbnail().isEmpty()) {
-            String thumbnailDeleted = post.getThumbnail(); //지울 썸네일 사진파일 이름
-            String storedFileName = fileStore.storeFile(form.getThumbnail()); //새로운 파일 업로드
+    private void editThumbnail(WriteForm form, Post post) throws IOException {
+        String newThumbnail = getStoredThumbnail(form); // ✅ 새로운 썸네일 저장 또는 기본값 반환
+        String oldThumbnail = post.getThumbnail(); // ✅ 기존 썸네일 저장
 
-            post.updateThumbnail(storedFileName);
-            if (thumbnailDeleted != null) {
-                log.info("delete thumbnail : {}", thumbnailDeleted);
-                fileStore.deleteFile(thumbnailDeleted); // 기존 파일 삭제
-            }
-        } else {
-            post.updateThumbnail(DEFAULT_POST_PIC);
-        }
+        post.updateThumbnail(newThumbnail);
+        deleteOldThumbnail(oldThumbnail);
     }
 
     /**
-     * 수정시 태그 엔티티들을 태그 문자열(ex. "java,spring,jpa")로 변환
-     * @param postEdit
-     * @return
+     * 새 썸네일을 저장하고, 없으면 기본값을 반환하는 메서드
      */
-    private static String getTagsStringforForm(Post postEdit) {
-        return postEdit.getPostTags().stream()
-                .map(postTag -> postTag.getTag().getName())
-                .collect(Collectors.joining(","));
+    private String getStoredThumbnail(WriteForm form) throws IOException {
+        return (form.getThumbnail() != null && !form.getThumbnail().isEmpty())
+                ? fileStore.storeFile(form.getThumbnail())
+                : DEFAULT_POST_PIC;
+    }
+
+    /**
+     * 기존 썸네일이 존재하면 삭제하는 메서드
+     */
+    private void deleteOldThumbnail(String oldThumbnail) {
+        Optional.ofNullable(oldThumbnail)
+                .ifPresent(fileStore::deleteFile);
     }
 
     /**
@@ -250,37 +265,14 @@ public class WriteServiceProd implements WriteService{
      * @param tags
      * @param postSaved
      */
-    private void setTagsForPost(List<Tag> tags, Post postSaved) {
+    private void setTags(List<Tag> tags, Post postSaved) {
         List<Tag> tagsSaved = tagRepository.saveAll(tags);
-        List<PostTag> postTagsForBulkSave = tagsSaved.stream()
-                .map(tag -> PostTag.of(postSaved, tag))
+        List<PostTag> postTags = tagsSaved.stream()
+                .map(tag -> tagMapper.toPostTag(postSaved, tag))
                 .toList();
-        postTagRepository.saveAll(postTagsForBulkSave);
+        postTagRepository.saveAll(postTags);
     }
 
-    /**
-     * content 인코딩
-     * @param form
-     */
-    private static void encodedContent(WriteForm form) {
-        String encodedContent = URLDecoder.decode(form.getContent(), StandardCharsets.UTF_8); // content 설정
-        form.setContent(encodedContent);
-    }
-
-    /**
-     * 태그 문자열를 태그 엔티티들로 변환 (getTagsStringforForm와 counterpart)
-     * @param tags
-     * @return
-     */
-    private List<Tag> tagProvider(List<String> tags) {
-        if (tags == null || tags.isEmpty()) {
-            return List.of();
-        }
-
-        return tags.stream()
-                .map(Tag::of)
-                .toList();
-    }
 
     private static List<String> extractImageFilenames(String content) {
         // 정규식 패턴 (앞에 ![image alt attribute] 포함, 경로 수정)
@@ -353,4 +345,5 @@ public class WriteServiceProd implements WriteService{
     private static String decodingContent(String content) {
         return URLDecoder.decode(content, StandardCharsets.UTF_8);
     }
+
 }
