@@ -20,12 +20,4 @@ public class PostFile extends BaseEntity {
     private Post post;
 
     private String url;
-
-    public static PostFile of(Post post, String url) {
-        return PostFile.builder()
-                .post(post)
-                .url(url)
-                .build();
-    }
-
 }

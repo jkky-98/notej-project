@@ -126,38 +126,12 @@ public class Post extends BaseEntity {
         this.thumbnail = storedFileName;
     }
 
-    // 정적 팩토리 메서드
-    public static Post of(WriteForm form, User user, Series series, String thumbnail, String url) {
-        return Post.builder()
-                .title(form.getTitle())
-                .content(form.getContent())
-                .writable(form.isOpen())
-                .postSummary(form.getPostSummary())
-                .postUrl(url)
-                .series(series)
-                .thumbnail(thumbnail)
-                .user(user)
-                .build();
-    }
-
-    public static Post ofSavePostTemp(AutoSavePostRequest request, User sessionUser, Series series) {
-        return Post.builder()
-                .title(request.getTitle())
-                .content(decodingContent(request.getContent()))
-                .postUrl(request.getTitle() + UUID.randomUUID())
-                .writable(false)
-                .user(sessionUser)
-                .series(series)
-                .build();
-    }
-
     public void updateEditPostTemp(AutoEditPostRequest request, Series series) {
         title = request.getTitle();
         content = decodingContent(request.getContent());
         postUrl = request.getTitle() + UUID.randomUUID();
-        series = series;
+        this.series = series;
     }
-
 
     private static String decodingContent(String content) {
         return URLDecoder.decode(content, StandardCharsets.UTF_8);

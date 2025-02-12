@@ -31,11 +31,4 @@ public class PostTag extends BaseTimeEntity {
     public void updatePost(Post post) {
         this.post = post;
     }
-
-    public static PostTag of(Post post, Tag tag) {
-        return PostTag.builder()
-                .post(post)
-                .tag(tag)
-                .build();
-    }
 }
