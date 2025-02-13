@@ -9,12 +9,39 @@
                 <h5 class="mb-3">태그 목록</h5>
                 <div class="list-group">
                     <!-- 전체보기 -->
-                    <a th:href="@{/tags/all}"
-                       class="list-group-item list-group-item-action active"
-                       aria-current="true">
+                    <a th:href="${currentUri}"
+                       class="list-group-item list-group-item-action text-decoration-none"
+                       aria-current="true" style="background: var(--color-primary-light); color:white;">
                         전체보기
                     </a>
                     <!-- 각 태그 반복 -->
+                    <style>
+                        /* 링크 스타일 */
+                        .list-group-item {
+                            transition: background-color 0.3s ease, transform 0.2s ease;
+                            background: var(--color-primary-light);
+                            color: white;
+                        }
+
+                        /* 호버 효과 (마우스 올렸을 때) */
+                        .list-group-item:hover {
+                            background-color: rgba(255, 235, 59, 0.2); /* 옅은 노란색 */
+                            transform: translateY(-2px); /* 살짝 위로 올라가는 효과 */
+                        }
+
+                        /* 클릭(활성화) 효과 */
+                        .list-group-item:active {
+                            background-color: rgba(255, 235, 59, 0.4);
+                            transform: scale(0.98); /* 살짝 눌리는 효과 */
+                        }
+
+                        /* 선택된 태그 스타일 (선택된 상태 유지) */
+                        .list-group-item.active {
+                            background-color: #FFEB3B !important;
+                            color: #333 !important;
+                            font-weight: bold;
+                        }
+                    </style>
                     <a th:each="tag : ${postsForm.tags}"
                        th:href="@{${currentUri}(tagName=${tag.tagName})}"
                        class="list-group-item list-group-item-action">
@@ -41,12 +68,12 @@
                         <div class="row justify-content-center">
                             <div th:each="post : ${postsForm.posts}">
                                 <!-- 카드 전체를 클릭 가능하게 -->
-                                <a th:href="@{'/@' + ${post.username} + '/post/' + ${post.postUrl}}" class="card posts-style my-5 text-decoration-none">
+                                <a th:href="@{'/@' + ${post.username} + '/post/' + ${post.postUrl}}" class="card posts-style my-5 text-decoration-none" >
                                     <!-- 포스트 썸네일 -->
                                     <img th:src="@{/image-print/{path}(path=${post.thumbnail})}"
                                     class="card-img-top thumbnail-posts-img" alt="Post Thumbnail" />
                                     <!-- 포스트 제목 -->
-                                    <div class="card-body my-2 mx-2">
+                                    <div class="card-body">
                                         <h3 class="card-title" th:text="${post.title}">
                                             Post Title
                                         </h3>

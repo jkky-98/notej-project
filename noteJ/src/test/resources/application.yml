@@ -1,6 +1,0 @@
-spring:
-  profiles:
-    active: test
-
-file:
-  dir: "/Users/jkky/Documents/private/notej-project/noteJ/src/main/resources/static/"

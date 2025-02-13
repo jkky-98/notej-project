@@ -13,18 +13,19 @@
         /* 기본 스타일 */
         .nav-link {
             transition: background-color 0.3s ease, color 0.3s ease; /* 부드러운 전환 효과 */
+            color: white;
         }
 
         /* hover 시 배경색과 글자색 변경 */
         .nav-link:hover {
-            background-color: #007bff; /* 파란색 배경 */
-            color: white; /* 글자색 흰색 */
+            background-color: var(--color-primary); /* 파란색 배경 */
+            color: var(--color-secondary); /* 글자색 흰색 */
         }
 
         /* 활성화된 탭 스타일 (선택 사항) */
         .nav-link.active {
-            background-color: #0056b3; /* 더 어두운 파란색 */
-            color: white;
+            background-color: var(--color-primary);; /* 더 어두운 파란색 */
+            color: var(--color-secondary);;
         }
     </style>
 </div>

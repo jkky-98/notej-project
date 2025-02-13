@@ -31,13 +31,13 @@ public class NoteJApplication {
 											 CacheManager cacheManager) {
 		return args -> {
 			log.info("========== ENVIRONMENT SETTINGS ==========");
-			log.info("Active Profile: {}", activeProfile);
-			log.info("Server Env: {}", serverEnv);
-			log.info("AWS Access Key: {}", maskSensitiveInfo(awsAccessKey));
-			log.info("AWS Secret Key: {}", maskSensitiveInfo(awsSecretKey));
-			log.info("AWS Region: {}", awsRegion);
-			log.info("Datasource URL: {}", datasourceUrl);
-			log.info("Cache Manager: {}", cacheManager.getClass().getName());  // 전체 클래스명 출력
+			log.info("✅ Active Profile: {}", activeProfile);
+			log.info("✅ Server Env: {}", serverEnv);
+			log.info("✅ AWS Access Key: {}", maskSensitiveInfo(awsAccessKey));
+			log.info("✅ AWS Secret Key: {}", maskSensitiveInfo(awsSecretKey));
+			log.info("✅ AWS Region: {}", awsRegion);
+			log.info("✅ Datasource URL: {}", datasourceUrl);
+			log.info("✅ Cache Manager: {}", cacheManager.getClass().getName());  // 전체 클래스명 출력
 			log.info("========== EHCACHE SETTINGS ==========");
 
 			if (cacheManager != null) {
@@ -62,7 +62,7 @@ public class NoteJApplication {
 					log.info("  - Cache: {}", cacheName);
 				});
 			} else {
-				log.warn("Ehcache is NOT configured properly!");
+				log.warn("⚠️ Ehcache is NOT configured properly!");
 			}
 			log.info("==========================================");
 		};

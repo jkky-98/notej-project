@@ -2,6 +2,9 @@ package com.github.jkky_98.noteJ.service;
 
 import com.github.jkky_98.noteJ.domain.Post;
 import com.github.jkky_98.noteJ.domain.Series;
+import com.github.jkky_98.noteJ.domain.mapper.PageMapper;
+import com.github.jkky_98.noteJ.domain.mapper.PostMapper;
+import com.github.jkky_98.noteJ.domain.mapper.SeriesMapper;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.PostRepository;
 import com.github.jkky_98.noteJ.web.controller.dto.*;
@@ -25,6 +28,9 @@ public class PostsService {
     private final ProfileService profileService;
     private final TagService tagService;
     private final FollowService followService;
+    private final PostMapper postMapper;
+    private final PageMapper pageMapper;
+    private final SeriesMapper seriesMapper;
 
     @Transactional(readOnly = true)
     public List<PostDto> getPosts(Long userId, PostsConditionForm cond) {
@@ -32,75 +38,65 @@ public class PostsService {
 
         List<Post> posts = postRepository.searchPosts(cond, userFind.getId());
 
-        return posts.stream()
-                .map(post -> PostDto.of(post, userFind))
-                .toList();
+        return postMapper.toPostDtoList(posts);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<PostDto> getPostsWithPageable(String username, PostsConditionForm cond, Pageable pageable) {
         User userFind = userService.findUserByUsername(username);
         Page<Post> posts = postRepository.searchPostsWithPage(cond, userFind.getId(), pageable);
 
-        return posts.stream()
-                .map(post -> PostDto.of(post, userFind))
-                .toList();
+        return postMapper.toPostDtoListFromPage(posts);
     }
 
 
     @Transactional(readOnly = true)
-    public PostsForm getPosts(GetPostsToServiceDto dto) {
+    public PostsForm getPostsInitialPage(GetPostsToServiceDto dto) {
 
         User userPost = userService.findUserByUsername(dto.getUsernamePost());
 
         ProfileForm profile = profileService.getProfile(userPost.getId());
         List<TagCountDto> allTag = tagService.getAllTag(userPost.getId());
-        boolean following = followService.isFollowing(dto.getUser(), userPost);
+        boolean canFollowing = followService.isFollowing(dto.getUser(), userPost);
         List<PostDto> posts = getPosts(userPost.getId(), dto.getCondition());
 
-        return PostsForm.ofPosts(
+        return pageMapper.toPostsForm(
                 profile,
-                posts,
                 allTag,
-                following,
-                dto.getUsernamePost()
+                canFollowing,
+                posts,
+                userPost.getUsername()
         );
     }
 
     @Transactional(readOnly = true)
     public PostsForm getSeriesTabs(String username, Optional<User> sessionUser) {
-        User userFind = userService.findUserByUsername(username);
+        User userPost = userService.findUserByUsername(username);
 
-        // User의 Series 목록 가져오기
-        List<Series> seriesList = userFind.getSeriesList();
+        ProfileForm profile = profileService.getProfile(userPost.getId());
+        List<TagCountDto> allTag = tagService.getAllTag(userPost.getId());
+        List<Series> seriesList = userPost.getSeriesList();
+        List<SeriesViewDto> seriesViewDtoList = seriesMapper.toSeriesViewDtoList(seriesList);
+        boolean canFollowing = followService.isFollowing(
+                sessionUser,
+                userPost
+        );
 
-        return PostsForm.ofSeries(
-                profileService.getProfile(userFind.getId()),
-                seriesList.stream()
-                        .map(series -> SeriesViewDto.of(
-                                series.getSeriesName(),
-                                series.getPosts().size(),
-                                series.getPosts().isEmpty()
-                                        ? null
-                                        : series.getPosts().get(0).getLastModifiedDt()
-                        ))
-                        .toList(),
-                followService.isFollowing(
-                        sessionUser,
-                        userFind
-                ),
+        return pageMapper.toPostsFormSeriesPage(
+                profile,
+                allTag,
+                canFollowing,
+                seriesViewDtoList,
                 username
         );
     }
 
     @Transactional(readOnly = true)
-    public List<PostNotOpenDto> getPostsNotOpen(User sessionUser) {
-        User userFind = userService.findUserById(sessionUser.getId());
+    public List<PostNotOpenDto> getPostsNotOpen(Long sessionUserId) {
+        User userFind = userService.findUserById(sessionUserId);
 
         List<Post> postAllNotOpen = postRepository.findAllByUserIdAndWritableFalse(userFind.getId());
 
-        return postAllNotOpen.stream()
-                .map(PostNotOpenDto::of)
-                .toList();
+        return postMapper.toPostNotOpenDtoList(postAllNotOpen);
     }
 }

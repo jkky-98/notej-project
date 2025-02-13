@@ -38,7 +38,7 @@ public class PostsController {
                 Optional.ofNullable(sessionUser)
         );
 
-        PostsForm postsForm = postsService.getPosts(getPostsToServiceDto);
+        PostsForm postsForm = postsService.getPostsInitialPage(getPostsToServiceDto);
 
         model.addAttribute("postsForm", postsForm);
 
@@ -50,7 +50,7 @@ public class PostsController {
             @SessionAttribute (name = SessionConst.LOGIN_USER, required = false) User sessionUser,
             Model model
             ) {
-        List<PostNotOpenDto> postsNotOpen = postsService.getPostsNotOpen(sessionUser);
+        List<PostNotOpenDto> postsNotOpen = postsService.getPostsNotOpen(sessionUser.getId());
 
         model.addAttribute("postsNotOpen", postsNotOpen);
 

@@ -31,6 +31,12 @@ public class LogTraceAspect {
 
     @Around("applicationPackagePointcut()")
     public Object execute(ProceedingJoinPoint joinPoint) throws Throwable {
+
+        // 애플리케이션이 아직 준비되지 않았다면 AOP 적용 안 함
+        if (!ApplicationStartupListener.isReady()) {
+            return joinPoint.proceed();
+        }
+
         TraceStatus status = null;
         try {
             String message = joinPoint.getSignature().toShortString();
