@@ -1,23 +1,21 @@
 package com.github.jkky_98.noteJ.domain.mapper;
 
-import com.github.jkky_98.noteJ.domain.Post;
-import com.github.jkky_98.noteJ.domain.Series;
+import com.github.jkky_98.noteJ.domain.*;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.service.util.DefaultConst;
-import com.github.jkky_98.noteJ.web.controller.dto.AutoEditPostResponse;
-import com.github.jkky_98.noteJ.web.controller.dto.AutoSavePostRequest;
-import com.github.jkky_98.noteJ.web.controller.dto.AutoSavePostResponse;
+import com.github.jkky_98.noteJ.web.controller.dto.*;
 import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.springframework.data.domain.Page;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {CommentMapper.class})
 public interface PostMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -77,5 +75,48 @@ public interface PostMapper {
     @Mapping(source = "thumbnail", target = "thumbnail")
     @Mapping(source = "user", target = "user")
     Post toPostSaveWrite(WriteForm form, User user, Series series, String thumbnail);
+
+    @Mapping(source = "post.title", target = "title")
+    @Mapping(source = "post.postSummary", target = "postSummary")
+    @Mapping(source = "post.postUrl", target = "postUrl")
+    @Mapping(source = "post.thumbnail", target = "thumbnail")
+    @Mapping(source = "post.writable", target = "writable")
+    @Mapping(source = "post.createDt", target = "createByDt")
+    @Mapping(source = "post.user.username", target = "username")
+    @Mapping(source = "post.postTags", target = "tags", qualifiedByName = "getTagNamesFromPostTags")
+    @Mapping(expression = "java(post.getComments().size())", target = "commentCount")
+    @Mapping(expression = "java(post.getLikes().size())", target = "likeCount")
+    PostDto toPostDto(Post post);
+
+    List<PostDto> toPostDtoList(List<Post> posts);
+
+    @Named("mapPageToList")
+    default List<PostDto> toPostDtoListFromPage(Page<Post> posts) {
+        return toPostDtoList(posts.getContent()); // 기존 List 변환 메서드 사용
+    }
+
+    @Named("getTagNamesFromPostTags")
+    default List<String> getTagNamesFromPostTags(List<PostTag> postTags) {
+        return postTags.stream()
+                .map(postTag -> postTag.getTag().getName())
+                .toList();
+    }
+
+    @Mapping(source = "post.title", target = "title")
+    @Mapping(source = "post.postUrl", target = "postUrl")
+    @Mapping(source = "post.createDt", target = "createDt")
+    @Mapping(source = "post.postSummary", target = "postSummary")
+    PostNotOpenDto toPostNotOpenDto(Post post);
+
+    List<PostNotOpenDto> toPostNotOpenDtoList(List<Post> posts);
+
+    @Mapping(source = "post.title", target = "title")
+    @Mapping(source = "post.postUrl", target = "postUrl")
+    @Mapping(source = "post.user.username", target = "username")
+    @Mapping(source = "post.createDt", target = "createByDt")
+    @Mapping(source = "post.postTags", target = "tags", qualifiedByName = "getTagNamesFromPostTags")
+    @Mapping(source = "post.comments", target = "comments")
+    @Mapping(expression = "java(post.getLikes().size())", target = "likeCount")
+    PostViewDto toPostViewDto(Post post);
 }
 

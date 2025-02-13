@@ -12,12 +12,4 @@ public class SeriesViewDto {
     private String seriesName;
     private int count;
     private LocalDateTime lastUpdateDt;
-
-    public static SeriesViewDto of(String seriesName, int count, LocalDateTime lastUpdateDt) {
-        return SeriesViewDto.builder()
-                .seriesName(seriesName)
-                .count(count)
-                .lastUpdateDt(lastUpdateDt)
-                .build();
-    }
 }

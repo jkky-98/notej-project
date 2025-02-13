@@ -1,6 +1,7 @@
 package com.github.jkky_98.noteJ.service;
 
 import com.github.jkky_98.noteJ.domain.*;
+import com.github.jkky_98.noteJ.domain.mapper.PostMapper;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.*;
 import com.github.jkky_98.noteJ.service.dto.DeletePostToServiceDto;
@@ -22,7 +23,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final UserService userService;
-    private final ViewLogService viewLogService;
+    private final PostMapper postMapper;
 
     @Transactional(readOnly = true)
     public Post findByPostUrl(String postUrl) {
@@ -44,29 +45,7 @@ public class PostService {
 
         Post post = postRepository.findByPostUrl(postUrl).orElseThrow(() -> new EntityNotFoundException("Post not found"));
 
-        PostViewDto postViewDto = PostViewDto.ofFromPost(post);
-
-        return postViewDto;
-    }
-
-    @Transactional
-    public void removePost(Long postId) {
-        Post post = findById(postId);
-
-        Long userIdPost = post.getUser().getId();
-
-        // Post에 연결된 PostTag의 Tag delete 처리
-        List<Tag> tagsRemoved = post.getPostTags().stream()
-                .map(
-                        postTag -> postTag.getTag()
-                ).toList();
-        tagRepository.deleteAll(tagsRemoved);
-
-        // Post 삭제
-        postRepository.delete(post);
-
-        // tag 캐시 삭제
-        evictTagCache(userIdPost);
+        return postMapper.toPostViewDto(post);
     }
 
     @CacheEvict(value = "tagCache", key = "#userId")
@@ -74,28 +53,32 @@ public class PostService {
         // 캐시만 삭제하는 목적이므로 내부 로직은 비워둠
     }
 
+
     @Transactional
-    public void removeTagInPost(Long postId, Long tagId) {
-        Post post = findById(postId);
+    public void deletePost(DeletePostToServiceDto dto) {
+        Long postIdDeleted = validDeletePostAndGetRemovedPostId(
+                dto.getPostUrl(), dto.getSessionUserId()
+        );
 
-        post.getPostTags().stream()
-                .filter(postTag -> postTag.getTag().getId().equals(tagId))
-                .findFirst()
-                .ifPresent(postTag -> {
-                    // 양방향에서 연관관계 끊기
-                    Tag targetTag = postTag.getTag();
-                    targetTag.removePostTag(postTag);
-                    post.removePostTag(postTag);
+        Post post = findById(postIdDeleted);
+        Long userIdPost = post.getUser().getId();
 
-                    if (targetTag.getPostTags().isEmpty()) {
-                        tagRepository.delete(targetTag);
-                    }
-                });
+        // Post에 연결된 PostTag의 Tag delete 처리
+        List<Tag> tagsRemoved = post.getPostTags()
+                .stream()
+                .map(
+                        PostTag::getTag
+                ).toList();
+
+        tagRepository.deleteAll(tagsRemoved);
+        postRepository.delete(post);
+
+        // tag 캐시 삭제
+        evictTagCache(userIdPost);
+
     }
 
-
-    @Transactional
-    public Long deleteValidPostAndGetRemovedPostId(String postUrl, Long sessionUserId) {
+    private Long validDeletePostAndGetRemovedPostId(String postUrl, Long sessionUserId) {
         User userFind = userService.findUserById(sessionUserId);
         Post postFind = findByPostUrl(postUrl);
 
@@ -105,14 +88,5 @@ public class PostService {
         }
 
         return postFind.getId();
-    }
-
-    @Transactional
-    public void deletePost(DeletePostToServiceDto dto) {
-        Long postIdDeleted = deleteValidPostAndGetRemovedPostId(
-                dto.getPostUrl(), dto.getSessionUserId()
-        );
-
-        removePost(postIdDeleted);
     }
 }

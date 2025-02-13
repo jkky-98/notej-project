@@ -16,23 +16,4 @@ public class PostsForm {
     private boolean followStatus;
     private String username;
     private List<SeriesViewDto> seriesList;
-
-    public static PostsForm ofPosts(ProfileForm profileForm, List<PostDto> posts, List<TagCountDto> tagAlls, boolean followStatus, String username) {
-        return PostsForm.builder()
-                .profileForm(profileForm)
-                .posts(posts)
-                .tags(tagAlls)
-                .followStatus(followStatus)
-                .username(username)
-                .build();
-    }
-
-    public static PostsForm ofSeries(ProfileForm profileForm, List<SeriesViewDto> seriesList, boolean followStatus, String username) {
-        return PostsForm.builder()
-                .profileForm(profileForm)
-                .seriesList(seriesList)
-                .followStatus(followStatus)
-                .username(username)
-                .build();
-    }
 }
