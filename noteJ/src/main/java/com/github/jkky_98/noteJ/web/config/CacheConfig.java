@@ -40,6 +40,12 @@ public class CacheConfig {
                     .setStoreByValue(false)
                     .setExpiryPolicyFactory(ModifiedExpiryPolicy.factoryOf(new Duration(TimeUnit.HOURS, 6))));
 
+            // 처리율 제한 캐시 추가 (1분간 유지)
+            cacheManager.createCache("rateLimitCache", new MutableConfiguration<String, Integer>()
+                    .setTypes(String.class, Integer.class)
+                    .setStoreByValue(false)
+                    .setExpiryPolicyFactory(ModifiedExpiryPolicy.factoryOf(new Duration(TimeUnit.MINUTES, 1))));
+
             // 모든 캐시에 이벤트 리스너 등록
             registerCacheEventListeners(cacheManager);
         };
