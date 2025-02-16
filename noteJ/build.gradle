@@ -34,6 +34,8 @@ dependencies {
 	implementation 'org.ehcache:ehcache:3.10.8'
 	implementation 'com.google.guava:guava:32.1.2-jre'
 	implementation 'javax.cache:cache-api:1.1.1'
+	implementation 'net.coobird:thumbnailator:0.4.20'
+
 
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
 	implementation 'org.projectlombok:lombok'

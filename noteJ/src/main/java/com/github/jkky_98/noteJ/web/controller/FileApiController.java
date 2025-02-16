@@ -1,6 +1,5 @@
 package com.github.jkky_98.noteJ.web.controller;
 
-import com.github.jkky_98.noteJ.aop.RateLimit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -31,7 +30,6 @@ public class FileApiController {
      * @param image 파일 객체;
      * @return 업로드된 파일 명
      */
-    @RateLimit(maxRequests = 100, timeWindow = 60)
     @PostMapping("/editor/image-upload")
     public String uploadEditorImage(@RequestParam final MultipartFile image) {
         if (image.isEmpty()) {
