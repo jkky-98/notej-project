@@ -61,7 +61,6 @@ public class AuthController {
             // 로그인 성공 시 세션에 로그인 정보 저장
             session.setAttribute(SessionConst.LOGIN_USER, loginUser);
 
-            // Referer가 존재하면 해당 URL로 리다이렉트, 없으면 기본 페이지로 리다이렉트
             return "redirect:" + redirectURL;
 
         } catch (AuthenticationException e) {

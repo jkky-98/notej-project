@@ -27,6 +27,10 @@ public class Like extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
+    @JoinColumn(name = "user_get_like_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User userGetLike;
+
     public void updatePost(Post post) {
         this.post = post;
     }
@@ -35,6 +39,7 @@ public class Like extends BaseTimeEntity {
         return Like.builder()
                 .post(post)
                 .user(user)
+                .userGetLike(post.getUser())
                 .build();
     }
 }

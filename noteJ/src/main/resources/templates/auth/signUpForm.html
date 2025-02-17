@@ -3,57 +3,57 @@
 <div th:insert="~{fragments/header :: header}"></div>
 <body>
 <div th:replace="~{fragments/header :: navigation}"></div>
+
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card">
-                <div class="card-header text-center">
-                    <h4>Sign Up</h4>
-                </div>
-                <div class="card-body">
-                    <form th:action="@{/signup}" th:method="post" th:object="${signUpForm}">
-                        <!-- Global Error -->
-                        <div th:if="${#fields.hasGlobalErrors()}">
-                            <p class="field-error" th:each="err : ${#fields.globalErrors()}"
-                               th:text="${err}">전체 오류 메시지</p>
-                        </div>
-                        <!-- Username -->
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" th:field="*{username}" placeholder="Enter your username"
-                                    th:errorclass="field-error">
-                            <div class="text-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
-                        </div>
-                        <!-- Email -->
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" th:field="*{email}" placeholder="Enter your email">
-                            <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
-                        </div>
-                        <!-- Password -->
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" th:field="*{password}" placeholder="Enter your password">
-                            <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
-                        </div>
-                        <!-- BlogTitle -->
-                        <div class="mb-3">
-                            <label for="blogTitle" class="form-label">Blog Title</label>
-                            <input type="text" class="form-control" id="blogTitle" th:field="*{blogTitle}" placeholder="Enter your blog title">
-                            <div class="text-danger" th:if="${#fields.hasErrors('blogTitle')}" th:errors="*{blogTitle}"></div>
-                        </div>
-                        <!-- Submit Button -->
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">Sign Up</button>
-                        </div>
-                    </form>
+            <div class="wrap">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h4>Sign Up</h4>
+                    </div>
+                    <div class="card-body login-wrap">
+                        <form th:action="@{/signup}" th:method="post" th:object="${signUpForm}">
+                            <!-- Global Error -->
+                            <div th:if="${#fields.hasGlobalErrors()}">
+                                <p class="field-error" th:each="err : ${#fields.globalErrors()}"
+                                   th:text="${err}">전체 오류 메시지</p>
+                            </div>
+                            <!-- Username -->
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" id="username" th:field="*{username}"
+                                        th:errorclass="field-error" required>
+                                <label class="form-control-placeholder" for="username">Username</label>
+                                <div class="text-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                            </div>
+                            <!-- Email -->
+                            <div class="form-group mb-3">
+                                <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                                <label class="form-control-placeholder" for="email">Email</label>
+                                <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                            </div>
+                            <!-- Password -->
+                            <div class="form-group mb-3">
+                                <input type="password" class="form-control" id="password" th:field="*{password}" required>
+                                <label class="form-control-placeholder" for="password">Password</label>
+                                <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                            </div>
+                            <!-- BlogTitle -->
+                            <div class="form-group mb-3">
+                                <input type="text" class="form-control" id="blogTitle" th:field="*{blogTitle}" required>
+                                <label class="form-control-placeholder" for="blogTitle">BlogTitle</label>
+                                <div class="text-danger" th:if="${#fields.hasErrors('blogTitle')}" th:errors="*{blogTitle}"></div>
+                            </div>
+                            <!-- Submit Button -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Sign Up</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- Bootstrap JS -->
-<script src="/js/bootstrap.bundle.min.js"></script>
-<script src="/js/custom.js"></script> <!-- 사용자 정의 스크립트 -->
 </body>
 </html>

@@ -1,74 +1,100 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<!-- Include the header fragment -->
 <div th:insert="~{fragments/header :: header}"></div>
 <body>
-<!-- Include the navigation fragment -->
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
+
+<!-- FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <div th:replace="~{fragments/header :: navigation}"></div>
-<div class="container">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <div class="form-bg mx-auto text-center">
-        <div class="row g-0">
-            <div class="col-lg-7 col-md-12 mb-4 p-5">
-                <h2 class="login-title">Sign In</h2>
-                <p class="desc-text">
-                    If you have an account, you can log in using your login information.
-                </p>
-                <form th:action="@{/login}" method="post" th:object="${loginForm}">
-
-                    <input type="hidden" th:name="redirectURL" th:value="${redirectURL}"/>
-
-                    <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
-                        <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
-                    </div>
-
-                    <div class="mt-4 mb-4">
-                        <input type="text" class="form-control" th:field="*{username}" placeholder="Your email" required>
-                    </div>
-
-                    <div class="mb-4">
-                        <input type="password" class="form-control" th:field="*{password}" placeholder="Your password" required>
-                        <div class="text-end mt-1 mb-3">
-                            <a href="#" class="forgot me-2">Forgot your password?</a>
+<section class="ftco-section">
+    <div class="container">
+        <script
+                src="https://code.jquery.com/jquery-3.7.1.min.js"
+                integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+                crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js" integrity="sha512-2rNj2KJ+D8s1ceNasTIex6z4HWyOnEYLVC3FigGOmyQCZc2eBXKgOxQmo3oKLHyfcj53uz4QMsRCWNbLd32Q1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="js/main.js"></script>
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-5">
+                <div class="wrap">
+                    <img class="img" th:src="@{/image-print/default/bg-1.jpg}" alt="Background Image">
+                    <div class="login-wrap p-4 p-md-5">
+                        <div class="d-flex">
+                            <div class="w-100">
+                                <h3 class="mb-4">Sign In</h3>
+                            </div>
+                            <div class="w-100 text-end">
+                                <p class="social-media d-flex justify-content-end">
+                                    <a href="#" class="social-icon d-flex align-items-center justify-content-center"><span class="fa fa-facebook"></span></a>
+                                    <a href="#" class="social-icon d-flex align-items-center justify-content-center"><span class="fa fa-twitter"></span></a>
+                                </p>
+                            </div>
                         </div>
-                    </div>
 
-                    <button type="submit" class="button login-btn mt-4">Sign In</button>
-                </form>
+                        <form th:action="@{/login}" method="post" th:object="${loginForm}">
+                            <input type="hidden" th:name="redirectURL" th:value="${redirectURL}"/>
 
-                <div class="separator mt-5">OR</div>
-                <div class="row mt-4">
-                    <div class="col-4">
-                        <a href="" class="alternative-login">
-                            <i class="fa-brands fa-google"></i>
-                        </a>
-                    </div>
-                    <div class="col-4">
-                        <a href="" class="alternative-login">
-                            <i class="fa-brands fa-facebook-f"></i>
-                        </a>
-                    </div>
-                    <div class="col-4">
-                        <a href="" class="alternative-login">
-                            <i class="fa-brands fa-apple"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
+                            <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+                                <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+                            </div>
 
-            <div class="col-lg-5 col-md-12">
-                <div class="register-area p-5">
-                    <h2 class="register-title">Register</h2>
-                    <p>
-                        Don't have an account? You can create an account by clicking on the sign up button.
-                    </p>
-                    <a href="/signup" class="button register-btn mt-4">Sign Up</a>
+                            <div class="form-group mt-3">
+                                <input id="username" type="text" class="form-control" th:field="*{username}" required>
+                                <label class="form-control-placeholder" for="username">Username</label>
+                            </div>
+
+                            <div class="form-group">
+                                <input id="password" type="password" class="form-control" th:field="*{password}"  required>
+                                <label class="form-control-placeholder" for="password">Password</label>
+                                <span toggle="#password" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <button type="submit" class="form-control btn btn-primary rounded submit px-3">Sign In</button>
+                            </div>
+
+                            <div class="form-group d-md-flex">
+                                <div class="w-50 text-left">
+                                    <label class="checkbox-wrap checkbox-primary mb-0">Remember Me
+                                        <input type="checkbox" checked>
+                                        <span class="checkmark"></span>
+                                    </label>
+                                </div>
+                                <div class="w-50 text-md-right">
+                                    <a href="#">Forgot Password?</a>
+                                </div>
+                            </div>
+                        </form>
+
+                        <p class="text-center">Not a member? <a th:href="@{/signup}">Sign Up</a></p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<!-- Bootstrap JS -->
+<!-- JS Dependencies -->
+<style>
+    .wrap .img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+</style>
+<script>
+    $(document).on('click', '.toggle-password', function () {
+        let input = $($(this).attr('toggle'));
+        if (input.attr('type') === 'password') {
+            input.attr('type', 'text');
+            $(this).removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            input.attr('type', 'password');
+            $(this).removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
+</script>
 </body>
 </html>
