@@ -7,6 +7,8 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" th:href="'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css'">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
     <style>
         .profile-pic {
             width: 40px;
@@ -14,41 +16,62 @@
             border-radius: 50%;
             object-fit: cover;
             cursor: pointer;
+            border: 1px solid #ccc;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+        .profile-pic:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        /* dropdown 메뉴 애니메이션 */
         .dropdown-menu {
             right: 0;
             left: auto;
+            transform: translateY(-20px);
+            opacity: 0;
+            /* display는 dropdown-menu.show 상태에서 block이 적용되므로 기본값 유지 */
         }
+
+        .dropdown-menu.show {
+            animation: slideDown 0.5s forwards;
+        }
+
+        @keyframes slideDown {
+            0% {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
         .card.posts-style {
             transition: all 0.3s ease;
             border: none;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
             color: #4a5568;
         }
-
         .card.posts-style:hover {
             transform: translateY(-10px);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
         }
-
         .feature-list li {
             padding: 8px 0;
             position: relative;
         }
-
         .popular-badge {
             position: absolute;
             top: 10px;
             right: 10px;
             transform: rotate(15deg);
         }
-
         .btn.posts-style {
             border: none;
             padding: 12px 30px;
             transition: all 0.3s ease;
         }
-
         .btn.posts-style:hover {
             transform: scale(1.05);
             box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
@@ -58,6 +81,16 @@
             max-height: 300px; /* 최대 높이 설정 */
             object-fit: cover;
         }
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            transition: background-color 0.3s ease-in-out;
+        }
     </style>
 </head>
 
@@ -66,11 +99,13 @@
     <div class="container-fluid">
         <!-- 로고 -->
         <a class="navbar-brand" href="/">
-            <span th:text="${sessionUser != null ? sessionUser.blogTitle + '.noteJ' : 'noteJ'}"></span>
+            <span class="fw-bold" th:text="${sessionUser != null ? sessionUser.blogTitle + '.noteJ' : 'noteJ'}"></span>
         </a>
 
         <!-- 메뉴 토글 버튼 (모바일용) -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -78,31 +113,39 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item mt-1">
-                    <a class="nav-link pb-1" href="/write">새 글 작성</a>
+                    <a class="nav-link pb-1 fw-bold" href="/write">새 글 작성</a>
                 </li>
                 <li class="nav-item mt-1">
-                    <a class="nav-link pb-1" href="/notifications">
+                    <a class="nav-link pb-1 fw-bold" href="/notifications">
                         알림
                         <span th:if="${notificationCountNotRead > 0}"
                               class="badge badge-danger"
-                              th:text="${notificationCountNotRead}" style="background-color: #f4999a; font-size: 1rem; padding: 0.25rem 0.5rem;"></span>
+                              th:text="${notificationCountNotRead}"
+                              style="background-color: #f4999a; font-size: 1rem; padding: 0.25rem 0.5rem;"></span>
                     </a>
                 </li>
                 <li class="nav-item mt-1 me-4">
-                    <a class="nav-link pb-1" href="/search-global">검색</a>
+                    <a class="nav-link pb-1 fw-bold" href="/search-global">검색</a>
                 </li>
 
                 <!-- 프로필 메뉴 -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#"
+                       id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <!-- 세션 존재 & 프로필 사진 존재 -->
-                        <img th:if="${sessionUser != null && sessionUser.profilePic != null}" th:src="@{/image-print/{path}(path=${sessionUser.profilePic})}" class="profile-pic me-2" alt="Profile">
+                        <img th:if="${sessionUser != null && sessionUser.profilePic != null}"
+                             th:src="@{/image-print/{path}(path=${sessionUser.profilePic})}"
+                             class="profile-pic me-2" alt="Profile">
 
                         <!-- 세션 존재 & 프로필 사진 없음 -->
-                        <img th:if="${sessionUser != null && sessionUser.profilePic == null}" th:src="@{/image-print/{path}(path=${sessionUser.profilePic})}" class="profile-pic me-2" alt="Default Profile">
+                        <img th:if="${sessionUser != null && sessionUser.profilePic == null}"
+                             th:src="@{/image-print/{path}(path=${sessionUser.profilePic})}"
+                             class="profile-pic me-2" alt="Default Profile">
 
                         <!-- 세션 비존재 -->
-                        <img th:if="${sessionUser == null}" th:src="@{/image-print/default/default-profile.png}" class="profile-pic me-2" alt="Default Profile">
+                        <img th:if="${sessionUser == null}"
+                             th:src="@{/image-print/default/default-profile.png}"
+                             class="profile-pic me-2" alt="Default Profile">
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                         <!-- 로그인된 경우 -->
@@ -121,7 +164,6 @@
                         <li th:if="${sessionUser != null}">
                             <hr class="dropdown-divider">
                         </li>
-
                         <li th:if="${sessionUser != null}">
                             <form th:action="@{/logout}" method="post">
                                 <button type="submit" class="dropdown-item text-danger">
@@ -129,7 +171,6 @@
                                 </button>
                             </form>
                         </li>
-
                         <!-- 로그인되지 않은 경우 -->
                         <li th:if="${sessionUser == null}">
                             <a class="dropdown-item" th:href="@{/login}">로그인</a>

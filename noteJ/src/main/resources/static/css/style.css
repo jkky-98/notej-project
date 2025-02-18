@@ -50,14 +50,15 @@ article, aside, figcaption, figure, footer, header, hgroup, main, nav, section {
   display: block; }
 
 body {
-  margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
   color: #212529;
   text-align: left;
-  background-color: #fff; }
+  background-color: #fff;
+  margin: 80px 0 0;
+}
 
 [tabindex="-1"]:focus {
   outline: 0 !important; }
@@ -8133,7 +8134,7 @@ a.text-dark:hover, a.text-dark:focus {
     border-color: #dee2e6; } }
 
 body {
-  font-family: "Lato", Arial, sans-serif;
+  font-family: 'Noto Sans', sans-serif;
   font-size: 16px;
   line-height: 1.8;
   font-weight: normal;
@@ -8144,14 +8145,14 @@ a {
   -webkit-transition: .3s all ease;
   -o-transition: .3s all ease;
   transition: .3s all ease;
-  color: #01d28e; }
+  color: #007bff; }
   a:hover, a:focus {
     text-decoration: none !important;
     outline: none !important;
     -webkit-box-shadow: none;
     box-shadow: none; }
   a:hover, a:active, a:focus {
-    color: #01d28e;
+    color: #007bff;
     outline: none !important;
     text-decoration: none !important; }
 
@@ -8163,7 +8164,7 @@ h1, h2, h3, h4, h5,
   color: #000; }
 
 .bg-primary {
-  background: #01d28e !important; }
+  background: #007bff !important; }
 
 .ftco-section {
   padding: 7em 0; }
@@ -8231,7 +8232,7 @@ h1, h2, h3, h4, h5,
     outline: none !important;
     -webkit-box-shadow: none;
     box-shadow: none;
-    border: 1px solid #01d28e; }
+    border: 1px solid #007bff; }
 
 .field-icon {
   position: absolute;
@@ -8261,7 +8262,7 @@ input:-webkit-autofill + .form-control-placeholder{
   text-transform: uppercase;
   font-size: 12px;
   letter-spacing: 1px;
-  color: #01d28e;
+  color: #007bff;
   font-weight: 700; }
 
 .social-media {
@@ -8279,7 +8280,7 @@ input:-webkit-autofill + .form-control-placeholder{
     .social-media .social-icon span {
       color: #999999; }
     .social-media .social-icon:hover, .social-media .social-icon:focus {
-      background: #01d28e; }
+      background: #007bff; }
       .social-media .social-icon:hover span, .social-media .social-icon:focus span {
         color: #fff; }
 
@@ -8336,9 +8337,9 @@ input:-webkit-autofill + .form-control-placeholder{
 
 /* Style the checkmark/indicator */
 .checkbox-primary {
-  color: #01d28e; }
+  color: #007bff; }
   .checkbox-primary input:checked ~ .checkmark:after {
-    color: #01d28e; }
+    color: #007bff; }
 
 .btn {
   cursor: pointer;
@@ -8349,18 +8350,18 @@ input:-webkit-autofill + .form-control-placeholder{
   .btn:hover, .btn:active, .btn:focus {
     outline: none; }
   .btn.btn-primary {
-    background: #01d28e !important;
-    border: 1px solid #01d28e !important;
+    background: #007bff !important;
+    border: 1px solid #007bff !important;
     color: #fff !important; }
     .btn.btn-primary:hover {
-      border: 1px solid #01d28e;
+      border: 1px solid #18AFE2;
       background: transparent;
-      color: #01d28e; }
+      color: #18AFE2; }
     .btn.btn-primary.btn-outline-primary {
-      border: 1px solid #01d28e;
+      border: 1px solid #007bff;
       background: transparent;
-      color: #01d28e; }
+      color: #007bff; }
       .btn.btn-primary.btn-outline-primary:hover {
         border: 1px solid transparent;
-        background: #01d28e;
+        background: #18AFE2;
         color: #fff; }

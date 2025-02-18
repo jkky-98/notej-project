@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <div id="progressBar" th:fragment="progressBarHome">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/progressbar.js/1.0.1/progressbar.min.js"></script>
+  <style>
+    #progressBar {
+      width: 150px;   /* 원하는 너비 */
+      height: 150px;  /* 원하는 높이 */
+      margin: 15px auto;
+      position: relative;
+    }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // ProgressBar.Circle 생성
+      var circle = new ProgressBar.Circle('#progressBar', {
+        strokeWidth: 4,
+        easing: 'easeInOut',
+        duration: 700,
+        color: '#007bff',         // 진행률 색상에 CSS 변수 사용
+        trailColor: '#eee',              // 배경(트레일) 색상
+        trailWidth: 0.5,
+        svgStyle: null, // 컨테이너에 맞게 SVG 크기 설정
+        text: {
+          autoStyleContainer: false
+        },
+        from: { color: '#007bff' },
+        to: { color: '#007bff' },
+        step: function(state, circle) {
+          // 진행률에 따라 텍스트 업데이트 (예: 70 %)
+          circle.path.setAttribute('stroke', state.color);
+          var value = Math.round(circle.value() * 100);
+          circle.setText(value + ' %');
+        }
+      });
+      // 텍스트 스타일 지정
+      circle.text.style.fontFamily = 'Helvetica, Arial, sans-serif';
+      circle.text.style.fontSize = '1rem';
+
+      // 0%에서 100%로 애니메이션 진행
+      circle.animate(1.0);
+    });
+  </script>
+</div>
+</html>

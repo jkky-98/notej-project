@@ -10,20 +10,144 @@
 <!-- Include the navigation fragment -->
 <div th:insert="~{fragments/header :: navigation}">
 </div>
-<div>Home</div>
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-8">
-            <div id="terminal" style="width: 100%; height: 400px;"></div>
+<div class="container-fluid m-3">
+    <div class="row mt-4">
+        <div class="col-md-9 col-auto">
+            <h2 class="mb-2 fw-bold">User Dashboard</h2>
+            <h6 class="text-body-tertiary fw-semibold">대시보드를 통해 블로그 통계 추적 및 관리를 해보세요!</h6>
         </div>
-        <div class="col-4">
-            무엇이 들어가려나
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <div class="card h-100 shadow-sm rounded-lg">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Terminal</h5>
+                    <small class="text-muted">명령어를 통해 블로그 관리 및 통계기능을 수행해보세요.</small>
+                </div>
+                <div class="card-body p-0">
+                    <div id="terminal" style="width: 100%; height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="mb-1">Total orders<span class="badge badge-phoenix badge-phoenix-warning rounded-pill fs-9 ms-2"><span class="badge-label">-6.8%</span></span></h5>
+                                    <h6 class="text-body-tertiary">Last 7 days</h6>
+                                </div>
+                                <h4>16,247</h4>
+                            </div>
+                            <div class="d-flex justify-content-center px-4 py-6">
+                                <div th:insert="~{fragments/progressBarHome :: progressBarHome}"></div>
+                            </div>
+                            <div class="mt-2">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="bullet-item bg-primary me-2"></div>
+                                    <h6 class="text-body fw-semibold flex-1 mb-0">Completed</h6>
+                                    <h6 class="text-body fw-semibold mb-0">52%</h6>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <div class="bullet-item bg-primary-subtle me-2"></div>
+                                    <h6 class="text-body fw-semibold flex-1 mb-0">Pending payment</h6>
+                                    <h6 class="text-body fw-semibold mb-0">48%</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="mb-1">New customers<span class="badge badge-phoenix badge-phoenix-warning rounded-pill fs-9 ms-2"> <span class="badge-label">+26.5%</span></span></h5>
+                                    <h6 class="text-body-tertiary">Last 7 days</h6>
+                                </div>
+                                <h4>356</h4>
+                            </div>
+                            <div class="pb-0 pt-4">
+                                <div class="echarts-new-customers" style="height: 180px; width: 100%; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" _echarts_instance_="ec_1739862395147"><div style="position: relative; width: 506px; height: 180px; padding: 0px; margin: 0px; border-width: 0px;"><canvas data-zr-dom-id="zr_0" width="506" height="180" style="position: absolute; left: 0px; top: 0px; width: 506px; height: 180px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas><canvas data-zr-dom-id="zr_2" width="506" height="180" style="position: absolute; left: 0px; top: 0px; width: 506px; height: 180px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas></div><div class=""></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="mb-2">Top coupons</h5>
+                                    <h6 class="text-body-tertiary">Last 7 days</h6>
+                                </div>
+                            </div>
+                            <div class="pb-4 pt-3">
+                                <div class="echart-top-coupons" style="height: 115px; width: 100%; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" _echarts_instance_="ec_1739862395148"><div style="position: relative; width: 506px; height: 115px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;"><canvas data-zr-dom-id="zr_0" width="506" height="115" style="position: absolute; left: 0px; top: 0px; width: 506px; height: 115px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas><div style="position: absolute !important; visibility: hidden !important; padding: 0px !important; margin: 0px !important; border-width: 0px !important; user-select: none !important; width: 0px !important; height: 0px !important; inset: 0px auto auto 0px !important;"></div><div style="position: absolute !important; visibility: hidden !important; padding: 0px !important; margin: 0px !important; border-width: 0px !important; user-select: none !important; width: 0px !important; height: 0px !important; inset: 0px 0px auto auto !important;"></div><div style="position: absolute !important; visibility: hidden !important; padding: 0px !important; margin: 0px !important; border-width: 0px !important; user-select: none !important; width: 0px !important; height: 0px !important; inset: auto auto 0px 0px !important;"></div><div style="position: absolute !important; visibility: hidden !important; padding: 0px !important; margin: 0px !important; border-width: 0px !important; user-select: none !important; width: 0px !important; height: 0px !important; inset: auto 0px 0px auto !important;"></div></div><div class="" style="position: absolute; display: block; border-style: solid; white-space: nowrap; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; background-color: rgb(239, 242, 246); border-width: 1px; border-radius: 4px; color: rgb(20, 24, 36); font: 14px / 21px sans-serif; padding: 7px 10px; top: 0px; left: 0px; transform: translate3d(21px, 10px, 0px); border-color: rgb(203, 208, 221); z-index: 1000; pointer-events: none; visibility: hidden; opacity: 0;"><strong>Percentage discount:</strong> 72%</div></div>
+                            </div>
+                            <div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="bullet-item bg-primary me-2"></div>
+                                    <h6 class="text-body fw-semibold flex-1 mb-0">Percentage discount</h6>
+                                    <h6 class="text-body fw-semibold mb-0">72%</h6>
+                                </div>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="bullet-item bg-primary-lighter me-2"></div>
+                                    <h6 class="text-body fw-semibold flex-1 mb-0">Fixed card discount</h6>
+                                    <h6 class="text-body fw-semibold mb-0">18%</h6>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <div class="bullet-item bg-info-dark me-2"></div>
+                                    <h6 class="text-body fw-semibold flex-1 mb-0">Fixed product discount</h6>
+                                    <h6 class="text-body fw-semibold mb-0">10%</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5 class="mb-2">Paying vs non paying</h5>
+                                    <h6 class="text-body-tertiary">Last 7 days</h6>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-center pt-3 flex-1">
+                                <div class="echarts-paying-customer-chart" style="height: 100%; width: 100%; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;" _echarts_instance_="ec_1739862395151"><div style="position: relative; width: 506px; height: 144px; padding: 0px; margin: 0px; border-width: 0px;"><canvas data-zr-dom-id="zr_0" width="506" height="144" style="position: absolute; left: 0px; top: 0px; width: 506px; height: 144px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas></div><div class=""></div></div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="bullet-item bg-primary me-2"></div>
+                                    <h6 class="text-body fw-semibold flex-1 mb-0">Paying customer</h6>
+                                    <h6 class="text-body fw-semibold mb-0">30%</h6>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <div class="bullet-item bg-primary-subtle me-2"></div>
+                                    <h6 class="text-body fw-semibold flex-1 mb-0">Non-paying customer</h6>
+                                    <h6 class="text-body fw-semibold mb-0">70%</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+<!--            <div th:insert="~{fragments/progressBarHome :: progressBarHome}">-->
+<!--            </div>-->
         </div>
     </div>
 </div>
 
 <script>
     function printAsciiArt(term) {
+        // 사용자 지정 색상과 리셋 코드 (ANSI escape sequence)
+        const userColor = "\x1b[38;2;0;123;255m";
+        const resetColor = "\x1b[0m";
+
         const lines = [
             String.raw` $ ▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌`,
             String.raw` $ ▐                                                                                   ▌`,
@@ -42,7 +166,32 @@
             String.raw` $ ▐▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▌`,
             String.raw` $  `
         ];
-        lines.forEach(line => term.writeln(line));
+
+        lines.forEach(line => {
+            // 만약 양쪽에 테두리 역할의 '▐'와 '▌'가 있다면,
+            const leftIndex = line.indexOf('▐');
+            const rightIndex = line.lastIndexOf('▌');
+
+            // 양쪽 테두리가 발견되었고, 그 사이에 내용이 있는 경우
+            if (leftIndex !== -1 && rightIndex !== -1 && rightIndex > leftIndex) {
+                const left = line.substring(0, leftIndex + 1);
+                const middle = line.substring(leftIndex + 1, rightIndex);
+                const right = line.substring(rightIndex);
+
+                /*
+                   만약 박스 내부 내용이 단순 공백이나 반복되는 테두리 문자(예: '▀', '▄')로만 구성되어 있다면
+                   (즉, border라인인 경우)에는 색상을 적용하지 않고 그대로 출력합니다.
+                */
+                if (/^[\s▀▄]+$/.test(middle)) {
+                    term.writeln(line);
+                } else {
+                    term.writeln(left + userColor + middle + resetColor + right);
+                }
+            } else {
+                // 테두리 패턴이 없는 라인은 그대로 출력
+                term.writeln(line);
+            }
+        });
     }
 
 
@@ -56,8 +205,11 @@
         ? " \x1b[1;3;94m" + username + "\x1b[0m" + "@notej:# ~ "
         : " \x1b[1;3;95m" + "nologin" + "\x1b[0m" + "@notej:# ~ ";
 
+    // 사용자 입력 글자에 적용할 색상 (RGB: 0,123,255)
+    const userColor = "\x1b[38;2;0;123;255m";
+    const resetColor = "\x1b[0m";
+
     console.log(prompt);
-    /*]]>*/
 
     // 터미널 인스턴스 생성 및 오픈
     const term = new Terminal({
@@ -65,15 +217,23 @@
         fontSize: 14,
         letterSpacing: 0,
         lineHeight: 1.0,
-        cols: 200
+        cols: 120,
+        theme: {
+            background: '#ffffff',   // 배경색
+            foreground: '#000000',   // 기본 글자색 (프롬프트 등)
+            cursor: '#007bff',       // 커서 색상
+            cursorAccent: '#ffffff'  // 커서 내부 텍스트 색상
+        },
+        cursorBlink: true  // 커서 깜빡임 활성화
     });
-    term.resize(200, 30);
+
+    term.resize(120, 35);
     term.open(document.getElementById('terminal'));
     term.focus();
 
-    // 초기 프롬프트 설정 및 안내 메시지 출력
+    // 초기 프롬프트 및 안내 메시지 출력
     term.writeln(' $');
-    term.writeln(' $ 🚀  NOTEJ에 오신걸 환영합니다 \x1B[1;3;32m\'help\'\x1B[0m 명령어로 하여금 다양한 기능을 수행해보세요!');
+    term.writeln(' $ 🚀  NOTEJ에 오신걸 환영합니다 ' + userColor + '\'help\'' + resetColor + ' 명령어로 다양한 기능을 수행해보세요!');
     term.writeln(' $');
     printAsciiArt(term);
     term.write(prompt);
@@ -83,7 +243,20 @@
     var commandHistory = []; // 이전에 입력한 명령어들을 저장
     var historyIndex = 0;    // 현재 히스토리 인덱스. 기본적으로 히스토리의 끝(새로운 명령 입력 상태)
 
+    function redrawCommandBuffer() {
+        // 현재 줄 클리어 후 프롬프트와 색상이 적용된 커맨드 버퍼 재출력
+        term.write('\x1B[2K\r' + prompt + userColor + commandBuffer + resetColor);
+    }
+
     function processCommand(cmd) {
+        if (cmd === "help") {
+            term.writeln(" 사용 가능한 명령어(로그인 필요)");
+            term.writeln("    - like all: 사용자가 얻은 총 좋아요 개수를 출력합니다.");
+            term.writeln('    - like all series = "seriesName": seriesName에 소속된 게시글들의 총 좋아요 개수를 출력합니다.');
+            term.write(prompt);
+            return;
+        }
+
         // 예시: 'help' 명령어에 대한 처리. 실제 구현에 맞게 수정하세요.
         fetch('/api/execute-command', {
             method: 'POST',
@@ -109,14 +282,11 @@
         // 화살표 키 (위: \x1b[A, 아래: \x1b[B) 처리
         if (data === '\x1b[A') {  // Up arrow
             if (commandHistory.length > 0) {
-                // 히스토리 인덱스가 0보다 크면 위로 이동
                 if (historyIndex > 0) {
                     historyIndex--;
                 }
-                // 현재 히스토리 명령어로 commandBuffer 설정
                 commandBuffer = commandHistory[historyIndex];
-                // 현재 줄 클리어 후 프롬프트와 commandBuffer 재출력
-                term.write('\x1B[2K\r' + prompt + commandBuffer);
+                redrawCommandBuffer();
             }
         }
         else if (data === '\x1b[B') {  // Down arrow
@@ -125,31 +295,27 @@
                     historyIndex++;
                     commandBuffer = commandHistory[historyIndex];
                 } else {
-                    // 마지막 명령어 이후에는 빈 문자열로 초기화
                     historyIndex = commandHistory.length;
                     commandBuffer = '';
                 }
-                term.write('\x1B[2K\r' + prompt + commandBuffer);
+                redrawCommandBuffer();
             }
         }
         // 백스페이스 처리: 일반적으로 \x7F 또는 \b
         else if (data === '\x7F' || data === '\b') {
             if (commandBuffer.length > 0) {
                 commandBuffer = commandBuffer.slice(0, -1);
-                term.write('\x1B[2K\r' + prompt + commandBuffer);
+                redrawCommandBuffer();
             }
         }
         // 엔터 처리: 줄바꿈 후 프롬프트 재출력
         else if (data === '\r') {
             term.write('\r\n');
             if (commandBuffer.trim() !== '') {
-                // 명령어를 히스토리에 저장 (성공 여부와 상관없이)
                 commandHistory.push(commandBuffer);
-                // 히스토리의 길이가 30개를 초과하면 가장 오래된 항목 제거
                 if (commandHistory.length > 30) {
                     commandHistory.shift();
                 }
-                // 히스토리 인덱스를 히스토리의 끝으로 업데이트
                 historyIndex = commandHistory.length;
 
                 if (username !== 'nologin') {
@@ -168,10 +334,13 @@
         // 일반 문자 입력 처리
         else {
             commandBuffer += data;
-            term.write(data);
+            // 출력 시마다 사용자 입력 글자는 지정한 색상으로 적용
+            term.write(userColor + data + resetColor);
         }
     });
+    /*]]>*/
 </script>
+
 
 
 <!-- Bootstrap JS -->
