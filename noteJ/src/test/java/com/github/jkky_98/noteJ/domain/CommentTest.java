@@ -1,5 +1,8 @@
 package com.github.jkky_98.noteJ.domain;
 
+import com.github.jkky_98.noteJ.domain.user.User;
+import com.github.jkky_98.noteJ.domain.user.UserDesc;
+import com.github.jkky_98.noteJ.domain.user.UserRole;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -11,19 +14,23 @@ class CommentTest {
     @DisplayName("[Comment] 빌더를 통한 객체 생성 테스트")
     void commentBuilderTest() {
         // given
-        String testContent = "This is a comment.";
+        User testUser = createTestUser();
+        Post testPost = createTestPost(testUser);
 
         Comment comment = Comment.builder()
-                .content(testContent)
+                .content("테스트 댓글")
+                .post(testPost)
+                .user(testUser)
                 .build();
 
         // then
-        assertThat(comment).isNotNull();
-        assertThat(comment.getContent()).isEqualTo(testContent);
-        assertThat(comment.getPost()).isNull(); // 연관관계는 설정하지 않았으므로 null
-        assertThat(comment.getUser()).isNull();
+        assertThat(comment.getContent()).isEqualTo("테스트 댓글");
+        assertThat(comment.getPost()).isEqualTo(testPost);
+        assertThat(comment.getUser()).isEqualTo(testUser);
+        // Self-referencing 필드는 기본적으로 null 이어야 함
         assertThat(comment.getParent()).isNull();
     }
+
 
     @Test
     @DisplayName("[Comment] 기본 상태 테스트")
@@ -41,29 +48,70 @@ class CommentTest {
     }
 
     @Test
+    @DisplayName("[Comment] Builder.Default 초기화 테스트 (childrens 리스트)")
+    void builderDefaultInitializationTest() {
+        // given
+        User testUser = createTestUser();
+        Post testPost = createTestPost(testUser);
+
+        Comment comment = Comment.builder()
+                .content("테스트 댓글")
+                .post(testPost)
+                .user(testUser)
+                .build();
+
+        // then
+        assertThat(comment.getChildrens()).isNotNull();
+        assertThat(comment.getChildrens().isEmpty()).isTrue();
+    }
+
+    @Test
     @DisplayName("[Comment] updatePost 메서드 테스트")
     void updatePostTest() {
         // given
-        Post oldPost = Post.builder()
-                .title("Old Post")
-                .content("Content of old post")
-                .build();
-
+        User testUser = createTestUser();
+        Post oldPost = createTestPost(testUser);
         Post newPost = Post.builder()
-                .title("New Post")
-                .content("Content of new post")
+                .title("테스트 포스트 제목2")
+                .content("테스트 포스트 내용")
+                .user(testUser)
                 .build();
 
         Comment comment = Comment.builder()
-                .content("This is a test comment")
+                .content("업데이트 테스트 댓글")
                 .post(oldPost)
+                .user(testUser)
                 .build();
 
         // when
         comment.updatePost(newPost);
 
         // then
-        // comment의 post 필드가 newPost로 업데이트되었는지 확인
         assertThat(comment.getPost()).isEqualTo(newPost);
+    }
+
+    // 테스트용 User 생성 (UserTest의 createTestUser 참고)
+    private User createTestUser() {
+        UserDesc userDesc = UserDesc.builder()
+                .description("테스트 유저 설명")
+                .blogTitle("테스트 블로그 제목")
+                .build();
+
+        return User.builder()
+                .username("testuser")
+                .email("test@example.com")
+                .password("password123")
+                .userRole(UserRole.USER)
+                .userDesc(userDesc)
+                .build();
+    }
+
+    // 테스트용 Post 생성 (간단한 필드만 설정)
+    private Post createTestPost(User user) {
+        return Post.builder()
+                .title("테스트 포스트 제목")
+                .content("테스트 포스트 내용")
+                .user(user)
+                .build();
     }
 }

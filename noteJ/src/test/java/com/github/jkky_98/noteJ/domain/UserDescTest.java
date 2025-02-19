@@ -15,7 +15,58 @@ public class UserDescTest {
     @DisplayName("[UserDesc] 빌더를 통한 객체 생성 테스트")
     void userDescBuilderTest() {
         // given
-        UserDesc userDesc = UserDesc.builder()
+        UserDesc userDesc = createUserDesc();
+
+        // then
+        assertThat(userDesc.getDescription()).isEqualTo("User description");
+        assertThat(userDesc.getProfilePic()).isEqualTo("profile.jpg");
+        assertThat(userDesc.getBlogTitle()).isEqualTo("My Blog");
+        assertThat(userDesc.getTheme()).isEqualTo(ThemeMode.DARK);
+        assertThat(userDesc.getSocialEmail()).isEqualTo("test@example.com");
+        assertThat(userDesc.isCommentAlarm()).isTrue();
+        assertThat(userDesc.isNoteJAlarm()).isFalse();
+    }
+
+    @Test
+    @DisplayName("[UserDesc] 기본 상태 테스트")
+    void userDescDefaultStateTest() {
+        // given: UserDesc 객체 생성
+        UserDesc userDesc = createUserDesc();
+
+        // then: 각 필드가 올바르게 설정되었는지 검증
+        assertThat(userDesc.getDescription()).isEqualTo("User description");
+        assertThat(userDesc.getProfilePic()).isEqualTo("profile.jpg");
+        assertThat(userDesc.getBlogTitle()).isEqualTo("My Blog");
+        assertThat(userDesc.getTheme()).isEqualTo(ThemeMode.DARK);
+        assertThat(userDesc.getSocialEmail()).isEqualTo("test@example.com");
+        assertThat(userDesc.getSocialGitHub()).isEqualTo("github.com/test");
+        assertThat(userDesc.getSocialTwitter()).isEqualTo("twitter.com/test");
+        assertThat(userDesc.getSocialFacebook()).isEqualTo("facebook.com/test");
+        assertThat(userDesc.getSocialOther()).isEqualTo("other.com/test");
+        assertThat(userDesc.isCommentAlarm()).isTrue();
+        assertThat(userDesc.isNoteJAlarm()).isFalse();
+    }
+
+    @Test
+    @DisplayName("[UserDesc] updateDescription 메서드 테스트")
+    void updateDescriptionTest() {
+        UserDesc userDesc = createUserDesc();
+
+        userDesc.updateDescription("updated description");
+        assertThat(userDesc.getDescription()).isEqualTo("updated description");
+    }
+
+    @Test
+    @DisplayName("[UserDesc] updateProfilePic 메서드 테스트")
+    void updateProfilePicTest() {
+        UserDesc userDesc = createUserDesc();
+
+        userDesc.updateProfilePic("updateProfilePic");
+        assertThat(userDesc.getProfilePic()).isEqualTo("updateProfilePic");
+    }
+
+    private UserDesc createUserDesc() {
+        return UserDesc.builder()
                 .description("User description")
                 .profilePic("profile.jpg")
                 .blogTitle("My Blog")
@@ -28,32 +79,6 @@ public class UserDescTest {
                 .commentAlarm(true)
                 .noteJAlarm(false)
                 .build();
-
-        // then
-        assertThat(userDesc.getDescription()).isEqualTo("User description");
-        assertThat(userDesc.getProfilePic()).isEqualTo("profile.jpg");
-        assertThat(userDesc.getBlogTitle()).isEqualTo("My Blog");
-        assertThat(userDesc.getTheme()).isEqualTo(ThemeMode.DARK);
-        assertThat(userDesc.getSocialEmail()).isEqualTo("test@example.com");
-        assertThat(userDesc.isCommentAlarm()).isTrue();
-        assertThat(userDesc.isNoteJAlarm()).isFalse();
-    }
-
-
-    @Test
-    @DisplayName("[UserDesc] 기본 상태 테스트")
-    void userDescDefaultStateTest() {
-        // given
-        UserDesc userDesc = UserDesc.builder()
-                .description("Default test")
-                .build();
-
-        // then
-        assertThat(userDesc.getProfilePic()).isNull();
-        assertThat(userDesc.getTheme()).isNull();
-        assertThat(userDesc.getSocialEmail()).isNull();
-        assertThat(userDesc.isCommentAlarm()).isFalse();
-        assertThat(userDesc.isNoteJAlarm()).isFalse();
     }
 
 

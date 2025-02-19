@@ -218,6 +218,7 @@
         letterSpacing: 0,
         lineHeight: 1.0,
         cols: 120,
+        rows: 35,
         theme: {
             background: '#ffffff',   // 배경색
             foreground: '#000000',   // 기본 글자색 (프롬프트 등)
@@ -227,7 +228,6 @@
         cursorBlink: true  // 커서 깜빡임 활성화
     });
 
-    term.resize(120, 35);
     term.open(document.getElementById('terminal'));
     term.focus();
 

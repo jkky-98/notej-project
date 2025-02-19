@@ -11,7 +11,6 @@ import com.github.jkky_98.noteJ.web.controller.dto.AutoEditPostResponse;
 import com.github.jkky_98.noteJ.web.controller.dto.AutoSavePostRequest;
 import com.github.jkky_98.noteJ.web.controller.dto.AutoSavePostResponse;
 import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;

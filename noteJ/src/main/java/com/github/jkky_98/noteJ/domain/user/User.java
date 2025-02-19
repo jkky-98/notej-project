@@ -4,10 +4,6 @@ import com.github.jkky_98.noteJ.domain.*;
 import com.github.jkky_98.noteJ.domain.base.BaseEntity;
 import com.github.jkky_98.noteJ.web.controller.form.SignUpForm;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -101,6 +97,7 @@ public class User extends BaseEntity {
         }
     }
 
+    // toDo : moderMapper로 인해 사라질 예정
     public static User of(SignUpForm signUpForm, UserDesc userDesc) {
         return User.builder()
                 .username(signUpForm.getUsername())

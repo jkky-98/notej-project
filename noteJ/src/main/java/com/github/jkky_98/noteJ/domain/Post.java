@@ -3,7 +3,6 @@ package com.github.jkky_98.noteJ.domain;
 import com.github.jkky_98.noteJ.domain.base.BaseEntity;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.web.controller.dto.AutoEditPostRequest;
-import com.github.jkky_98.noteJ.web.controller.dto.AutoSavePostRequest;
 import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
 import jakarta.persistence.*;
 import lombok.*;

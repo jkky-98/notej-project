@@ -35,6 +35,7 @@ public class Like extends BaseTimeEntity {
         this.post = post;
     }
 
+    //toDo: 모델 매퍼 도입 -> 삭제 예정
     public static Like of(Post post, User user) {
         return Like.builder()
                 .post(post)
