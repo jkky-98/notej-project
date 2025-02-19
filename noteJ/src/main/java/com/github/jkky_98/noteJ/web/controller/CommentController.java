@@ -44,7 +44,7 @@ public class CommentController {
         }
 
         commentService.saveComment(
-                SaveCommentToServiceDto.of(commentForm, sessionUser, postUrl, username)
+                commentForm, sessionUser.getId(), postUrl, username
         );
 
         referer = RefererUtil.removeQueryStringInReferer(referer);
