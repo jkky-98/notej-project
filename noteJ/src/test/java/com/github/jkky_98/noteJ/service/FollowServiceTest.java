@@ -61,7 +61,7 @@ class FollowServiceTest {
     }
 
     @Test
-    @DisplayName("getFollowingList: 정상 조회")
+    @DisplayName("[FollowService] getFollowingList: 정상 조회")
     void testGetFollowingList() {
         // given
         String usernameBlog = "userA";
@@ -80,7 +80,7 @@ class FollowServiceTest {
     }
 
     @Test
-    @DisplayName("follow: 정상 팔로우")
+    @DisplayName("[FollowService] follow: 정상 팔로우")
     void testFollow() {
         // given
         String myUsername = "userA";
@@ -104,7 +104,7 @@ class FollowServiceTest {
     }
 
     @Test
-    @DisplayName("isFollowing: 팔로우 상태 확인 (true)")
+    @DisplayName("[FollowService] isFollowing: 팔로우 상태 확인 (true)")
     void testIsFollowingTrue() {
         // given
         // userA가 userB를 팔로우하는 상태
@@ -120,7 +120,7 @@ class FollowServiceTest {
     }
 
     @Test
-    @DisplayName("isFollowing: 팔로우 상태 확인 (false)")
+    @DisplayName("[FollowService] isFollowing: 팔로우 상태 확인 (false)")
     void testIsFollowingFalse() {
         // given: userA가 userB를 팔로우하지 않은 경우
         when(userService.findUserById(userA.getId())).thenReturn(userA);
@@ -133,7 +133,7 @@ class FollowServiceTest {
     }
 
     @Test
-    @DisplayName("isFollowing: 세션 사용자가 없는 경우 false 반환")
+    @DisplayName("[FollowService] isFollowing: 세션 사용자가 없는 경우 false 반환")
     void testIsFollowingNoSessionUser() {
         // when
         boolean result = followService.isFollowing(Optional.empty(), userB);
@@ -143,7 +143,7 @@ class FollowServiceTest {
     }
 
     @Test
-    @DisplayName("unfollow: 정상 언팔로우")
+    @DisplayName("[FollowService] unfollow: 정상 언팔로우")
     void testUnfollow() {
         // given
         // userA가 userB를 이미 팔로우한 상태
@@ -163,7 +163,7 @@ class FollowServiceTest {
     }
 
     @Test
-    @DisplayName("getFollowerList: 정상 조회")
+    @DisplayName("[FollowService] getFollowerList: 정상 조회")
     void testGetFollowerList() {
         // given
         String usernameBlog = "userA";

@@ -1,6 +1,6 @@
 package com.github.jkky_98.noteJ.web.config;
 
-import com.github.jkky_98.noteJ.web.controller.form.UserViewForm;
+import com.github.jkky_98.noteJ.web.controller.form.UserNavigationViewForm;
 import lombok.extern.slf4j.Slf4j;
 import org.ehcache.event.EventFiring;
 import org.ehcache.event.EventOrdering;
@@ -25,8 +25,8 @@ public class CacheConfig {
     @Bean
     public JCacheManagerCustomizer cacheManagerCustomizer() {
         return cacheManager -> {
-            cacheManager.createCache("sessionUserInfoCache", new MutableConfiguration<Long, UserViewForm>()
-                    .setTypes(Long.class, UserViewForm.class)
+            cacheManager.createCache("sessionUserInfoCache", new MutableConfiguration<Long, UserNavigationViewForm>()
+                    .setTypes(Long.class, UserNavigationViewForm.class)
                     .setStoreByValue(false)  // Store by reference (Ehcache 특성에 맞게)
                     .setExpiryPolicyFactory(ModifiedExpiryPolicy.factoryOf(new Duration(TimeUnit.HOURS, 6))));
 

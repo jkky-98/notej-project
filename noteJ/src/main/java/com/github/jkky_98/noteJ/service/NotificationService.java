@@ -1,6 +1,7 @@
 package com.github.jkky_98.noteJ.service;
 
 import com.github.jkky_98.noteJ.domain.Notification;
+import com.github.jkky_98.noteJ.domain.mapper.NotificationMapper;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.exception.UnauthenticatedUserException;
 import com.github.jkky_98.noteJ.repository.NotificationRepository;
@@ -21,6 +22,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserService userService;
+    private final NotificationMapper mapper;
 
     /**
      * Follow 신청 알림 보내기
@@ -31,7 +33,7 @@ public class NotificationService {
     @CacheEvict(value = "navigationAlarm", key = "#userGetNotification.id")
     public void sendFollowNotification(User userGetNotification, User userSendNotification) {
         // 알림 엔티티 생성 for 팔로우
-        Notification notification = Notification.ofFollow(userSendNotification, userGetNotification);
+        Notification notification = mapper.toNotificationForFollow(userGetNotification, userSendNotification);
         // 알림 저장
         notificationRepository.save(notification);
 
@@ -42,7 +44,7 @@ public class NotificationService {
     @Transactional
     @CacheEvict(value = "navigationAlarm", key = "#userGetNotification.id")
     public void sendLikePostNotification(User userGetNotification, User userSendNotification, String postTitle) {
-        Notification notification = Notification.ofLike(userSendNotification, userGetNotification, postTitle);
+        Notification notification = mapper.toNotificationForLike(userSendNotification, userGetNotification, postTitle);
         notificationRepository.save(notification);
 
         userGetNotification.addNotificationToRecipient(notification);
@@ -52,7 +54,7 @@ public class NotificationService {
     @Transactional
     @CacheEvict(value = "navigationAlarm", key = "#userGetNotification.id")
     public void sendCommentPostNotification(User userGetNotification, User userSendNotification, String postTitle) {
-        Notification notification = Notification.ofComment(userSendNotification, userGetNotification, postTitle);
+        Notification notification = mapper.toNotificationForComment(userSendNotification, userGetNotification, postTitle);
         notificationRepository.save(notification);
 
         userGetNotification.addNotificationToRecipient(notification);
@@ -61,7 +63,7 @@ public class NotificationService {
 
     @Transactional
     public void sendCommentParentsNotification(User userGetNotification, User userSendNotification, String postTitle) {
-        Notification notification = Notification.ofCommentParents(userSendNotification, userGetNotification, postTitle);
+        Notification notification = mapper.toNotificationForCommentParents(userSendNotification, userGetNotification, postTitle);
         notificationRepository.save(notification);
 
         userGetNotification.addNotificationToRecipient(notification);
@@ -134,9 +136,7 @@ public class NotificationService {
 
 
     private List<NotificationForm> convertNotificationsToDto(List<Notification> notifications) {
-        return notifications.stream()
-                .map(NotificationForm::of)
-                .toList();
+        return mapper.toNotificationFormList(notifications);
     }
 
     private List<Notification> filterNotificationsByStatus(User sessionUser, Optional<Boolean> status) {

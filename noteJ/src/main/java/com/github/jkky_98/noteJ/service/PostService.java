@@ -70,6 +70,8 @@ public class PostService {
                         PostTag::getTag
                 ).toList();
 
+
+
         tagRepository.deleteAll(tagsRemoved);
         postRepository.delete(post);
 
@@ -77,6 +79,7 @@ public class PostService {
         evictTagCache(userIdPost);
 
     }
+
 
     private Long validDeletePostAndGetRemovedPostId(String postUrl, Long sessionUserId) {
         User userFind = userService.findUserById(sessionUserId);

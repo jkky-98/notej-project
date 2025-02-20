@@ -3,7 +3,7 @@ package com.github.jkky_98.noteJ.web.controller.global;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.service.GlobalService;
 import com.github.jkky_98.noteJ.service.NotificationService;
-import com.github.jkky_98.noteJ.web.controller.form.UserViewForm;
+import com.github.jkky_98.noteJ.web.controller.form.UserNavigationViewForm;
 import com.github.jkky_98.noteJ.web.session.SessionConst;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -60,7 +60,6 @@ public class GlobalControllerAdvice {
         String requestUri = request.getRequestURI();
 
         // 특정 URL에서는 실행하지 않음
-        // toDO: 이거 고민 필요하다....
         if (    requestUri.startsWith("/api/") ||
                 requestUri.startsWith("/editor/") ||
                 requestUri.startsWith("/image-print/")
@@ -74,7 +73,7 @@ public class GlobalControllerAdvice {
             return; // 세션에 사용자 정보가 없으면 바로 반환
         }
 
-        UserViewForm navigationWithSessionUser = globalService.getNavigationWithSessionUser(loginUser.getId());
+        UserNavigationViewForm navigationWithSessionUser = globalService.getNavigationWithSessionUser(loginUser.getId());
         model.addAttribute("sessionUser", navigationWithSessionUser);
 
         // 알림 수 가져오기

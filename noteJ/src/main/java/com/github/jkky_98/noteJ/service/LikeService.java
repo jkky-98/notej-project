@@ -2,12 +2,12 @@ package com.github.jkky_98.noteJ.service;
 
 import com.github.jkky_98.noteJ.domain.Like;
 import com.github.jkky_98.noteJ.domain.Post;
+import com.github.jkky_98.noteJ.domain.mapper.LikeMapper;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.exception.LikeBadRequestClientException;
 import com.github.jkky_98.noteJ.exception.LikeSelfSaveClientException;
 import com.github.jkky_98.noteJ.repository.LikeRepository;
 import com.github.jkky_98.noteJ.service.dto.DeleteLikeToServiceDto;
-import com.github.jkky_98.noteJ.service.dto.GetLikeStatusToServiceDto;
 import com.github.jkky_98.noteJ.service.dto.SaveLikeToServiceDto;
 import com.github.jkky_98.noteJ.web.controller.dto.LikeListByPostDto;
 import com.github.jkky_98.noteJ.web.controller.dto.LikeStatusForm;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,11 +29,12 @@ public class LikeService {
     private final LikeRepository likeRepository;
     private final PostService postService;
     private final NotificationService notificationService;
+    private final LikeMapper likeMapper;
 
-    @Transactional
-    public LikeStatusForm getLikeStatus(final GetLikeStatusToServiceDto request) {
-        User userFind = userService.findUserById(request.getSessionUserId());
-        Post postFind = postService.findByPostUrl(request.getPostUrl());
+    @Transactional(readOnly = true)
+    public LikeStatusForm getLikeStatus(String postUrl, Long sessionUserId) {
+        User userFind = userService.findUserById(sessionUserId);
+        Post postFind = postService.findByPostUrl(postUrl);
         boolean isLike = likeRepository.existsByUserAndPost(userFind, postFind);
 
         return LikeStatusForm.of(isLike);
@@ -54,7 +54,7 @@ public class LikeService {
             throw new LikeSelfSaveClientException("스스로에게 좋아요는 불가능 합니다.");
         }
 
-        Like like = Like.of(postFind, userFind);
+        Like like = likeMapper.toLike(userFind, postFind);
         likeRepository.save(like);
 
         // 좋아요 알림 처리
@@ -74,8 +74,7 @@ public class LikeService {
         Post postFind = postService.findByPostUrl(dto.getPostUrl());
         User userFind = userService.findUserById(dto.getUserId());
 
-        Optional<Like> likeByUserAndPost = likeRepository.findByUserAndPost(userFind, postFind);
-        Like like = likeByUserAndPost.orElseThrow(() -> new EntityNotFoundException("like not found"));
+        Like like = likeRepository.findByUserAndPost(userFind, postFind).orElseThrow(() -> new EntityNotFoundException("like not found"));
 
         likeRepository.delete(like);
 
@@ -85,11 +84,9 @@ public class LikeService {
     public List<LikeListByPostDto> getLikeListByPostUrl(String postUrl) {
         Post post = postService.findByPostUrl(postUrl);
 
-        return post.getLikes().stream()
-                .map(like -> {
-                    User user = like.getUser();
-                    return LikeListByPostDto.ofFromUser(user);
-                })
+        return post.getLikes()
+                .stream()
+                .map(like -> likeMapper.toLikeListByPostDto(like.getUser()))
                 .toList();
     }
 
@@ -101,8 +98,9 @@ public class LikeService {
     public List<LikeCardForm> getLikeCards(Long userId) {
         User user = userService.findUserById(userId);
 
-        return user.getLikes().stream()
-                .map(like -> LikeCardForm.ofFromPost(like.getPost()))
+        return user.getLikes()
+                .stream()
+                .map(like -> likeMapper.toLikeCardFormByPost(like.getPost()))
                 .toList();
     }
 }

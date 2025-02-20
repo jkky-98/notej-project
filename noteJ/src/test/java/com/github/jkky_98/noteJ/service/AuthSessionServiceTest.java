@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("[AuthSessionService] Unit Tests")
 public class AuthSessionServiceTest {
 
     @Mock

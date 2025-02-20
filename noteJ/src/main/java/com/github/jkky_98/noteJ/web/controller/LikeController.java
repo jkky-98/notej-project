@@ -32,10 +32,8 @@ public class LikeController {
             @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser
     ) {
         LikeStatusForm likeStatus = likeService.getLikeStatus(
-                new GetLikeStatusToServiceDto(
-                        postUrl,
-                        sessionUser.getId()
-                )
+                postUrl,
+                sessionUser.getId()
         );
 
         return likeStatus;

@@ -23,5 +23,4 @@ public interface TagMapper {
     @Mapping(source = "post", target = "post")
     @Mapping(source = "tag", target = "tag")
     PostTag toPostTag(Post post, Tag tag);
-
 }
