@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
+@Table(
+        name = "POST",
+        indexes = @Index(name = "idx_post_url", columnList = "postUrl")
+)
 @Getter
 @Builder(toBuilder = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 기본 생성자
@@ -32,6 +36,7 @@ public class Post extends BaseEntity {
 
     private String postSummary;
 
+    @Column(unique = true, nullable = false)
     private String postUrl;
 
     private String thumbnail;

@@ -10,11 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(
+        name = "user_table",
+        indexes = @Index(name = "idx_username", columnList = "username")
+)
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 기본 생성자
 @AllArgsConstructor(access = AccessLevel.PRIVATE) // 빌더와 함께 사용할 모든 필드 생성자
-@Table(name = "user_table")
 public class User extends BaseEntity {
     @Id @GeneratedValue
     @Column(name = "user_id")
