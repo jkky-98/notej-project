@@ -65,6 +65,7 @@ public class CommandDispatcher {
                 }
             }
         }
+        System.out.println("Fdsafaf" + result);
         return xtermsMapper.fromResult(result);
     }
 }

@@ -3,7 +3,6 @@ package com.github.jkky_98.noteJ.web.session;
 import com.github.jkky_98.noteJ.domain.user.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 

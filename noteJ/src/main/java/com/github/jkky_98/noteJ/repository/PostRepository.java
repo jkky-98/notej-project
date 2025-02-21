@@ -12,14 +12,6 @@ import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
 
-    @Query("SELECT p " +
-            "FROM User u " +
-            "JOIN u.posts p " + // 연관 필드를 기준으로 조인
-            "WHERE p.postUrl = :postUrl AND u.username = :username")
-    Post findPostByUsernameAndPostUrl(@Param("username") String username, @Param("postUrl") String postUrl);
-
-    Optional<Post> findByUserUsernameAndPostUrl(String username, String postUrl);
-
     Optional<Post> findByPostUrl(String postUrl);
 
     List<Post> findAllByUserIdAndWritableFalse(Long userId);

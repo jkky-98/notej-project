@@ -19,9 +19,9 @@ public class UserTest {
     	// when
 
     	// then
-        assertThat(testUser.getUsername()).isEqualTo("testname");
-        assertThat(testUser.getEmail()).isEqualTo("test@gmail.com");
-        assertThat(testUser.getPassword()).isEqualTo("testpassword");
+        assertThat(testUser.getUsername()).isEqualTo("testuser");
+        assertThat(testUser.getEmail()).isEqualTo("test@example.com");
+        assertThat(testUser.getPassword()).isEqualTo("password123");
         assertThat(testUser.getUserRole()).isEqualTo(UserRole.USER);
     }
 
