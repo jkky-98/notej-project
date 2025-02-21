@@ -31,6 +31,7 @@ public class PostsService {
     private final PostMapper postMapper;
     private final PageMapper pageMapper;
     private final SeriesMapper seriesMapper;
+    private final PostService postService;
 
     @Transactional(readOnly = true)
     public List<PostDto> getPosts(Long userId, PostsConditionForm cond) {
@@ -98,5 +99,16 @@ public class PostsService {
         List<Post> postAllNotOpen = postRepository.findAllByUserIdAndWritableFalse(userFind.getId());
 
         return postMapper.toPostNotOpenDtoList(postAllNotOpen);
+    }
+
+    // toDo : need to Test
+    @Transactional(readOnly = true)
+    public List<PostDto> getPostsGlobalWithPaging(SearchGlobalCondition cond, Pageable pageable) {
+        String searchKeyword = cond.getKeyword();
+
+        Page<Post> postsPage = postRepository.findAllByWritableTrue(searchKeyword, pageable);
+
+        return postMapper.toPostDtoListFromPage(postsPage);
+
     }
 }

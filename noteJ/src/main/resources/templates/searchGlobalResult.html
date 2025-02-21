@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:insert="~{fragments/header :: header}"></div>
+<body>
+  <div th:insert="~{fragments/header :: navigation}"></div>
+  <div th:insert="~{fragments/searchBar :: searchBar}"></div>
+  <section>
+    <div class="container" id="post-list">
+      <div class="row justify-content-center">
+        <div th:each="post : ${posts}">
+          <!-- 카드 전체를 클릭 가능하게 -->
+          <a th:href="@{'/@' + ${post.username} + '/post/' + ${post.postUrl}}" class="card posts-style my-5 text-decoration-none" >
+            <!-- 포스트 썸네일 -->
+            <img th:src="@{/image-print/{path}(path=${post.thumbnail})}"
+                 class="card-img-top thumbnail-posts-img" alt="Post Thumbnail" />
+            <!-- 포스트 제목 -->
+            <div class="card-body">
+              <h3 class="card-title" th:text="${post.title}">
+                Post Title
+              </h3>
+              <p class="card-text" th:text="${post.postSummary}">This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.</p>
+            </div>
+            <div class="card-footer">
+              <small class="text-muted" th:text="${#temporals.format(post.createByDt, 'yyyy-MM-dd')}">Last updated 3 mins ago</small>
+              <small class="text-muted"> . </small>
+              <small class="text-muted" th:text="${post.commentCount} + '개의 댓글'"></small>
+              <small class="text-muted"> . </small>
+              <small class="text-muted" th:text="'♥' + ${post.likeCount}"></small>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</body>
+</html>

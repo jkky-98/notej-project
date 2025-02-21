@@ -88,6 +88,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         return new PageImpl<>(content, pageable, total);
     }
 
+
     private BooleanExpression userCondition(Long userId, QUser u) {
         return userId != null
                 ? u.id.eq(userId)

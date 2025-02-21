@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -91,5 +93,20 @@ class PostRepositoryTest {
         assertThat(result).hasSize(2)
                 .extracting("postUrl")
                 .containsExactlyInAnyOrder("url1", "url3");
+    }
+
+    @Test
+    @DisplayName("findAllByWritableTrue() - 검색 조건에 맞는 게시글 반환")
+    void testFindAllByWritableTrue() {
+        // given
+        // 쿼리에서는 post.writable = true AND p.title LIKE %:keyword%
+        // 따라서 "Spring Boot"가 포함되고 writable이 true인 게시글은 post1만 해당됨.
+        PageRequest pageable = PageRequest.of(0, 10);
+        // userId 파라미터는 쿼리에서 사용되지 않지만, 호출 시 전달
+        Page<Post> result = postRepository.findAllByWritableTrue("ost", pageable);
+
+        // then
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getTitle()).contains("ost");
     }
 }
