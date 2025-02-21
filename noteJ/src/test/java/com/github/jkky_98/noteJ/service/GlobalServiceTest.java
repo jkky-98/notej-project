@@ -47,7 +47,7 @@ class GlobalServiceTest {
     }
 
     @Test
-    @DisplayName("[GlobalService] getNavigationWithSessionUser: 정상적으로 DTO 반환")
+    @DisplayName("getNavigationWithSessionUser() - 정상적으로 DTO 반환")
     void testGetNavigationWithSessionUser() {
         Long userId = 1L;
 

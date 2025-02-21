@@ -8,6 +8,7 @@ import com.github.jkky_98.noteJ.repository.NotificationRepository;
 import com.github.jkky_98.noteJ.web.controller.dto.NotificationForm;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserService userService;
-    private final NotificationMapper mapper;
+    private final NotificationMapper notificationMapper;
 
     /**
      * Follow 신청 알림 보내기
@@ -33,7 +34,7 @@ public class NotificationService {
     @CacheEvict(value = "navigationAlarm", key = "#userGetNotification.id")
     public void sendFollowNotification(User userGetNotification, User userSendNotification) {
         // 알림 엔티티 생성 for 팔로우
-        Notification notification = mapper.toNotificationForFollow(userGetNotification, userSendNotification);
+        Notification notification = notificationMapper.toNotificationForFollow(userGetNotification, userSendNotification);
         // 알림 저장
         notificationRepository.save(notification);
 
@@ -44,7 +45,7 @@ public class NotificationService {
     @Transactional
     @CacheEvict(value = "navigationAlarm", key = "#userGetNotification.id")
     public void sendLikePostNotification(User userGetNotification, User userSendNotification, String postTitle) {
-        Notification notification = mapper.toNotificationForLike(userSendNotification, userGetNotification, postTitle);
+        Notification notification = notificationMapper.toNotificationForLike(userSendNotification, userGetNotification, postTitle);
         notificationRepository.save(notification);
 
         userGetNotification.addNotificationToRecipient(notification);
@@ -54,7 +55,7 @@ public class NotificationService {
     @Transactional
     @CacheEvict(value = "navigationAlarm", key = "#userGetNotification.id")
     public void sendCommentPostNotification(User userGetNotification, User userSendNotification, String postTitle) {
-        Notification notification = mapper.toNotificationForComment(userSendNotification, userGetNotification, postTitle);
+        Notification notification = notificationMapper.toNotificationForComment(userSendNotification, userGetNotification, postTitle);
         notificationRepository.save(notification);
 
         userGetNotification.addNotificationToRecipient(notification);
@@ -63,7 +64,7 @@ public class NotificationService {
 
     @Transactional
     public void sendCommentParentsNotification(User userGetNotification, User userSendNotification, String postTitle) {
-        Notification notification = mapper.toNotificationForCommentParents(userSendNotification, userGetNotification, postTitle);
+        Notification notification = notificationMapper.toNotificationForCommentParents(userSendNotification, userGetNotification, postTitle);
         notificationRepository.save(notification);
 
         userGetNotification.addNotificationToRecipient(notification);
@@ -136,7 +137,7 @@ public class NotificationService {
 
 
     private List<NotificationForm> convertNotificationsToDto(List<Notification> notifications) {
-        return mapper.toNotificationFormList(notifications);
+        return notificationMapper.toNotificationFormList(notifications);
     }
 
     private List<Notification> filterNotificationsByStatus(User sessionUser, Optional<Boolean> status) {

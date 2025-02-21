@@ -4,6 +4,8 @@ import com.github.jkky_98.noteJ.domain.Post;
 import com.github.jkky_98.noteJ.domain.ViewLog;
 import com.github.jkky_98.noteJ.repository.PostRepository;
 import com.github.jkky_98.noteJ.repository.ViewLogRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.OptimisticLockException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +24,8 @@ import java.util.Optional;
 public class ViewLogService {
 
     private final ViewLogRepository viewLogRepository;
+    private final EntityManager entityManager;
+    private final PostService postService;
 
     private static final String COOKIE_NAME = "viewed_posts";
     private static final int COOKIE_EXPIRATION = 60 * 60 * 24; // 24시간 (초 단위)
@@ -72,8 +76,10 @@ public class ViewLogService {
         while (!success && retryCount < maxRetry) {
             try {
                 post.increaseViewCount();
-
+                entityManager.flush();
+                entityManager.clear();
                 log.info("✅ 조회수 증가 성공 - postId: {}, 새로운 viewCount: {}", postId, post.getViewCount());
+
 
                 // 4️⃣ 새로운 조회 기록을 `ViewLog`에 저장 (쿠키가 없던 경우만 저장)
                 if (viewedPosts.isEmpty()) {
@@ -101,6 +107,10 @@ public class ViewLogService {
                     log.error("❌ 조회수 업데이트 실패 (최대 재시도 초과) - postId: {}", postId);
                     throw new RuntimeException("조회수 업데이트 실패 (최대 재시도 초과)", e);
                 }
+
+                // 🔴 기존 post 엔티티를 버리고 최신 데이터를 다시 조회
+                entityManager.clear();  // ✅ 기존 영속성 컨텍스트 비우기
+                post = postService.findById(postId);
             }
         }
     }

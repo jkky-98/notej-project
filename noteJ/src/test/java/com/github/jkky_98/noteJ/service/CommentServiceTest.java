@@ -65,7 +65,7 @@ class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("[CommentService] - saveComment: 일반 댓글 저장 (부모 없음)")
+    @DisplayName("saveComment() - 일반 댓글 저장 (부모 없음)")
     void testSaveComment_NormalComment_NoParent() {
         // given
         Long sessionUserId = sessionUser.getId();
@@ -99,7 +99,7 @@ class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("[CommentService] - saveComment: 대댓글 저장")
+    @DisplayName("saveComment() - 대댓글 저장")
     void testSaveComment_ReplyComment() {
         // given
         Long sessionUserId = 3L;
@@ -150,7 +150,7 @@ class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("[CommentService] - deleteComment: 정상 삭제")
+    @DisplayName("deleteComment() - 정상 삭제")
     void testDeleteComment_SuccessfulDeletion() {
         // given
         Long commentId = 100L;
@@ -173,7 +173,7 @@ class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("[CommentService] - deleteComment: 작성자 불일치 예외 발생")
+    @DisplayName("deleteComment() - 작성자 불일치 예외 발생")
     void testDeleteComment_UserMismatch_ShouldThrowException() {
         // given
         Long commentId = 100L;
@@ -202,7 +202,7 @@ class CommentServiceTest {
     }
 
     @Test
-    @DisplayName("[CommentService] - deleteComment: 댓글 미존재 예외 발생")
+    @DisplayName("deleteComment() - 댓글 미존재 예외 발생")
     void testDeleteComment_CommentNotFound_ShouldThrowException() {
         // given
         Long commentId = 100L;

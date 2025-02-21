@@ -74,7 +74,7 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("findByPostUrl: 존재하는 포스트 반환")
+    @DisplayName("findByPostUrl() - 존재하는 포스트 반환")
     void testFindByPostUrl_found() {
         // given
         String url = "test-url";
@@ -90,7 +90,7 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("findByPostUrl: 포스트 미존재 시 예외 발생")
+    @DisplayName("findByPostUrl() - 포스트 미존재 시 예외 발생")
     void testFindByPostUrl_notFound() {
         String url = "not-found";
         when(postRepository.findByPostUrl(url)).thenReturn(Optional.empty());
@@ -101,7 +101,7 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("findById: 존재하는 포스트 반환")
+    @DisplayName("findById() - 존재하는 포스트 반환")
     void testFindById_found() {
         when(postRepository.findById(10L)).thenReturn(Optional.of(post));
 
@@ -112,7 +112,7 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("findById: 포스트 미존재 시 예외 발생")
+    @DisplayName("findById() - 포스트 미존재 시 예외 발생")
     void testFindById_notFound() {
         when(postRepository.findById(10L)).thenReturn(Optional.empty());
 
@@ -122,7 +122,7 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("getPost: 포스트 DTO 반환")
+    @DisplayName("getPost() - 포스트 DTO 반환")
     void testGetPost() {
         String url = "test-url";
         when(postRepository.findByPostUrl(url)).thenReturn(Optional.of(post));
@@ -135,14 +135,14 @@ class PostServiceTest {
     }
 
     @Test
-    @DisplayName("evictTagCache: 캐시 제거 메서드 실행")
+    @DisplayName("evictTagCache() - 캐시 제거 메서드 실행")
     void testEvictTagCache() {
         // 내부 로직이 없으므로, 단순히 메서드 호출 시 예외가 발생하지 않는지 확인
         Long userId = 1L;
         assertDoesNotThrow(() -> postService.evictTagCache(userId));
     }
     @Test
-    @DisplayName("deletePost: 정상 포스트 삭제")
+    @DisplayName("deletePost() - 정상 포스트 삭제")
     void testDeletePost_success() {
         String url = "test-url";
         Long sessionUserId = 1L;
@@ -191,7 +191,7 @@ class PostServiceTest {
 
 
     @Test
-    @DisplayName("deletePost: 세션유저와 포스트 소유자 불일치 시 예외 발생")
+    @DisplayName("deletePost() - 세션유저와 포스트 소유자 불일치 시 예외 발생")
     void testDeletePost_userMismatch() {
         String url = "test-url";
         Long sessionUserId = 1L;

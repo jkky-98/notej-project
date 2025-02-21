@@ -32,7 +32,7 @@ public class AuthSessionServiceTest {
     private AuthSessionService authSessionService;
 
     @Test
-    @DisplayName("[AuthSessionService] logout() 호출 시 세션 무효화 Mock Test")
+    @DisplayName("logout() - 호출 시 세션 무효화 Mock Test")
      void logoutTest() {
         HttpSession session = mock(HttpSession.class);
         authSessionService.logout(session);
@@ -40,7 +40,7 @@ public class AuthSessionServiceTest {
     }
 
     @Test
-    @DisplayName("[AuthSessionService] login() 성공 케이스: 올바른 아이디와 비밀번호")
+    @DisplayName("login() - 성공 케이스: 올바른 아이디와 비밀번호")
     void loginSuccessTest() throws AuthenticationException {
         // given
         LoginForm form = new LoginForm();
@@ -62,7 +62,7 @@ public class AuthSessionServiceTest {
     }
 
     @Test
-    @DisplayName("[AuthSessionService] login() 실패 케이스: 잘못된 비밀번호")
+    @DisplayName("login() - 실패 케이스: 잘못된 비밀번호")
     void loginFailTest() {
         // given
         LoginForm form = new LoginForm();
@@ -81,7 +81,7 @@ public class AuthSessionServiceTest {
     }
 
     @Test
-    @DisplayName("[AuthSessionService] signUp() 성공 케이스: 중복 없음")
+    @DisplayName("signUp() - 성공 케이스: 중복 없음")
     void signUpSuccessTest() {
         // given
         SignUpForm form = new SignUpForm();
@@ -111,7 +111,7 @@ public class AuthSessionServiceTest {
     }
 
     @Test
-    @DisplayName("[AuthSessionService] signUp() 실패 케이스: username 중복")
+    @DisplayName("signUp() - 실패 케이스: username 중복")
     void signUpUsernameDuplicationTest() {
         // given
         SignUpForm form = new SignUpForm();
@@ -133,7 +133,7 @@ public class AuthSessionServiceTest {
     }
 
     @Test
-    @DisplayName("[AuthSessionService] signUp() 실패 케이스: email 중복")
+    @DisplayName("signUp() - 실패 케이스: email 중복")
     void signUpEmailDuplicationTest() {
         // given
         SignUpForm form = new SignUpForm();

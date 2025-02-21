@@ -79,7 +79,7 @@ class LikeServiceTest {
     }
 
     @Test
-    @DisplayName("[LikeService] getLikeStatus: 좋아요 상태가 true인 경우")
+    @DisplayName("getLikeStatus() - 좋아요 상태가 true인 경우")
     void testGetLikeStatus_true() {
         // given
         when(userService.findUserById(1L)).thenReturn(user);
@@ -97,7 +97,7 @@ class LikeServiceTest {
     }
 
     @Test
-    @DisplayName("[LikeService] getLikeStatus: 좋아요 상태가 false인 경우")
+    @DisplayName("getLikeStatus() - 좋아요 상태가 false인 경우")
     void testGetLikeStatus_false() {
         // given
         when(userService.findUserById(1L)).thenReturn(user);
@@ -115,7 +115,7 @@ class LikeServiceTest {
     }
 
     @Test
-    @DisplayName("[LikeService] saveLike: 이미 좋아요 상태이면 예외 발생")
+    @DisplayName("saveLike() - 이미 좋아요 상태이면 예외 발생")
     void testSaveLike_whenAlreadyLiked_shouldThrowException() {
         // given
         SaveLikeToServiceDto dto = new SaveLikeToServiceDto();
@@ -128,7 +128,7 @@ class LikeServiceTest {
     }
 
     @Test
-    @DisplayName("[LikeService] saveLike: 자기 자신의 게시글에 좋아요 시도 시 예외 발생")
+    @DisplayName("saveLike() - 자기 자신의 게시글에 좋아요 시도 시 예외 발생")
     void testSaveLike_whenSelfLike_shouldThrowException() {
         // given
         SaveLikeToServiceDto dto = new SaveLikeToServiceDto();
@@ -153,7 +153,7 @@ class LikeServiceTest {
     }
 
     @Test
-    @DisplayName("[LikeService] saveLike: 정상 좋아요 저장")
+    @DisplayName("saveLike() - 정상 좋아요 저장")
     void testSaveLike_success() {
         // given
         SaveLikeToServiceDto dto = new SaveLikeToServiceDto();
@@ -184,7 +184,7 @@ class LikeServiceTest {
     }
 
     @Test
-    @DisplayName("[LikeService] deleteLike: 좋아요 상태가 false이면 예외 발생")
+    @DisplayName("deleteLike() - 좋아요 상태가 false이면 예외 발생")
     void testDeleteLike_whenNotLiked_shouldThrowException() {
         // given
         DeleteLikeToServiceDto dto = new DeleteLikeToServiceDto();
@@ -197,7 +197,7 @@ class LikeServiceTest {
     }
 
     @Test
-    @DisplayName("[LikeService] deleteLike: 정상 좋아요 삭제")
+    @DisplayName("deleteLike() - 정상 좋아요 삭제")
     void testDeleteLike_success() {
         // given
         DeleteLikeToServiceDto dto = new DeleteLikeToServiceDto();
@@ -222,7 +222,7 @@ class LikeServiceTest {
     }
 
     @Test
-    @DisplayName("[LikeService] deleteLike: 좋아요가 존재하지 않으면 예외 발생")
+    @DisplayName("deleteLike() - 좋아요가 존재하지 않으면 예외 발생")
     void testDeleteLike_whenLikeNotFound_shouldThrowException() {
         // given
         DeleteLikeToServiceDto dto = new DeleteLikeToServiceDto();
@@ -241,7 +241,7 @@ class LikeServiceTest {
     }
 
     @Test
-    @DisplayName("[LikeService] getLikeListByPostUrl: 게시글의 좋아요 목록 반환")
+    @DisplayName("getLikeListByPostUrl() - 게시글의 좋아요 목록 반환")
     void testGetLikeListByPostUrl() {
         // given
         when(postService.findByPostUrl("test-post")).thenReturn(post);
@@ -267,7 +267,7 @@ class LikeServiceTest {
     }
 
     @Test
-    @DisplayName("[LikeService] getLikeCards: 사용자의 좋아요 카드 목록 반환")
+    @DisplayName("getLikeCards() - 사용자의 좋아요 카드 목록 반환")
     void testGetLikeCards() {
         // given
         when(userService.findUserById(1L)).thenReturn(user);

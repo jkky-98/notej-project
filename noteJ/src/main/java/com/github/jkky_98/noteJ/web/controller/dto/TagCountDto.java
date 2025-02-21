@@ -8,4 +8,7 @@ import lombok.Data;
 public class TagCountDto {
     private String tagName;
     private Long count;
+
+    public TagCountDto() {
+    }
 }
