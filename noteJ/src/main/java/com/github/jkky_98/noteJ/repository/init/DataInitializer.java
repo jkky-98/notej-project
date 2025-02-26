@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,6 +45,7 @@ public class DataInitializer {
                     .username("master")
                     .email("aal2525@ajou.ac.kr")
                     .password("master")
+                    .accountExpiredTime(LocalDateTime.now())
                     .userRole(UserRole.ADMIN)
                     .userDesc(initUserDesc)
                     .build();

@@ -5,8 +5,11 @@ import com.github.jkky_98.noteJ.web.controller.form.ProfileForm;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface ProfileMapper {
 
     @Mapping(source = "user.username", target = "username")

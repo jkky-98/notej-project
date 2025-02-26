@@ -9,11 +9,14 @@ import com.github.jkky_98.noteJ.web.controller.form.FollowingListForm;
 import com.github.jkky_98.noteJ.web.controller.form.FollowerListForm;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface FollowMapper {
 
     // ===== Following 관련 매핑 =====

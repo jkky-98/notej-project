@@ -6,8 +6,11 @@ import com.github.jkky_98.noteJ.web.controller.form.SignUpForm;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+// toDo: testCode 수정 필요, DB 마이그레이션 필요(필드 수정됨)
 
 @Entity
 @Table(
@@ -33,6 +36,11 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+    private int failedCount;
+
+    private boolean accountLocked;
+
+    private LocalDateTime accountExpiredTime;
 
     // 연관관계
     @JoinColumn(name = "user_desc_id")
@@ -114,5 +122,25 @@ public class User extends BaseEntity {
 
     public boolean isPasswordValid(String password) {
         return this.password.equals(password);
+    }
+
+    public void updateAccountLocked() {
+        this.accountLocked = true;
+    }
+
+    public void increaseFailedCount() {
+        this.failedCount++;
+    }
+
+    public void initFailedCount() {
+        this.failedCount = 0;
+    }
+
+    public void updateAccountExpiredTime() {
+        this.accountExpiredTime = LocalDateTime.now().plusMinutes(5);
+    }
+
+    public void initAccountLocked() {
+        this.accountLocked = false;
     }
 }

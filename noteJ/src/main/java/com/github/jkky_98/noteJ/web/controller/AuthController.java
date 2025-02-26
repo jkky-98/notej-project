@@ -1,5 +1,7 @@
 package com.github.jkky_98.noteJ.web.controller;
 
+import com.github.jkky_98.noteJ.exception.authentication.BadCredentialsException;
+import com.github.jkky_98.noteJ.exception.authentication.LockedException;
 import com.github.jkky_98.noteJ.web.controller.form.LoginForm;
 import com.github.jkky_98.noteJ.web.controller.form.SignUpForm;
 import com.github.jkky_98.noteJ.domain.user.User;
@@ -63,10 +65,19 @@ public class AuthController {
 
             return "redirect:" + redirectURL;
 
-        } catch (AuthenticationException e) {
+        } catch (BadCredentialsException e) {
             // 로그인 실패 시 BindingResult에 에러 메시지 추가
-            bindingResult.reject("loginFail", e.getMessage());
+            String loginFailMessage = e.getMessage();
+
+            if (e.getFailedCount() > 0) {
+                loginFailMessage = loginFailMessage + " [남은 로그인 시도" + (5 - e.getFailedCount() + "회]");
+            }
+            bindingResult.reject("loginFail", loginFailMessage);
+
             return "auth/loginForm"; // 로그인 실패 시 로그인 폼으로 다시 돌아감
+        } catch (LockedException e) {
+            bindingResult.reject("loginFail", e.getMessage());
+            return "auth/loginForm";
         }
     }
 

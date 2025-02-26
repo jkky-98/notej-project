@@ -8,6 +8,7 @@ import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+import org.mapstruct.ReportingPolicy;
 import org.springframework.data.domain.Page;
 
 import java.net.URLDecoder;
@@ -15,7 +16,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
-@Mapper(componentModel = "spring", uses = {CommentMapper.class})
+@Mapper(componentModel = "spring", uses = {CommentMapper.class},
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface PostMapper {
 
     @Mapping(target = "id", ignore = true)
