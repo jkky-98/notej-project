@@ -27,11 +27,16 @@ public class CommandDispatcher {
 
         // 동적 명령어 등록: 예를 들어 "like all series = " 뒤에 시리즈 이름이 오는 경우
         Pattern pattern = Pattern.compile("^like all series = \"(.+)\"$", Pattern.CASE_INSENSITIVE);
+        Pattern pattern2 = Pattern.compile("^series change \"(.+)\" to \"(.+)\"$", Pattern.CASE_INSENSITIVE);
         dynamicCommands.add(new DynamicCommand(pattern, (cmd, userId, groups) -> {
             // groups.get(1)는 시리즈 이름에 해당합니다.
             String seriesName = groups.get(1);
-            System.out.println(seriesName);
             return xtermsService.getLikeAllBySeries(cmd, userId, seriesName);
+        }));
+        dynamicCommands.add(new DynamicCommand(pattern2, (cmd, userId, groups) -> {
+            String oldSeriesName = groups.get(1);
+            String newSeriesName = groups.get(2);
+            return xtermsService.changePostsSeries(userId, oldSeriesName, newSeriesName);
         }));
     }
 
@@ -49,7 +54,9 @@ public class CommandDispatcher {
                 // 동적 명령어 처리
                 boolean handled = false;
                 for (DynamicCommand dynCmd : dynamicCommands) {
+                    System.out.println(dynCmd);
                     var matcher = dynCmd.getPattern().matcher(trimmedCommand);
+                    System.out.println(matcher.matches());
                     if (matcher.matches()) {
                         List<String> groups = new ArrayList<>();
                         for (int i = 0; i <= matcher.groupCount(); i++) {
@@ -65,7 +72,6 @@ public class CommandDispatcher {
                 }
             }
         }
-        System.out.println("Fdsafaf" + result);
         return xtermsMapper.fromResult(result);
     }
 }
