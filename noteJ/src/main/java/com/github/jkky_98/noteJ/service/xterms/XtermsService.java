@@ -42,7 +42,6 @@ public class XtermsService {
 
         return user.getUsername() + "님의 시리즈 : '" +  seriesName + "'의 총 좋아요 개수 : " + countAllLikeBySeries + "개 💖";
     }
-    // toDo: test 필요
     @Transactional
     public String changePostsSeries(Long userId, String oldSeriesName, String newSeriesName) {
         User user = userService.findUserById(userId);

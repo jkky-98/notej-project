@@ -1,5 +1,7 @@
 package com.github.jkky_98.noteJ.service;
 
+import com.github.jkky_98.noteJ.domain.Post;
+import com.github.jkky_98.noteJ.domain.Series;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.LikeRepository;
 import com.github.jkky_98.noteJ.service.xterms.XtermsService;
@@ -23,6 +25,8 @@ public class XtermsServiceTest {
     private LikeRepository likeRepository;
     @Mock
     private UserService userService;
+    @Mock
+    private SeriesService seriesService;
 
     @InjectMocks
     private XtermsService xtermsService;
@@ -73,5 +77,74 @@ public class XtermsServiceTest {
         assertThat(expected).isEqualTo(result);
         verify(userService).findUserById(userId);
         verify(likeRepository).countLikesByUserIdAndSeriesName(userId, seriesName);
+    }
+
+    @Test
+    @DisplayName("changePostsSeries() - 시리즈1에 소속된 모든 게시글 새로운 시리즈2로 수정 (시리즈2 이미 존재 경우)")
+    void testChangePostsSeriesExisted() {
+        Long userId = 1L;
+        String oldSeriesName = "MySeries";
+        String newSeriesName = "MySeries2";
+
+        User sessionUser = User.builder()
+                        .id(1L)
+                        .build();
+
+        Series newSeries = Series.of(newSeriesName);
+        Series oldSeries = Series.of(oldSeriesName);
+
+        oldSeries.getPosts().add(
+                Post.builder()
+                        .series(oldSeries)
+                        .build()
+        );
+
+        sessionUser.getSeriesList().add(
+                newSeries
+        );
+
+        when(userService.findUserById(userId)).thenReturn(sessionUser);
+        when(seriesService.getSeries(oldSeriesName, sessionUser)).thenReturn(newSeries);
+
+        String resultString = xtermsService.changePostsSeries(1L, oldSeriesName, newSeriesName);
+        String expectedString = "✅ [시리즈 " + oldSeriesName + "] 에 소속된 모든 게시글을 " + "[시리즈 " + newSeriesName + "] 으로 변경했습니다.";
+
+        assertThat(resultString).isEqualTo(expectedString);
+        verify(userService).findUserById(userId);
+        verify(seriesService).getSeries(oldSeriesName, sessionUser);
+
+    }
+
+    @Test
+    @DisplayName("changePostsSeries() - 시리즈1에 소속된 모든 게시글 새로운 시리즈2로 수정 (시리즈2 존재하지 않음)")
+    void testChangePostsSeriesNotExisted() {
+        Long userId = 1L;
+        String oldSeriesName = "MySeries";
+        String newSeriesName = "MySeries2";
+
+        User sessionUser = User.builder()
+                .id(1L)
+                .build();
+
+        Series newSeries = Series.of(newSeriesName);
+        Series oldSeries = Series.of(oldSeriesName);
+
+        oldSeries.getPosts().add(
+                Post.builder()
+                        .series(oldSeries)
+                        .build()
+        );
+
+        when(userService.findUserById(userId)).thenReturn(sessionUser);
+        when(seriesService.saveSeries(sessionUser, newSeriesName)).thenReturn(newSeries);
+        when(seriesService.getSeries(oldSeriesName, sessionUser)).thenReturn(newSeries);
+
+        String resultString = xtermsService.changePostsSeries(1L, oldSeriesName, newSeriesName);
+        String expectedString = "✅ [시리즈 " + oldSeriesName + "] 에 소속된 모든 게시글을 " + "[시리즈 " + newSeriesName + "] 으로 변경했습니다.";
+
+        assertThat(resultString).isEqualTo(expectedString);
+        verify(userService).findUserById(userId);
+        verify(seriesService).getSeries(oldSeriesName, sessionUser);
+
     }
 }

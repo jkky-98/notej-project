@@ -101,7 +101,6 @@ public class PostsService {
         return postMapper.toPostNotOpenDtoList(postAllNotOpen);
     }
 
-    // toDo : need to Test
     @Transactional(readOnly = true)
     public List<PostDto> getPostsGlobalWithPaging(SearchGlobalCondition cond, Pageable pageable) {
         String searchKeyword = cond.getKeyword();

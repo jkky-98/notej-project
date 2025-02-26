@@ -18,8 +18,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -190,7 +192,7 @@ public class PostsServiceTest {
     @Test
     @DisplayName("getPostsNotOpen() - 비공개 게시글 목록 조회")
     void testGetPostsNotOpen() {
-        // Given
+        // given
         List<Post> postList = List.of(Post.builder().build());
         List<PostNotOpenDto> expectedDtos = List.of(PostNotOpenDto.builder().build());
 
@@ -198,12 +200,53 @@ public class PostsServiceTest {
         when(postRepository.findAllByUserIdAndWritableFalse(user.getId())).thenReturn(postList);
         when(postMapper.toPostNotOpenDtoList(postList)).thenReturn(expectedDtos);
 
-        // When
+        // when
         List<PostNotOpenDto> result = postsService.getPostsNotOpen(1L);
 
-        // Then
+        // then
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(expectedDtos.size());
         verify(postRepository).findAllByUserIdAndWritableFalse(user.getId());
+    }
+
+    @Test
+    @DisplayName("getPostsGlobalWithPaging() - 전체 게시글 페이징 조회")
+    void testGetPostsGlobalWithPaging() {
+        // given
+        SearchGlobalCondition cond = new SearchGlobalCondition();
+        cond.setKeyword("Spring");
+        Pageable pageable = Pageable.ofSize(10);
+
+        // 더미 데이터 생성
+        List<Post> postList = new ArrayList<>();
+        Post post = Post.builder().build();
+        // 필요에 따라 post 객체에 필드값 설정
+        postList.add(post);
+
+        Page<Post> postsPage = new PageImpl<>(postList, pageable, postList.size());
+
+        // repository와 mapper 동작 정의
+        when(postRepository.findAllByWritableTrue(eq(cond.getKeyword()), eq(pageable)))
+                .thenReturn(postsPage);
+
+        List<PostDto> expectedDtos = new ArrayList<>();
+        PostDto postDto = PostDto.builder().build();
+        // 필요에 따라 postDto 객체에 필드값 설정
+        expectedDtos.add(postDto);
+
+        when(postMapper.toPostDtoListFromPage(postsPage))
+                .thenReturn(expectedDtos);
+
+        // when
+        List<PostDto> actualDtos = postsService.getPostsGlobalWithPaging(cond, pageable);
+
+        // then
+        assertThat(actualDtos).isNotNull();
+        assertThat(actualDtos.size()).isEqualTo(expectedDtos.size());
+        assertThat(actualDtos.get(0)).isEqualTo(postDto);
+
+        verify(postRepository, times(1))
+                .findAllByWritableTrue(eq(cond.getKeyword()), eq(pageable));
+        verify(postMapper, times(1)).toPostDtoListFromPage(postsPage);
     }
 }
