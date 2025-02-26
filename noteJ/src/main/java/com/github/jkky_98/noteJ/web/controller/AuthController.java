@@ -100,7 +100,6 @@ public class AuthController {
             return "auth/signUpForm";
         }
 
-        // 회원가입이 성공적으로 처리된 경우
         if (signUpUser == null) {
             // 회원가입 실패(아이디가 없거나 기타 이유로 null 반환)
             bindingResult.reject("signup.error", "회원가입에 실패했습니다. 나중에 다시 시도해주세요.");

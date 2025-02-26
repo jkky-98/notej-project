@@ -34,7 +34,10 @@ public class AuthorizationUsernamePasswordFilter implements Filter {
             "/api/post/likes/**",
             "/env",
             "/favicon.ico",
-            "/search-global/**"
+            "/search-global/**",
+            "/error/**",
+            "/error/403",
+            "/actuator/**",
     };
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 

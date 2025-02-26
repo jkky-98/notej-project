@@ -44,7 +44,7 @@ public class DataInitializer {
                     .username("master")
                     .email("aal2525@ajou.ac.kr")
                     .password("master")
-                    .userRole(UserRole.USER)
+                    .userRole(UserRole.ADMIN)
                     .userDesc(initUserDesc)
                     .build();
 
