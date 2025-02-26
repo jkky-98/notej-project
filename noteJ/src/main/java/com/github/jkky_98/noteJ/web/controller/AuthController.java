@@ -7,6 +7,7 @@ import com.github.jkky_98.noteJ.web.controller.form.SignUpForm;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.service.AuthService;
 import com.github.jkky_98.noteJ.web.session.SessionConst;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +50,7 @@ public class AuthController {
     public String saveLoginForm(@Validated @ModelAttribute("loginForm") LoginForm form,
                             BindingResult bindingResult,
                             @RequestParam String redirectURL,
-                            HttpSession session) {
+                            HttpServletRequest request) {
 
         // 유효성 검사 오류가 있으면 로그인 폼으로
         if (bindingResult.hasErrors()) {
@@ -61,7 +62,8 @@ public class AuthController {
         try {
             User loginUser = authService.login(form);
             // 로그인 성공 시 세션에 로그인 정보 저장
-            session.setAttribute(SessionConst.LOGIN_USER, loginUser);
+            // 세션 고정 공격 방지: 기존 세션이 있으면 무효화하고 새 세션 생성
+            initSession(request, loginUser);
 
             return "redirect:" + redirectURL;
 
@@ -79,6 +81,16 @@ public class AuthController {
             bindingResult.reject("loginFail", e.getMessage());
             return "auth/loginForm";
         }
+    }
+
+    private static void initSession(HttpServletRequest request, User loginUser) {
+        HttpSession oldSession = request.getSession(false);
+        if (oldSession != null) {
+            oldSession.invalidate();
+        }
+        HttpSession newSession = request.getSession(true);
+        newSession.setMaxInactiveInterval(30 * 60);
+        newSession.setAttribute(SessionConst.LOGIN_USER, loginUser);
     }
 
     @GetMapping("/signup")

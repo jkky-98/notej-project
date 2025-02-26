@@ -67,18 +67,5 @@ public class UserDesc extends BaseTimeEntity {
     public void updateProfilePic(String updatedProfilePic) {
         profilePic = updatedProfilePic;
     }
-
-    // toDo : modelMapper로 사라질 예정
-    public static UserDesc of(SignUpForm signUpForm) {
-        return UserDesc.builder()
-                .blogTitle(signUpForm.getBlogTitle())
-                .socialEmail(signUpForm.getEmail())
-                .commentAlarm(true)
-                .noteJAlarm(true)
-                .profilePic("default/default-profile.png")
-                .theme(ThemeMode.LIGHT)
-                .description("")
-                .build();
-    }
 }
 

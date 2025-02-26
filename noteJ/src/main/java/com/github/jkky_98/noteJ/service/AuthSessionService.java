@@ -1,5 +1,6 @@
 package com.github.jkky_98.noteJ.service;
 
+import com.github.jkky_98.noteJ.domain.mapper.UserMapper;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
 import com.github.jkky_98.noteJ.exception.authentication.BadCredentialsException;
 import com.github.jkky_98.noteJ.exception.authentication.LockedException;
@@ -13,8 +14,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.naming.AuthenticationException;
-import javax.security.auth.login.AccountLockedException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -23,6 +22,8 @@ import java.time.LocalDateTime;
 public class AuthSessionService implements AuthService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private static final int MAX_FAILED_ATTEMPTS = 5;
 
     @Override
     public void logout(HttpSession session) {
@@ -32,46 +33,50 @@ public class AuthSessionService implements AuthService {
     @Override
     @Transactional(noRollbackFor = BadCredentialsException.class)
     public User login(LoginForm form) throws BadCredentialsException {
-        String AuthenticationUsername = form.getUsername();
-        String AuthenticationPassword = form.getPassword();
+        String username = form.getUsername();
+        String password = form.getPassword();
 
-        User user = userRepository.findByUsername(AuthenticationUsername)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new BadCredentialsException("존재하지 않는 아이디입니다.", 0));
 
-        // 계정 잠금 확인
-        if (user.isAccountLocked()) {
-            // 잠금 만료시간 확인
-            if (user.getAccountExpiredTime().isBefore(LocalDateTime.now())) {
-                // 만료시간이 다 되었을 경우
-                user.initFailedCount();
-                user.initAccountLocked();
-            } else {
-                LocalDateTime now = LocalDateTime.now();
-                LocalDateTime accountExpiredTime = user.getAccountExpiredTime();
-                // 몇분 남았는지
-                Duration duration = Duration.between(now, accountExpiredTime);
-                long seconds = duration.getSeconds();
-                int minutesLeft = (int) Math.ceil(seconds / 60.0);
+        checkAccountLock(user);
 
-                throw new LockedException("계정이 잠겼습니다. " + minutesLeft + "분 후에 다시 로그인 하세요.");
-            }
-        }
-
-        if (!user.isPasswordValid(AuthenticationPassword)) {
-            int failedCount = user.getFailedCount();
-
-            if (failedCount == 5) {
-                user.updateAccountLocked();
-                user.updateAccountExpiredTime();
-            } else {
-                user.increaseFailedCount();
-            }
-
+        if (!user.isPasswordValid(password)) {
+            handleInvalidPassword(user);
             throw new BadCredentialsException("비밀번호가 틀렸습니다.", user.getFailedCount());
         }
 
         user.initFailedCount();
         return user;
+    }
+
+    private void checkAccountLock(User user) throws LockedException {
+        if (!user.isAccountLocked()) {
+            return;
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime accountExpiredTime = user.getAccountExpiredTime();
+
+        if (accountExpiredTime.isBefore(now)) {
+            // 잠금 기간이 만료되었으면 초기화
+            user.initFailedCount();
+            user.initAccountLocked();
+        } else {
+            // 남은 잠금 시간을 계산하여 예외 발생
+            Duration duration = Duration.between(now, accountExpiredTime);
+            int minutesLeft = (int) Math.ceil(duration.getSeconds() / 60.0);
+            throw new LockedException("계정이 잠겼습니다. " + minutesLeft + "분 후에 다시 로그인 하세요.");
+        }
+    }
+
+    private void handleInvalidPassword(User user) {
+        if (user.getFailedCount() >= MAX_FAILED_ATTEMPTS) {
+            user.updateAccountLocked();
+            user.updateAccountExpiredTime();
+        } else {
+            user.increaseFailedCount();
+        }
     }
 
 
@@ -90,10 +95,11 @@ public class AuthSessionService implements AuthService {
      * @param signUpForm
      * @return
      */
-    private static User createUserWithDescription(SignUpForm signUpForm) {
-        UserDesc userDesc = UserDesc.of(signUpForm);
-        User signUpUser = User.of(signUpForm, userDesc);
-        return signUpUser;
+    private User createUserWithDescription(SignUpForm signUpForm) {
+        UserDesc userDesc = userMapper.toUserDescSignUp(signUpForm);
+        User user = userMapper.toUserSignUp(signUpForm, userDesc);
+
+        return user;
     }
 
     /**

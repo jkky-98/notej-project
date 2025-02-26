@@ -1,6 +1,9 @@
 package com.github.jkky_98.noteJ.service;
 
+import com.github.jkky_98.noteJ.domain.mapper.UserMapper;
 import com.github.jkky_98.noteJ.domain.user.User;
+import com.github.jkky_98.noteJ.domain.user.UserDesc;
+import com.github.jkky_98.noteJ.exception.authentication.BadCredentialsException;
 import com.github.jkky_98.noteJ.repository.UserRepository;
 import com.github.jkky_98.noteJ.web.controller.form.LoginForm;
 import com.github.jkky_98.noteJ.web.controller.form.SignUpForm;
@@ -28,6 +31,9 @@ public class AuthSessionServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private UserMapper userMapper;
+
     @InjectMocks
     private AuthSessionService authSessionService;
 
@@ -41,7 +47,7 @@ public class AuthSessionServiceTest {
 
     @Test
     @DisplayName("login() - 성공 케이스: 올바른 아이디와 비밀번호")
-    void loginSuccessTest() throws AuthenticationException {
+    void loginSuccessTest() throws BadCredentialsException {
         // given
         LoginForm form = new LoginForm();
         form.setUsername("testuser");
@@ -77,7 +83,7 @@ public class AuthSessionServiceTest {
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
 
         // when & then
-        assertThrows(AuthenticationException.class, () -> authSessionService.login(form));
+        assertThrows(BadCredentialsException.class, () -> authSessionService.login(form));
     }
 
     @Test
@@ -89,15 +95,23 @@ public class AuthSessionServiceTest {
         form.setPassword("password123");
         form.setEmail("newuser@example.com");
 
+        // 저장 시 리포지토리가 전달받은 User 객체를 반환하도록 설정
+        UserDesc userDesc = UserDesc.builder()
+                .build();
+
+        User newUser = User.builder()
+                .username("newuser")
+                .password("password123")
+                .email("newuser@example.com")
+                .userDesc(userDesc)
+                .build();
+
+
         // 중복 검증을 위해 리포지토리가 빈 Optional 반환
         when(userRepository.findByUsername("newuser")).thenReturn(Optional.empty());
         when(userRepository.findByEmail("newuser@example.com")).thenReturn(Optional.empty());
-        // 저장 시 리포지토리가 전달받은 User 객체를 반환하도록 설정
-        User newUser = User.builder()
-                        .username("newuser")
-                        .password("password123")
-                        .email("newuser@example.com")
-                        .build();
+        when(userMapper.toUserDescSignUp(form)).thenReturn(userDesc);
+        when(userMapper.toUserSignUp(form,userDesc)).thenReturn(newUser);
 
         when(userRepository.save(any(User.class))).thenReturn(newUser);
 

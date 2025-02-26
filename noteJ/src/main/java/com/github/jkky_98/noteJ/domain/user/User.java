@@ -109,17 +109,6 @@ public class User extends BaseEntity {
         }
     }
 
-    // toDo : moderMapper로 인해 사라질 예정
-    public static User of(SignUpForm signUpForm, UserDesc userDesc) {
-        return User.builder()
-                .username(signUpForm.getUsername())
-                .email(signUpForm.getEmail())
-                .password(signUpForm.getPassword())
-                .userRole(UserRole.USER)
-                .userDesc(userDesc)
-                .build();
-    }
-
     public boolean isPasswordValid(String password) {
         return this.password.equals(password);
     }
