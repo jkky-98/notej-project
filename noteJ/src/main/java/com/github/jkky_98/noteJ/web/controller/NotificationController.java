@@ -48,7 +48,9 @@ public class NotificationController {
 
     // 3. 모두 삭제
     @PostMapping("/delete-all")
-    public ResponseEntity<?> deleteAllNotifications(@SessionAttribute(SessionConst.LOGIN_USER) User sessionUser) {
+    public ResponseEntity<?> deleteAllNotifications(
+            @SessionAttribute(SessionConst.LOGIN_USER) User sessionUser
+    ) {
         notificationService.deleteNotificationAll(sessionUser);
         Map<String, String> response = new HashMap<>();
         response.put("message", "All notifications deleted.");
