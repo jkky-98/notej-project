@@ -11,12 +11,14 @@ import com.github.jkky_98.noteJ.web.session.SessionConst;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class PostController {
 
     private final PostService postService;
@@ -34,10 +36,14 @@ public class PostController {
         model.addAttribute("postViewDto", postService.getPost(postUrl));
 
         // 조회수 증가 로직
-        viewLogService.increaseViewCount(
-                postService.findByPostUrl(postUrl),
-                request,
-                response);
+        try {
+            viewLogService.increaseViewCountV2(
+                    postService.findByPostUrl(postUrl).getId(),
+                    request,
+                    response);
+        } catch (RuntimeException e) {
+            log.error(e.getMessage(), e);
+        }
 
         return "postView";
     }

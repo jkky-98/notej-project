@@ -2,9 +2,13 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.min.css" />
+    <!-- tocbot -->
+    <link rel="stylesheet" href="https://unpkg.com/tocbot/dist/tocbot.css" />
+    <script src="https://unpkg.com/tocbot/dist/tocbot.min.js"></script>
+
     <style>
         .post-view-container {
-            max-width: 65%;
+            max-width: 80%;
             margin: 0 auto;
             padding: 20px;
         }
@@ -112,7 +116,14 @@
         </div>
     </div>
     <div class="row justify-content-center">
-        <div id="viewer"></div>
+        <div class="row">
+            <div class="col-8">
+                <div id="viewer"></div>
+            </div>
+            <div class="col-4">
+                <div class="toc"></div>
+            </div>
+        </div>
     </div>
 
     <div class="row justify-content-center mt-4">
@@ -121,6 +132,41 @@
     </div>
 </div><!-- Bootstrap JS -->
 <script src="https://uicdn.toast.com/editor/latest/toastui-editor-viewer.js"></script>
+<style>
+    .toc {
+        position: fixed;
+        top: 350px;     /* 화면 상단에서 20px 떨어진 위치 */
+        right: 20px;   /* 화면 오른쪽에서 20px 떨어진 위치 */
+        width: 250px;  /* 필요에 따라 너비 조정 */
+        /* 추가 스타일 (배경, 패딩 등) */
+        background-color: #fff;
+        padding: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const headings = document.querySelectorAll('.toastui-editor-contents h1, .toastui-editor-contents h2, .toastui-editor-contents h3, .toastui-editor-contents h4, .toastui-editor-contents h5, .toastui-editor-contents h6');
+        headings.forEach((heading, index) => {
+            // id 속성이 없으면 id 생성
+            if (!heading.id) {
+                heading.id = `heading-${index}`;
+            }
+        });
+
+        tocbot.init({
+            // 목차를 렌더링할 컨테이너
+            tocSelector: '.toc',
+            // 헤딩을 찾을 컨테이너 (TUI Editor의 출력 부분)
+            contentSelector: '.toastui-editor-contents',
+            // 분석할 헤딩 태그
+            headingSelector: 'h1, h2, h3, h4, h5, h6',
+            // 추가 옵션들...
+            scrollSmooth: false, // 부드러운 스크롤
+        });
+    });
+</script>
 <script th:inline="javascript">
     // Thymeleaf를 통해 서버에서 전달된 content 데이터를 가져옵니다.
     const postContent = /*<![CDATA[*/ [[${postViewDto.content}]] /*]]*/;

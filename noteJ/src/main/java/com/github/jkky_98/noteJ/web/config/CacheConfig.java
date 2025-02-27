@@ -46,6 +46,11 @@ public class CacheConfig {
                     .setStoreByValue(false)
                     .setExpiryPolicyFactory(ModifiedExpiryPolicy.factoryOf(new Duration(TimeUnit.MINUTES, 1))));
 
+            cacheManager.createCache("viewLogCache", new MutableConfiguration<String, Boolean>()
+                    .setTypes(String.class, Boolean.class)
+                    .setStoreByValue(false)
+                    .setExpiryPolicyFactory(ModifiedExpiryPolicy.factoryOf(new Duration(TimeUnit.HOURS, 6))));
+
             // 모든 캐시에 이벤트 리스너 등록
             registerCacheEventListeners(cacheManager);
         };
