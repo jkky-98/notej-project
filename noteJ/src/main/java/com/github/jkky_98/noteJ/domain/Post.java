@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.github.jkky_98.noteJ.service.util.DefaultConst.DEFAULT_POST_PIC;
+
 @Entity
 @Table(
         name = "POST",
@@ -135,6 +137,7 @@ public class Post extends BaseEntity {
         content = decodingContent(request.getContent());
         postUrl = request.getTitle() + UUID.randomUUID();
         this.series = series;
+        thumbnail = DEFAULT_POST_PIC;
     }
 
     private static String decodingContent(String content) {

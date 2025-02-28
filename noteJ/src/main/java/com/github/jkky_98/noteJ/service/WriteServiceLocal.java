@@ -187,6 +187,7 @@ public class WriteServiceLocal implements WriteService {
         String oldThumbnail = post.getThumbnail(); // ✅ 기존 썸네일 저장
 
         post.updateThumbnail(newThumbnail);
+
         if (!oldThumbnail.equals(DEFAULT_POST_PIC)) {
             deleteOldThumbnail(oldThumbnail);
         }

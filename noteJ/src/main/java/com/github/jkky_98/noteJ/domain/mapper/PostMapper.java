@@ -26,6 +26,7 @@ public interface PostMapper {
     @Mapping(source = "request.content", target = "content", qualifiedByName = "decodeContent")
     @Mapping(source = "request.title", target = "postUrl", qualifiedByName = "generatePostUrl")
     @Mapping(target = "writable", constant = "false")
+    @Mapping(target = "thumbnail", constant = "default/thumb.webp")
     Post toPostForAutoSave(AutoSavePostRequest request, User user, Series series);
 
     @Mapping(source = "post.user.username", target = "username")
