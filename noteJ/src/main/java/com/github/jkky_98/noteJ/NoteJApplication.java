@@ -28,6 +28,8 @@ public class NoteJApplication {
 											 @Value("${cloud.aws.credentials.secret-key}") String awsSecretKey,
 											 @Value("${cloud.aws.region.static}") String awsRegion,
 											 @Value("${spring.datasource.url}") String datasourceUrl,
+											 @Value("${spring.datasource.password}") String datasourcePassword,
+											 @Value("${spring.datasource.username}") String datasourceUsername,
 											 CacheManager cacheManager) {
 		return args -> {
 			log.info("========== ENVIRONMENT SETTINGS ==========");
@@ -37,6 +39,8 @@ public class NoteJApplication {
 			log.info("✅ AWS Secret Key: {}", maskSensitiveInfo(awsSecretKey));
 			log.info("✅ AWS Region: {}", awsRegion);
 			log.info("✅ Datasource URL: {}", datasourceUrl);
+			log.info("✅ Datasource Password: {}", maskSensitiveInfo(datasourcePassword));
+			log.info("✅ Datasource Username: {}", datasourceUsername);
 			log.info("✅ Cache Manager: {}", cacheManager.getClass().getName());  // 전체 클래스명 출력
 			log.info("========== EHCACHE SETTINGS ==========");
 
