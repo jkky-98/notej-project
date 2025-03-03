@@ -7,6 +7,7 @@ import com.github.jkky_98.noteJ.web.controller.dto.SettingForm;
 import com.github.jkky_98.noteJ.web.controller.form.UserSettingsForm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class SettingService{
     private final FileStore fileStore;
 
     @Transactional
+    @CacheEvict(value = "sessionUserInfoCache", key = "#sessionUserId")
     public void saveSettings(UserSettingsForm form, Long sessionUserId) throws IOException {
 
         User user = userService.findUserById(sessionUserId);
