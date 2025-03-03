@@ -179,7 +179,7 @@ User엔티티에 잠금 관련 필드를 추가하여 로그인시 아이디는 
 
 또한, 쿼리 스트링을 통해 tagName, seriesName, search와 같은 조건별 조회 기능을 지원하며, 이를 Querydsl을 활용한 동적 조회 쿼리로 처리하여 효율적인 조건별 데이터 조회가 가능하도록 구현하였습니다.
 #### 관련 작성글
-[무한 스크롤 페이징 기능 구현 과정](https://velog.io/write?id=965f2736-9586-413c-812f-c9a523e860d6)
+[무한 스크롤 페이징 기능 구현 과정](https://velog.io/@aal2525/%EB%AC%B4%ED%95%9C%EC%8A%A4%ED%81%AC%EB%A1%A4-Querydsl-Pageable)
 
 ### 댓글 대댓글 기능
 
