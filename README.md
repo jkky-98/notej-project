@@ -258,6 +258,8 @@ Ehcache를 통해 변경이 적고, 조회 부담이 큰 데이터를 캐싱하�
 엔티티나 DTO의 생성로직을 한 영역으로 몰아 처리할 수 있었으며 List 변환과 같이 자동적인 부분에서 오는 코드량 감소의 효과가 있었습니다.
 
 ### 무중단 배포 자동화
+![image](https://github.com/user-attachments/assets/9b2d97df-190f-4bd5-ab2c-b83eb7a8b276)
+
 Nginx를 리버스 프록시로 사용하였으며, 서버는 기본적으로 EC2에서 도커 컴포즈를 통해 띄워지게 됩니다.
 
 main 브랜치에 Push, Pull Request시에 github action이 동작하여 자동 배포가 이루어집니다.
