@@ -23,50 +23,71 @@ repositories {
 	mavenCentral()
 }
 
+ext {
+	mapstructVersion = "1.6.3"
+	lombokMapstructBindingVersion = "0.2.0"
+	querydslVersion = "5.0.0"
+	mysqlVersion = "8.0.33"
+	awsSpringCloudVersion = "2.2.6.RELEASE"
+	ehcacheVersion = "3.10.8"
+	cacheApiVersion = "1.1.1"
+	thumbnailatorVersion = "0.4.20"
+}
+
 dependencies {
+	// Spring Boot Starters
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.session:spring-session-core'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-cache'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.ehcache:ehcache:3.10.8'
-	implementation 'javax.cache:cache-api:1.1.1'
-	implementation 'net.coobird:thumbnailator:0.4.20'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+	// Caching
+	implementation "org.ehcache:ehcache:${ehcacheVersion}"
+	implementation "javax.cache:cache-api:${cacheApiVersion}"
+
+	// Image Processing
+	implementation "net.coobird:thumbnailator:${thumbnailatorVersion}"
+
+	// Monitoring
 	implementation 'io.micrometer:micrometer-registry-prometheus'
 
-	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-	implementation 'org.projectlombok:lombok'
-	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-	annotationProcessor 'org.projectlombok:lombok'
-	testAnnotationProcessor 'org.projectlombok:lombok'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-
+	// Lombok
 	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.h2database:h2'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-	//Lombok in Test
+	annotationProcessor 'org.projectlombok:lombok'
 	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
 
-	//Querydsl
-	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+	// Querydsl
+	implementation "com.querydsl:querydsl-jpa:${querydslVersion}:jakarta"
+	annotationProcessor "com.querydsl:querydsl-apt:${querydslVersion}:jakarta"
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
-	//devtool
+	// MapStruct
+	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+	implementation "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
+	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+	annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${lombokMapstructBindingVersion}"
+
+	// Database
+	developmentOnly 'com.h2database:h2'
+	implementation "mysql:mysql-connector-java:${mysqlVersion}"
+
+	// Devtool
 	implementation 'org.springframework.boot:spring-boot-devtools'
 
-	//aws
-	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-	implementation 'mysql:mysql-connector-java:8.0.33'
+	// AWS
+	implementation "org.springframework.cloud:spring-cloud-starter-aws:${awsSpringCloudVersion}"
 
+	// Testing
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
+
+
 
 tasks.named('test') {
 	useJUnitPlatform()

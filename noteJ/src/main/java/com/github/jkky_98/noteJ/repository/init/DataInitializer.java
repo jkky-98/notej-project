@@ -6,7 +6,6 @@ import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
 import com.github.jkky_98.noteJ.domain.user.UserRole;
 import com.github.jkky_98.noteJ.repository.*;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -14,11 +13,12 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.boot.CommandLineRunner;
 
 @Component
 @RequiredArgsConstructor
 @Profile("local")
-public class DataInitializer {
+public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final PostRepository postRepository;
@@ -26,8 +26,8 @@ public class DataInitializer {
     private final PostTagRepository postTagRepository;
     private final TagRepository tagRepository;
 
-    @PostConstruct
-    public void init() {
+    @Override
+    public void run(String... args) throws Exception {
         // 데이터베이스에 초기 데이터 삽입
         if (userRepository.count() == 0) {
 
@@ -172,8 +172,6 @@ public class DataInitializer {
 
             tagRepository.saveAll(List.of(tag1, tag2, tag3));
             postTagRepository.saveAll(List.of(postTag1, postTag2, postTag3));
-
         }
-
     }
 }

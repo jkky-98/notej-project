@@ -3,8 +3,8 @@ spring:
     active: local
     group:
       local: local, common
-      blue: blue, common, secret
-      green: green, common, secret
+      blue: blue, common
+      green: green, common
 
 server:
   env: blue
@@ -14,188 +14,164 @@ server:
 spring:
   config:
     activate:
-      on-profile: local
-  servlet:
-    multipart:
-      enabled: true
-      max-file-size: 10MB    # 개별 파일 최대 크기
-      max-request-size: 50MB # 요청 전체 크기 (여러 파일 포함 가능)
+      on-profile: local  # 이 설정은 'local' 프로파일이 활성화될 때만 적용됨
 
   devtools:
     livereload:
-      enabled: true
-#  web:
-#    resources:
-#      static-locations: classpath:/static/, file:/upload/
+      enabled: false  # 코드 변경 시 자동으로 페이지를 새로고침하는 LiveReload 기능 활성화 (개발 편의성)
+    restart:
+      enabled: false
+
   thymeleaf:
-    cache: false
-    prefix: file:src/main/resources/templates/
-  # 위는 개발용 설정
+    cache: false  # Thymeleaf 템플릿을 캐싱하지 않음 (템플릿 변경 사항을 즉시 반영하기 위해 설정)
+    prefix: file:src/main/resources/templates/  # 템플릿 파일을 프로젝트 내 경로에서 직접 읽도록 설정 (Hot Reload 반영)
+
   datasource:
-    url: jdbc:h2:tcp://localhost/~/notej
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+    url: jdbc:h2:tcp://localhost/~/notej  # H2 데이터베이스를 TCP 모드로 실행하여 외부 접근 허용
+    username: sa  # H2 기본 사용자명
+    password:  # H2의 기본 비밀번호 (설정하지 않으면 빈 값)
+    driver-class-name: org.h2.Driver  # H2 데이터베이스 드라이버
     hikari:
-      connection-timeout: 5000
+      connection-timeout: 5000  # 데이터베이스 커넥션 풀에서 연결을 기다리는 최대 시간 (5초)
+
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: create  # 애플리케이션 실행 시 기존 테이블을 삭제하고 새로 생성 (데이터 초기화)
     properties:
       hibernate:
-        show_sql: false
-        format_sql: false
-        default_batch_fetch_size: 100
+        show_sql: true  # 실행되는 SQL 쿼리를 콘솔에 출력
+        format_sql: true  # SQL 쿼리를 가독성 좋게 포맷팅하여 출력
+        default_batch_fetch_size: 100  # 여러 개의 데이터를 한 번에 조회할 때 Batch 크기 설정 (성능 최적화)
 
 logging:
   level:
     org:
       hibernate:
-        SQL: info
+        SQL: info  # Hibernate의 SQL 쿼리 로깅 수준을 'info'로 설정
         orm:
           jdbc:
-            bind: info
+            bind: info  # 바인딩된 SQL 파라미터 값을 함께 로깅
       springframework:
-        web: INFO
+        web: INFO  # Spring Web 관련 로그 레벨을 'INFO'로 설정
 
 file:
-  dir: ${fileDir:/Users/piehealthcare/Documents/private/noteJ-storage/}
+  dir: ${fileDir:/Users/piehealthcare/Documents/private/noteJ-storage/}  # 파일 업로드 저장 경로 설정 (기본값 지정)
 
 server:
-  port: 8080
-  serverAddress: localhost
-  tomcat:
-    uri-encoding: utf-8
-  servlet:
-    encoding:
-      charset: UTF-8
+  port: 8080  # 애플리케이션이 실행될 포트 (로컬 환경에서 8080으로 실행)
+  serverAddress: localhost  # 서버 주소 (로컬 환경에서는 localhost)
 
 cloud:
   aws:
     credentials:
-      access-key: localNoKey
-      secret-key: localSecretNoKey
+      access-key: localNoKey  # 로컬 개발용으로 AWS 인증 정보를 임시 값으로 설정
+      secret-key: localSecretNoKey  # 실제 AWS Secret Key가 아닌 더미 값 사용
     region:
-      static: localNoRegion
+      static: localNoRegion  # 로컬에서는 AWS 리전 정보가 필요하지 않으므로 더미 값 사용
     s3:
-      bucket: localNoBucket
+      bucket: localNoBucket  # S3 버킷 이름도 로컬 환경에서는 실제 값 대신 임시 값 사용
 
-serverName: local_server
-
-management:
-  info:
-    java:
-      enabled: true
-    os:
-      enabled: true
-    env:
-      enabled: true
-  endpoint:
-    shutdown:
-      access: none
-    health:
-      show-details: always
-  endpoints:
-    web:
-      exposure:
-        include: "*"
+serverName: local_server  # 로컬 서버 이름을 명시적으로 설정 (로깅이나 설정 구분용)
 
 ---
 
 spring:
   config:
     activate:
-      on-profile: blue
-  servlet:
-    multipart:
-      enabled: true
-      max-file-size: 10MB    # 개별 파일 최대 크기
-      max-request-size: 50MB # 요청 전체 크기 (여러 파일 포함 가능)
+      on-profile: blue  # 'blue' 프로파일이 활성화될 때만 적용되는 설정
+
   datasource:
     url: jdbc:mysql://${RDS_ENDPOINT}:3306/${RDS_NAME}?createDatabaseIfNotExist=true&useSSL=false&characterEncoding=UTF-8&useUnicode=true&serverTimezone=Asia/Seoul
-    username: ${RDS_USERNAME}
-    password: ${RDS_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+      # MySQL 데이터베이스 연결 URL
+      # - ${RDS_ENDPOINT}: RDS 엔드포인트 (환경변수에서 가져옴)
+      # - ${RDS_NAME}: 데이터베이스 이름 (환경변수에서 가져옴)
+      # - createDatabaseIfNotExist=true: 데이터베이스가 없으면 자동 생성
+      # - useSSL=false: SSL 비활성화
+      # - characterEncoding=UTF-8 & useUnicode=true: UTF-8 문자 인코딩 설정
+    # - serverTimezone=Asia/Seoul: 서버 시간대를 한국 표준시(KST)로 설정
+
+    username: ${RDS_USERNAME}  # 데이터베이스 접속 계정 (환경 변수에서 로드)
+    password: ${RDS_PASSWORD}  # 데이터베이스 접속 비밀번호 (환경 변수에서 로드)
+    driver-class-name: com.mysql.cj.jdbc.Driver  # MySQL 드라이버 사용
+
     hikari:
-      maximum-pool-size: 10 # 커넥션 풀 크기 설정 (필요시 조정)
-      connection-timeout: 3000 # 연결 대기 시간 설정
-      idle-timeout: 600000 # 유휴 연결 시간 설정
-      max-lifetime: 1800000 # 연결 최대 수명 설정
-    # 기타 JDBC 설정을 추가할 수 있습니다.
+      maximum-pool-size: 10  # 커넥션 풀 최대 크기 (동시 접속 가능한 커넥션 수)
+      connection-timeout: 3000  # 커넥션 풀에서 연결을 기다리는 최대 시간 (3초)
+      idle-timeout: 600000  # 사용되지 않는 커넥션이 유지되는 시간 (10분)
+      max-lifetime: 1800000  # 커넥션의 최대 수명 (30분)
+
   jpa:
     hibernate:
-      ddl-auto: none # 자동 테이블 생성 비활성화 (Flyway 또는 Liquibase를 사용할 경우)
-    properties:
-      hibernate:
-        format_sql: true
-        default_batch_fetch_size: 100
-#      flyway:
-#        enabled: true
-#        locations: classpath:db/migration
-#        baseline-on-migrate: true
+      ddl-auto: none  # 자동 테이블 생성 비활성화 (운영 환경에서는 직접 관리)
 
 logging.level:
-  org.hibernate.SQL: debug
-  org.hibernate.orm.jdbc.bind: trace #스프링 부트 3.x, hibernate6
+  org.hibernate.SQL: info  # Hibernate 실행 SQL을 로깅 (info 레벨)
 
 server:
-  port: 8080
-  serverAddress: ${LIVE_SERVER_IP}
-  tomcat:
-    uri-encoding: utf-8
-  servlet:
-    encoding:
-      charset: UTF-8
+  port: 8080  # 서버 포트 (blue = 8080)
+  serverAddress: ${LIVE_SERVER_IP}  # 서버 IP 주소 (환경 변수에서 설정)
 
-serverName: blue_server
+serverName: blue_server  # 운영 Blue 환경의 서버 이름 (서버 식별용)
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY_ID}
+      secret-key: ${AWS_SECRET_ACCESS_KEY}
+    region:
+      static: ${AWS_REGION}
+    s3:
+      bucket: ${S3_BUCKET_NAME}
+
 
 ---
 
 spring:
   config:
     activate:
-      on-profile: green
-  servlet:
-    multipart:
-      enabled: true
-      max-file-size: 10MB    # 개별 파일 최대 크기
-      max-request-size: 50MB # 요청 전체 크기 (여러 파일 포함 가능)
+      on-profile: green  # 'green' 프로파일이 활성화될 때만 적용되는 설정
+
   datasource:
     url: jdbc:mysql://${RDS_ENDPOINT}:3306/${RDS_NAME}?createDatabaseIfNotExist=true&useSSL=false&characterEncoding=UTF-8&useUnicode=true&serverTimezone=Asia/Seoul
-    username: ${RDS_USERNAME}
-    password: ${RDS_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+      # MySQL 데이터베이스 연결 URL
+      # - ${RDS_ENDPOINT}: RDS 엔드포인트 (환경변수에서 가져옴)
+      # - ${RDS_NAME}: 데이터베이스 이름 (환경변수에서 가져옴)
+      # - createDatabaseIfNotExist=true: 데이터베이스가 없으면 자동 생성
+      # - useSSL=false: SSL 비활성화
+      # - characterEncoding=UTF-8 & useUnicode=true: UTF-8 문자 인코딩 설정
+    # - serverTimezone=Asia/Seoul: 서버 시간대를 한국 표준시(KST)로 설정
+
+    username: ${RDS_USERNAME}  # 데이터베이스 접속 계정 (환경 변수에서 로드)
+    password: ${RDS_PASSWORD}  # 데이터베이스 접속 비밀번호 (환경 변수에서 로드)
+    driver-class-name: com.mysql.cj.jdbc.Driver  # MySQL 드라이버 사용
+
     hikari:
-      maximum-pool-size: 10 # 커넥션 풀 크기 설정 (필요시 조정)
-      connection-timeout: 3000 # 연결 대기 시간 설정
-      idle-timeout: 600000 # 유휴 연결 시간 설정
-      max-lifetime: 1800000 # 연결 최대 수명 설정
-    # 기타 JDBC 설정을 추가할 수 있습니다.
+      maximum-pool-size: 10  # 커넥션 풀 최대 크기 (동시 접속 가능한 커넥션 수)
+      connection-timeout: 3000  # 커넥션 풀에서 연결을 기다리는 최대 시간 (3초)
+      idle-timeout: 600000  # 사용되지 않는 커넥션이 유지되는 시간 (10분)
+      max-lifetime: 1800000  # 커넥션의 최대 수명 (30분)
+
   jpa:
     hibernate:
-      ddl-auto: none # 자동 테이블 생성 비활성화 (Flyway 또는 Liquibase를 사용할 경우)
-    properties:
-      hibernate:
-        format_sql: true
-        default_batch_fetch_size: 100
-#      flyway:
-#        enabled: true
-#        locations: classpath:db/migration
-#        baseline-on-migrate: true
+      ddl-auto: none  # 자동 테이블 생성 비활성화 (운영 환경에서는 직접 관리)
 
 logging.level:
-  org.hibernate.SQL: debug
-  org.hibernate.orm.jdbc.bind: trace #스프링 부트 3.x, hibernate6
+  org.hibernate.SQL: info  # Hibernate 실행 SQL을 로깅 (디버그 레벨)
 
 server:
-  port: 8081
-  serverAddress: ${LIVE_SERVER_IP}
-  tomcat:
-    uri-encoding: utf-8
-  servlet:
-    encoding:
-      charset: UTF-8
+  port: 8081  # 서버 포트 (green = 8081)
+  serverAddress: ${LIVE_SERVER_IP}  # 서버 IP 주소 (환경 변수에서 설정)
 
-serverName: green_server
+serverName: green_server  # 운영 Blue 환경의 서버 이름 (서버 식별용)
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY_ID}
+      secret-key: ${AWS_SECRET_ACCESS_KEY}
+    region:
+      static: ${AWS_REGION}
+    s3:
+      bucket: ${S3_BUCKET_NAME}
 
 ---

@@ -43,16 +43,4 @@ public class Comment extends BaseEntity {
         this.post = post;
     }
 
-    //toDo: modelMapper로 하여금 삭제될 예정
-    public static Comment of(Post post, User sessionUser, String content, Optional<Comment> parent) {
-        return Comment.builder()
-                .post(post)
-                .user(sessionUser)
-                .content(content)
-                .parent(
-                        parent.orElse(null)
-                )
-                .build();
-    }
-
 }

@@ -3,7 +3,6 @@ package com.github.jkky_98.noteJ.web.controller;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.service.LikeService;
 import com.github.jkky_98.noteJ.service.dto.DeleteLikeToServiceDto;
-import com.github.jkky_98.noteJ.service.dto.GetLikeStatusToServiceDto;
 import com.github.jkky_98.noteJ.service.dto.SaveLikeToServiceDto;
 import com.github.jkky_98.noteJ.web.controller.form.LikeCardForm;
 import com.github.jkky_98.noteJ.web.controller.form.LikeDeleteRequestForm;

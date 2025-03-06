@@ -272,7 +272,11 @@ class LikeServiceTest {
         // given
         when(userService.findUserById(1L)).thenReturn(user);
         // 사용자가 좋아요한 게시글 추가
-        Like like = Like.of(post, user);
+        Like like = Like.builder()
+                        .post(post)
+                                .user(user)
+                                        .userGetLike(postOwner)
+                                                .build();
         user.getLikes().add(like);
         // likeMapper를 통해 LikeCardForm 매핑
         LikeCardForm cardForm = LikeCardForm.builder().build();
