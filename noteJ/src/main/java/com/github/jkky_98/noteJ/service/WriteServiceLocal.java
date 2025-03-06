@@ -183,8 +183,8 @@ public class WriteServiceLocal implements WriteService {
     }
 
     private void editThumbnail(WriteForm form, Post post) throws IOException {
-        String newThumbnail = getStoredThumbnail(form); // ✅ 새로운 썸네일 저장 또는 기본값 반환
-        String oldThumbnail = post.getThumbnail(); // ✅ 기존 썸네일 저장
+        String newThumbnail = getStoredThumbnail(form);
+        String oldThumbnail = post.getThumbnail();
 
         post.updateThumbnail(newThumbnail);
 

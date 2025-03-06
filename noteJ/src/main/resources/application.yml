@@ -18,7 +18,9 @@ spring:
 
   devtools:
     livereload:
-      enabled: true  # 코드 변경 시 자동으로 페이지를 새로고침하는 LiveReload 기능 활성화 (개발 편의성)
+      enabled: false  # 코드 변경 시 자동으로 페이지를 새로고침하는 LiveReload 기능 활성화 (개발 편의성)
+    restart:
+      enabled: false
 
   thymeleaf:
     cache: false  # Thymeleaf 템플릿을 캐싱하지 않음 (템플릿 변경 사항을 즉시 반영하기 위해 설정)

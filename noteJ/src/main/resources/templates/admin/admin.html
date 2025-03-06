@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!-- Include the header fragment -->
+<div th:insert="~{fragments/header :: header}"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+<body>
+<div class="row">
+    <div class="col-2">
+        <div th:insert="~{admin/fragments/adminNav :: sidebar}"></div>
+    </div>
+    <div class="col-10">
+        <div class="container mt-3 pt-3">
+            <div class="row g-3">
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="rounded-3 border-start border-4 border-primary alert-primary shadow h-100">
+                        <span class="bi bi-person fs-1 m-4 float-start"></span>
+                        <div class="text-end p-4">
+                            <span class="d-block text-dark"> 등록된 유저 수</span>
+                            <span class="text-dark fs-3">Total <strong th:text="${form.getUsersSize()}">18</strong></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="rounded-3 border-start border-4 border-success alert-success shadow h-100">
+                        <span class="bi bi-file-earmark fs-1 m-4 float-start"></span>
+                        <div class="text-end p-4">
+                            <span class="d-block text-dark">게시물 수</span>
+                            <span class="text-dark fs-3">Total <strong th:text="${form.getPostsSize()}">50</strong></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-lg-4">
+                    <div class="rounded-3 border-start border-4 border-info alert-info shadow h-100">
+                        <span class="bi bi-arrow-return-right fs-1 m-4 float-start"></span>
+                        <div class="text-end p-4">
+                            <span class="d-block text-dark">조회수</span>
+                            <span class="text-dark fs-3">Total <strong th:text="${form.getTotalViewCount()}">1058</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

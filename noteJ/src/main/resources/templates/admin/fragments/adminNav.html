@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fragment: Sidebar</title>
+</head>
+<body>
+<!-- Sidebar Fragment 정의 -->
+<div th:fragment="sidebar" class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 280px; min-height: 100vh;" >
+    <style>
+        body {
+            background-color: #1b1e21 !important;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <a th:href="@{/admin}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+        <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
+        <span class="fs-4">NoteJ Admin</span>
+    </a>
+    <hr>
+    <ul class="nav nav-pills flex-column mb-auto">
+        <!-- Admin Home -->
+        <li class="nav-item">
+            <a th:href="@{/admin}"
+               th:class="${currentUri == '/admin' ? 'nav-link active' : 'nav-link text-white'}"
+               th:attr="aria-current=${currentUri == '/admin' ? 'page' : ''}">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#home"></use></svg>
+                어드민홈
+            </a>
+        </li>
+
+        <!-- 콘텐츠관리 탭 -->
+        <li class="nav-item">
+            <a th:href="@{/admin/contents}"
+               th:class="${currentUri == '/admin/contents' ? 'nav-link active' : 'nav-link text-white'}"
+               th:attr="aria-current=${currentUri == '/admin/contents' ? 'page' : ''}">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#speedometer2"></use></svg>
+                콘텐츠관리
+            </a>
+        </li>
+
+        <!-- 유저관리 탭 -->
+        <li class="nav-item">
+            <a th:href="@{/admin/users}"
+               th:class="${currentUri == '/admin/users' ? 'nav-link active' : 'nav-link text-white'}"
+               th:attr="aria-current=${currentUri == '/admin/users' ? 'page' : ''}">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#table"></use></svg>
+                유저관리
+            </a>
+        </li>
+
+        <!-- 댓글관리 탭 -->
+        <li class="nav-item">
+            <a th:href="@{/admin/comments}"
+               th:class="${currentUri == '/admin/comments' ? 'nav-link active' : 'nav-link text-white'}"
+               th:attr="aria-current=${currentUri == '/admin/comments' ? 'page' : ''}">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#grid"></use></svg>
+                댓글관리
+            </a>
+        </li>
+
+        <!-- 문의사항 탭 -->
+        <li class="nav-item">
+            <a th:href="@{/admin/contacts}"
+               th:class="${currentUri == '/admin/contacts' ? 'nav-link active' : 'nav-link text-white'}"
+               th:attr="aria-current=${currentUri == '/admin/contacts' ? 'page' : ''}">
+                <svg class="bi me-2" width="16" height="16"><use xlink:href="#people-circle"></use></svg>
+                사용자문의
+            </a>
+        </li>
+    </ul>
+
+
+    <hr>
+    <div class="dropdown">
+        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+           id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+            <!-- 프로필 사진: 세션 존재 & 프로필 사진 존재 -->
+            <span th:if="${sessionUser != null and sessionUser.profilePic != null}">
+        <img th:src="@{/image-print/{path}(path=${sessionUser.profilePic})}"
+             width="32" height="32" class="rounded-circle me-2" alt="Profile">
+      </span>
+            <!-- 프로필 사진: 세션 존재 & 프로필 사진 없음 -->
+            <span th:if="${sessionUser != null and sessionUser.profilePic == null}">
+        <img th:src="@{/image-print/default/default-profile.png}"
+             width="32" height="32" class="rounded-circle me-2" alt="Default Profile">
+      </span>
+            <!-- 프로필 사진: 세션 비존재 -->
+            <span th:if="${sessionUser == null}">
+        <img th:src="@{/image-print/default/default-profile.png}"
+             width="32" height="32" class="rounded-circle me-2" alt="Default Profile">
+      </span>
+            <strong th:text="${sessionUser != null ? sessionUser.username : 'Guest'}">Guest</strong>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+            <li><a class="dropdown-item" href="#">New project...</a></li>
+            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><a class="dropdown-item" href="#">Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Sign out</a></li>
+        </ul>
+    </div>
+    <!-- Bootstrap Bundle JS (Popper 포함) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</div>
+
+
+</body>
+</html>

@@ -11,6 +11,7 @@ public class LoginExceptionHandler {
 
     @ExceptionHandler(UnauthenticatedUserException.class)
     public String handleUnauthenticatedUserException(UnauthenticatedUserException e) {
+        log.error(e.getMessage(), e);
         return "redirect:/login";
     }
 }
