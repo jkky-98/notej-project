@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- 문의 버튼과 모달을 프래그먼트화 -->
+<div th:fragment="contact-button">
+  <style>
+    .floating-button {
+      position: fixed;
+      bottom: 50px;
+      right: 50px;
+      z-index: 1050;
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .floating-button:hover {
+      background-color: #0056b3;
+      box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
+    }
+  </style>
+  <!-- 오른쪽 하단 고정 버튼 -->
+  <button class="floating-button" data-bs-toggle="modal" data-bs-target="#inquiryModal">
+    <span class="bi bi-person fs-1 m-4 float-start"></span>
+  </button>
+
+  <!-- 문의 모달 -->
+  <div class="modal fade" id="inquiryModal" tabindex="-1" aria-labelledby="inquiryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="inquiryModalLabel">문의하기</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form th:action="@{/contact}" method="post">
+            <div class="mb-3">
+              <label for="email" class="form-label">이메일</label>
+              <input type="email" class="form-control" id="email" name="email" placeholder="이메일을 입력하세요" required>
+            </div>
+            <div class="mb-3">
+              <label for="content" class="form-label">문의 내용</label>
+              <textarea class="form-control" id="content" name="content" rows="4"
+                        placeholder="문의하실 내용을 입력하세요. 빠르게 답변드리겠습니다!" required
+                        style="resize: none; min-height: 120px; overflow-y: auto; border-radius: 8px;"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">문의 보내기</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -90,9 +90,12 @@ public class AdminController {
 
     @GetMapping("/admin/contacts")
     public String getAdminContacts(
-            @SessionAttribute("loginUser") User sessionUser
+            @SessionAttribute("loginUser") User sessionUser,
+            @PageableDefault(page = 0, size = 10) Pageable pageable,
+            Model model
     ) {
         if (sessionUser != null && sessionUser.getUserRole() == UserRole.ADMIN) {
+            model.addAttribute("contacts", adminService.getContacts(pageable));
             return "admin/adminContacts";
         }
         return "redirect:/";

@@ -24,6 +24,26 @@ public class AdminRepository {
         this.queryFactory = new JPAQueryFactory(em);
     }
 
+    public Page<Contact> searchContactsAdmin(Pageable pageable) {
+        QContact c = QContact.contact;
+
+        List<Contact> contacts = queryFactory
+                .select(c)
+                .from(c)
+                .orderBy(c.createDt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long total = Optional.ofNullable(
+                queryFactory
+                .select(c.count())
+                .from(c)
+                .fetchOne()).orElse(0L);
+
+        return new PageImpl<>(contacts, pageable, total);
+    }
+
     public Page<Post> searchPostsAdmin(AdminContentsCond cond, Pageable pageable) {
         QPost p = QPost.post; // QPost 객체 사용
 
