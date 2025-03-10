@@ -18,10 +18,11 @@ import java.util.List;
 public class Tag extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
-    @Column(name = "tag_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "tag_id", nullable = false)
     private Long id;
 
+    @Column(nullable = false, length = 20)
     private String name;
 
     //연관관계

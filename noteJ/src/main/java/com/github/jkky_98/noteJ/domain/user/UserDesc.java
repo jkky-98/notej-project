@@ -13,19 +13,23 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE) // 빌더와 함께 사용할 모든 필드 생성자
 public class UserDesc extends BaseTimeEntity {
     @Id
-    @GeneratedValue
-    @Column(name = "user_desc_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_desc_id", nullable = false)
     private Long id;
 
     private String description;
 
+    @Column(nullable = false)
     private String profilePic;
 
+    @Column(nullable = false, length = 50)
     private String blogTitle;
 
     @Enumerated(EnumType.STRING)
-    private ThemeMode theme;
+    @Column(nullable = false, length = 20)
+    private ThemeMode theme = ThemeMode.LIGHT;
 
+    @Column(length = 100)
     private String socialEmail;
 
     private String socialGitHub;
@@ -34,16 +38,20 @@ public class UserDesc extends BaseTimeEntity {
 
     private String socialFacebook;
 
+    @Column(columnDefinition = "TEXT")
     private String socialOther;
 
-    private boolean commentAlarm;
+    @Builder.Default
+    @Column(nullable = false, columnDefinition = "TINYINT(1)")
+    private boolean commentAlarm = true;
 
-    private boolean noteJAlarm;
+    @Builder.Default
+    @Column(nullable = false, columnDefinition = "TINYINT(1)")
+    private boolean noteJAlarm = true;
 
     // 연관관계
     @OneToOne(mappedBy = "userDesc")
     private User user;
-
 
     public void updateSetting(UserSettingsForm form, String newProfilePicPath) {
         // 다른 필드 업데이트

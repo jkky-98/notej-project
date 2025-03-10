@@ -34,6 +34,9 @@ public class AuthSessionServiceTest {
     @Mock
     private UserMapper userMapper;
 
+    @Mock
+    private UserService userService;
+
     @InjectMocks
     private AuthSessionService authSessionService;
 
@@ -113,8 +116,7 @@ public class AuthSessionServiceTest {
         when(userMapper.toUserDescSignUp(form)).thenReturn(userDesc);
         when(userMapper.toUserSignUp(form,userDesc)).thenReturn(newUser);
 
-        when(userRepository.save(any(User.class))).thenReturn(newUser);
-
+        when(userService.saveUser(any(User.class))).thenReturn(newUser);
         // when
         User result = authSessionService.signUp(form);
 

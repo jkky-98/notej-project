@@ -11,26 +11,34 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Notification extends BaseEntity {
-    @Id @GeneratedValue
-    @Column(name = "notification_id")
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "notification_id", nullable = false)
     private Long id;
 
-    private boolean status;
+    //읽지 않음 : false
+    //읽음 : true
+    @Builder.Default
+    @Column(nullable = false)
+    private boolean status = false;
 
+    @Column(nullable = false)
     private String message;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private NotificationType type;
 
     // 연관관계
     // 수신자 (알림을 받는 사용자)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver_id")
+    @JoinColumn(name = "receiver_id", nullable = false)
     private User receiver;
 
     // 발신자 (알림을 발생시킨 사용자)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id")
+    @JoinColumn(name = "sender_id", nullable = false)
     private User sender;  // 알림을 발생시킨 사용자 (발신자)
 
     public void updateReceiver(User user) {

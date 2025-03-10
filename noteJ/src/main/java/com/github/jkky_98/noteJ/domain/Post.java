@@ -27,13 +27,14 @@ import static com.github.jkky_98.noteJ.service.util.DefaultConst.DEFAULT_POST_PI
 public class Post extends BaseEntity {
 
     @Id
-    @GeneratedValue
-    @Column(name = "post_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "post_id", nullable = false)
     private Long id;
 
+    @Column(nullable = false, length = 50)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
     private String postSummary;
@@ -41,22 +42,26 @@ public class Post extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String postUrl;
 
+    @Column(nullable = false)
     private String thumbnail;
 
+    @Column(nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean writable;
 
     @Version
     private Integer version;
 
-    private int viewCount;
+    @Builder.Default
+    @Column(nullable = false)
+    private int viewCount = 0;
 
     //연관관계
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "series_id")
+    @JoinColumn(name = "series_id", nullable = false)
     private Series series;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Builder.Default

@@ -10,8 +10,8 @@ import com.github.jkky_98.noteJ.domain.Contact;
 import com.github.jkky_98.noteJ.domain.Post;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.repository.PostRepository;
-import com.github.jkky_98.noteJ.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.github.jkky_98.noteJ.service.PostService;
+import com.github.jkky_98.noteJ.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,33 +26,43 @@ public class AdminService {
 
     private final AdminRepository adminRepository;
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
     private final AdminMapper adminMapper;
+    private final PostService postService;
+    private final UserService userService;
 
-    @Transactional(readOnly = true)
     public Page<AdminContentsForm> getContents(AdminContentsCond cond, Pageable pageable) {
-        Page<Post> posts = adminRepository.searchPostsAdmin(cond, pageable);
+        Page<Post> posts = searchPostsAdmin(cond, pageable);
         return adminMapper.postPageToAdminContentsFormPage(posts);
     }
 
-    @Transactional(readOnly = true)
     public Page<AdminContactForm> getContacts(Pageable pageable) {
-        Page<Contact> contacts = adminRepository.searchContactsAdmin(pageable);
+        Page<Contact> contacts = searchContactsAdmin(pageable);
         return adminMapper.contactPageToAdminContactFormPage(contacts);
     }
 
     @Transactional
     public Long deleteContent(Long postId) {
-        Post postRemoved = postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("not found Post"));
+        Post postRemoved = postService.findById(postId);
         postRepository.deleteById(postRemoved.getId());
         return postRemoved.getId();
     }
 
     @Transactional(readOnly = true)
+    public Page<Post> searchPostsAdmin(AdminContentsCond cond, Pageable pageable) {
+        return adminRepository.searchPostsAdmin(cond, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Contact> searchContactsAdmin(Pageable pageable) {
+        return adminRepository.searchContactsAdmin(pageable);
+    }
+
     public AdminHomeForm getAdminHomeData() {
 
-        List<Post> allPosts = postRepository.findAll();
-        List<User> allUsers = userRepository.findAll();
+        // transaction start
+        List<Post> allPosts = postService.findAll();
+        List<User> allUsers = userService.findAllUsers();
+        // transaction end
 
         // user수
         long usersSize = allUsers.size();

@@ -37,8 +37,13 @@ public class CommentService {
 
         commentRepository.save(commentForSave);
 
+        commentNotificationing(commentForm, sessionUser, post);
+
+    }
+
+    private void commentNotificationing(CommentForm commentForm, User sessionUser, Post post) {
         // 대댓글의 부모 댓글 유저에게 대댓글 달렸다고 알림
-        if (validReplyComment(commentForm.getParentsId(), sessionUserId)) {
+        if (validReplyComment(commentForm.getParentsId(), sessionUser.getId())) {
 
             Comment commentParent = commentRepository.findById(
                     commentForm.getParentsId()
@@ -46,7 +51,7 @@ public class CommentService {
                     .orElseThrow(() -> new EntityNotFoundException("comment not found"));
 
             alarmToParentCommentUser(
-                   sessionUserId, postUrl, post.getUser()
+                   sessionUser.getId(), post.getPostUrl(), post.getUser()
             );
 
             if (isEqualsParentCommentUserisPostUser(post.getUser().getUsername(), commentParent.getUser().getUsername())) {
@@ -56,9 +61,8 @@ public class CommentService {
 
         // 게시글 작성자에게 댓글 알림
         if (validSameUserComment(sessionUser.getUsername(), post.getUser().getUsername())) {
-            alarmToPostUser(sessionUserId, postUrl);
+            alarmToPostUser(sessionUser.getId(), post.getPostUrl());
         }
-
     }
 
     @Transactional

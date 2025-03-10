@@ -24,6 +24,7 @@ public class AuthSessionService implements AuthService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private static final int MAX_FAILED_ATTEMPTS = 5;
+    private final UserService userService;
 
     @Override
     public void logout(HttpSession session) {
@@ -87,7 +88,7 @@ public class AuthSessionService implements AuthService {
 
         User signUpUser = createUserWithDescription(signUpForm);
 
-        return userRepository.save(signUpUser);
+        return userService.saveUser(signUpUser);
     }
 
     /**
@@ -106,20 +107,19 @@ public class AuthSessionService implements AuthService {
      * 이메일, Username 중복 검증
      * @param signUpForm
      */
-    private void validSignUpForm(SignUpForm signUpForm) {
+    @Transactional(readOnly = true)
+    public void validSignUpForm(SignUpForm signUpForm) {
         validateUsernameDuplication(signUpForm.getUsername());
         validateEmailDuplication(signUpForm.getEmail());
     }
 
     private void validateUsernameDuplication(String username) {
-        if (userRepository.findByUsername(username).isPresent()) {
-            throw new DataIntegrityViolationException("Username already exists.");
-        }
+        userRepository.findByUsername(username)
+                .ifPresent(user -> { throw new DataIntegrityViolationException("Username already exists."); });
     }
 
     private void validateEmailDuplication(String email) {
-        if (userRepository.findByEmail(email).isPresent()) {
-            throw new DataIntegrityViolationException("Email already exists.");
-        }
+        userRepository.findByEmail(email)
+                .ifPresent(user -> { throw new DataIntegrityViolationException("Email already exists."); });
     }
 }

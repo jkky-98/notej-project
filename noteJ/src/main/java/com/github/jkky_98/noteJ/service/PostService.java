@@ -30,6 +30,11 @@ public class PostService {
         return postRepository.findByPostUrl(postUrl).orElseThrow(() -> new EntityNotFoundException("Post Not Found"));
     }
 
+    @Transactional(readOnly = true)
+    public List<Post> findAll() {
+        return postRepository.findAll();
+    }
+
     /**
      * postId로 Post 엔티티 가져오기
      * @param postId

@@ -18,18 +18,19 @@ import java.util.List;
 public class Series extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "series_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Builder.Default
     @OneToMany(mappedBy = "series")
     private List<Post> posts = new ArrayList<>();
 
+    @Column(nullable = false, length = 50)
     private String seriesName;
 
     public void updateUser(User user) {

@@ -12,16 +12,16 @@ import lombok.*;
 public class PostTag extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
-    @Column(name = "post_tag_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "post_tag_id", nullable = false)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tag_id")
+    @JoinColumn(name = "tag_id", nullable = false)
     private Tag tag;
 
     public void updateTag(Tag tag) {

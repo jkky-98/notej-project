@@ -7,7 +7,6 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Entity
 @Getter
@@ -16,10 +15,11 @@ import java.util.Optional;
 @AllArgsConstructor(access = AccessLevel.PRIVATE) // 빌더와 함께 사용할 모든 필드 생성자
 public class Comment extends BaseEntity {
     @Id
-    @GeneratedValue
-    @Column(name = "comment_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "comment_id", nullable = false)
     private Long id;
 
+    @Column(nullable = false, length = 500)
     private String content;
 
     // 연관관계

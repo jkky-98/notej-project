@@ -13,8 +13,8 @@ import lombok.*;
 public class Follow extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
-    @Column(name = "follow_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "follow_id", nullable = false)
     private Long id;
 
     //연관관계

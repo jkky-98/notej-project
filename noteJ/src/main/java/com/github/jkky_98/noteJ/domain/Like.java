@@ -14,20 +14,20 @@ import lombok.*;
 public class Like extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "like_id")
     private Long id;
 
     //연관관계
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "post_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private Post post;
 
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    @JoinColumn(name = "user_get_like_id")
+    @JoinColumn(name = "user_get_like_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private User userGetLike;
 

@@ -3,7 +3,6 @@ package com.github.jkky_98.noteJ.domain;
 import com.github.jkky_98.noteJ.domain.base.BaseEntity;
 import com.github.jkky_98.noteJ.domain.user.User;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import lombok.*;
 // toDo : test
 @Entity
@@ -14,13 +13,14 @@ import lombok.*;
 public class Contact extends BaseEntity {
 
     @Id
-    @GeneratedValue
-    @Column(name = "contact_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "contact_id", nullable = false)
     private Long id;
 
-    @Email
+    @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
     private String content;
 
     @JoinColumn(name = "user_id")

@@ -60,6 +60,7 @@ class CommentServiceTest {
 
         post = Post.builder()
                 .user(postAuthor)
+                .postUrl("test-post-url")
                 .title("Test Post Title")
                 .build();
     }
@@ -74,29 +75,35 @@ class CommentServiceTest {
 
         CommentForm commentForm = new CommentForm();
         commentForm.setContent("This is a test comment");
-        commentForm.setParentsId(null);
+        commentForm.setParentsId(null); // 부모 댓글 없음
 
-        // stub 미리 설정
+        // Mocking (stub 설정)
         when(userService.findUserById(sessionUserId)).thenReturn(sessionUser);
         when(postService.findByPostUrl(postUrl)).thenReturn(post);
+
         when(userService.findUserByUsername(post.getUser().getUsername()))
-                .thenReturn(post.getUser()); // 수정된 부분
+                .thenReturn(post.getUser()); // 게시글 작성자 반환
 
         Comment commentForSave = Comment.builder()
                 .content(commentForm.getContent())
                 .build();
 
-        when(commentMapper.toCommentForSave(eq(post), eq(sessionUser), eq(commentForm.getContent()), any()))
+        when(commentMapper.toCommentForSave(eq(post), eq(sessionUser), eq(commentForm.getContent()), eq(Optional.empty())))
                 .thenReturn(commentForSave);
 
         // when
         commentService.saveComment(commentForm, sessionUserId, postUrl, username);
 
-        // then
+        // then (저장 여부 검증)
         verify(commentRepository).save(commentForSave);
+
+        // 부모 댓글 알림은 호출되지 않아야 함
         verify(notificationService, never()).sendCommentParentsNotification(any(), any(), any());
-        verify(notificationService).sendCommentPostNotification(eq(post.getUser()), any(), eq(post.getTitle()));
+
+        // 게시글 작성자에게 알림이 가야 함
+        verify(notificationService).sendCommentPostNotification(eq(post.getUser()), eq(sessionUser), eq(post.getTitle()));
     }
+
 
     @Test
     @DisplayName("saveComment() - 대댓글 저장")
