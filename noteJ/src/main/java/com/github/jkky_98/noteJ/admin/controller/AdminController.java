@@ -1,9 +1,6 @@
 package com.github.jkky_98.noteJ.admin.controller;
 
-import com.github.jkky_98.noteJ.admin.dto.AdminContentsCond;
-import com.github.jkky_98.noteJ.admin.dto.AdminContentsDeleteRequest;
-import com.github.jkky_98.noteJ.admin.dto.AdminContentsDeleteResponse;
-import com.github.jkky_98.noteJ.admin.dto.AdminContentsForm;
+import com.github.jkky_98.noteJ.admin.dto.*;
 import com.github.jkky_98.noteJ.admin.service.AdminService;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.domain.user.UserRole;
@@ -70,9 +67,14 @@ public class AdminController {
 
     @GetMapping("/admin/users")
     public String getAdminUsers(
-            @SessionAttribute("loginUser") User sessionUser
+            @SessionAttribute("loginUser") User sessionUser,
+            @ModelAttribute AdminUsersCond cond,
+            @PageableDefault(page = 0, size = 10) Pageable pageable,
+            Model model
     ) {
         if (sessionUser != null && sessionUser.getUserRole() == UserRole.ADMIN) {
+            Page<AdminUserForm> responseDto = adminService.getUsers(cond, pageable);
+            model.addAttribute("users", responseDto);
             return "admin/adminUsers";
         }
         return "redirect:/";
@@ -80,7 +82,8 @@ public class AdminController {
 
     @GetMapping("/admin/comments")
     public String getAdminComments(
-            @SessionAttribute("loginUser") User sessionUser
+            @SessionAttribute("loginUser") User sessionUser,
+            Model model
     ) {
         if (sessionUser != null && sessionUser.getUserRole() == UserRole.ADMIN) {
             return "admin/adminComments";

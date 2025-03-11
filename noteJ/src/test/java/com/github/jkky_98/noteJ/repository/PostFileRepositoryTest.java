@@ -8,14 +8,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)  // 기본 H2 사용 막기
+@ActiveProfiles("test")
 @Import({CacheConfig.class})
 @DisplayName("[PostFileRepository] Integration Tests")
 class PostFileRepositoryTest {
@@ -36,6 +40,10 @@ class PostFileRepositoryTest {
         // 동일한 postId를 가진 PostFile 엔티티 2건 생성
         post = Post.builder()
                 .postUrl("unique-post-url")
+                .title("title")
+                .content("content")
+                .thumbnail("thumbnail")
+                .writable(true)
                 .build();
 
         em.persist(post);
@@ -77,7 +85,11 @@ class PostFileRepositoryTest {
     void testDeleteByPostId_onlyDeletesSpecifiedPostFiles() {
         // given: 새로운 Post 및 PostFile 생성 (두 포스트 모두 존재)
         Post secondPost = Post.builder()
-                .postUrl("second-post-url")
+                .title("title")
+                .content("content")
+                .thumbnail("thumbnail")
+                .postUrl("unique-post-url22")
+                .writable(true)
                 .build();
         em.persist(secondPost);
         em.flush();

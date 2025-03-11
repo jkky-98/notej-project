@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.core.env.Environment;
 
@@ -21,6 +22,7 @@ public class NoteJApplication {
 	}
 
 	@Bean
+	@Profile({"blue", "green", "local"})
 	CommandLineRunner logEnvironmentSettings(Environment environment,
 											 @Value("${spring.profiles.active}") String activeProfile,
 											 @Value("${server.env}") String serverEnv,

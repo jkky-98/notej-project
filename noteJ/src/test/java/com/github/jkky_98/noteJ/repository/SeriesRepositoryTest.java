@@ -2,20 +2,25 @@ package com.github.jkky_98.noteJ.repository;
 
 import com.github.jkky_98.noteJ.domain.Series;
 import com.github.jkky_98.noteJ.domain.user.User;
+import com.github.jkky_98.noteJ.domain.user.UserRole;
 import com.github.jkky_98.noteJ.web.config.CacheConfig;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)  // 기본 H2 사용 막기
+@ActiveProfiles("test")
 @Import({CacheConfig.class})
 @DisplayName("[SeriesRepository] Integration Tests")
 class SeriesRepositoryTest {
@@ -34,6 +39,7 @@ class SeriesRepositoryTest {
                 .username("testUser")
                 .email("testUser@test.com")
                 .password("123456")
+                .userRole(UserRole.USER)
                 .build();
         em.persist(user);
 
@@ -63,6 +69,7 @@ class SeriesRepositoryTest {
                 .username("testUser")
                 .email("testUser@test.com")
                 .password("123456")
+                .userRole(UserRole.USER)
                 .build();
         em.persist(user);
         em.flush();

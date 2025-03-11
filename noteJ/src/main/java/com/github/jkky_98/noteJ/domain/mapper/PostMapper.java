@@ -2,13 +2,9 @@ package com.github.jkky_98.noteJ.domain.mapper;
 
 import com.github.jkky_98.noteJ.domain.*;
 import com.github.jkky_98.noteJ.domain.user.User;
-import com.github.jkky_98.noteJ.service.util.DefaultConst;
 import com.github.jkky_98.noteJ.web.controller.dto.*;
 import com.github.jkky_98.noteJ.web.controller.form.WriteForm;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 import org.springframework.data.domain.Page;
 
 import java.net.URLDecoder;
@@ -16,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
-@Mapper(componentModel = "spring", uses = {CommentMapper.class},
+@Mapper(componentModel = "spring", uses = {CommentMapper.class, UUID.class},
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface PostMapper {
@@ -24,7 +20,7 @@ public interface PostMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "series", target = "series")
     @Mapping(source = "request.content", target = "content", qualifiedByName = "decodeContent")
-    @Mapping(source = "request.title", target = "postUrl", qualifiedByName = "generatePostUrl")
+    @Mapping(source = "request.title", target = "title")
     @Mapping(target = "writable", constant = "false")
     @Mapping(target = "thumbnail", constant = "default/thumb.webp")
     Post toPostForAutoSave(AutoSavePostRequest request, User user, Series series);
@@ -39,11 +35,6 @@ public interface PostMapper {
     @Named("decodeContent")
     default String decodeContent(String content) {
         return URLDecoder.decode(content, StandardCharsets.UTF_8);
-    }
-
-    @Named("generatePostUrl")
-    default String generatePostUrl(String title) {
-        return title + UUID.randomUUID();
     }
 
     @Mapping(source = "post.title", target = "title")
@@ -74,7 +65,6 @@ public interface PostMapper {
     @Mapping(source = "form.content", target = "content", qualifiedByName = "decodeContent")
     @Mapping(source = "form.open", target = "writable")
     @Mapping(source = "form.postSummary", target = "postSummary")
-    @Mapping(source = "form.title", target = "postUrl", qualifiedByName = "generatePostUrl")
     @Mapping(source = "series", target = "series")
     @Mapping(source = "thumbnail", target = "thumbnail")
     @Mapping(source = "user", target = "user")
@@ -122,5 +112,15 @@ public interface PostMapper {
     @Mapping(source = "post.comments", target = "comments")
     @Mapping(expression = "java(post.getLikes().size())", target = "likeCount")
     PostViewDto toPostViewDto(Post post);
+
+    @AfterMapping
+    default void setDefaultValues(@MappingTarget Post post) {
+        if (post.getPostUrl() == null || post.getPostUrl().isEmpty()) {
+            post.updatePostUrl(UUID.randomUUID().toString()); // ✅ postUrl 기본 값 설정
+        }
+        if (post.getThumbnail() == null || post.getThumbnail().isEmpty()) {
+            post.updateThumbnail("default/thumb.webp"); // ✅ thumbnail 기본 값 설정
+        }
+    }
 }
 

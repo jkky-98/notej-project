@@ -14,7 +14,7 @@ import lombok.*;
 public class UserDesc extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_desc_id", nullable = false)
+    @Column(name = "user_desc_id")
     private Long id;
 
     private String description;
@@ -27,6 +27,7 @@ public class UserDesc extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
+    @Builder.Default
     private ThemeMode theme = ThemeMode.LIGHT;
 
     @Column(length = 100)

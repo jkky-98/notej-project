@@ -2,16 +2,19 @@ package com.github.jkky_98.noteJ.repository;
 
 import com.github.jkky_98.noteJ.domain.Post;
 import com.github.jkky_98.noteJ.domain.user.User;
+import com.github.jkky_98.noteJ.domain.user.UserRole;
 import com.github.jkky_98.noteJ.web.config.CacheConfig;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +22,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)  // 기본 H2 사용 막기
+@ActiveProfiles("test")
 @Import({CacheConfig.class})
 @DisplayName("[PostRepository] Integration Tests")
 class PostRepositoryTest {
@@ -41,6 +46,7 @@ class PostRepositoryTest {
                 .username("testUser")
                 .email("testUser@test.com")
                 .password("123456")
+                .userRole(UserRole.USER)
                 .build();
         em.persist(user);
 
@@ -49,18 +55,24 @@ class PostRepositoryTest {
                 .postUrl("url1")
                 .title("Post 1")
                 .writable(false)
+                .content("content1")
+                .thumbnail("thumbnail1")
                 .user(user)
                 .build();
         post2 = Post.builder()
                 .postUrl("url2")
                 .title("Post 2")
                 .writable(true)
+                .content("content2")
+                .thumbnail("thumbnail2")
                 .user(user)
                 .build();
         post3 = Post.builder()
                 .postUrl("url3")
                 .title("Post 3")
                 .writable(false)
+                .content("content3")
+                .thumbnail("thumbnail3")
                 .user(user)
                 .build();
 

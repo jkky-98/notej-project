@@ -7,7 +7,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@Profile("!local")
+@Profile({"green", "blue"})
 public class WebProdConfig implements WebMvcConfigurer {
 
     @Value("${cloud.aws.s3.bucket}")

@@ -42,7 +42,7 @@ import static com.github.jkky_98.noteJ.service.util.DefaultConst.DEFAULT_POST_PI
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Profile("!local")
+@Profile({"green", "blue"})
 public class WriteServiceProd implements WriteService{
 
     private final PostRepository postRepository;

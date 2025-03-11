@@ -4,6 +4,7 @@ import com.github.jkky_98.noteJ.domain.Post;
 import com.github.jkky_98.noteJ.domain.PostTag;
 import com.github.jkky_98.noteJ.domain.Tag;
 import com.github.jkky_98.noteJ.domain.user.User;
+import com.github.jkky_98.noteJ.domain.user.UserRole;
 import com.github.jkky_98.noteJ.web.config.CacheConfig;
 import com.github.jkky_98.noteJ.web.controller.dto.TagCountDto;
 import jakarta.persistence.EntityManager;
@@ -11,8 +12,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +23,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)  // 기본 H2 사용 막기
+@ActiveProfiles("test")
 @Import({CacheConfig.class}) // 캐시 관련 빈이 필요하다면
 @DisplayName("[UserRepository] Integration Tests")
 class UserRepositoryTest {
@@ -46,6 +51,7 @@ class UserRepositoryTest {
                 .username("testUser")
                 .email("testUser@test.com")
                 .password("123456")
+                .userRole(UserRole.USER)
                 .build();
         em.persist(user);
 
@@ -64,13 +70,17 @@ class UserRepositoryTest {
                 .title("Post 1")
                 .postUrl("url1")
                 .writable(true)
+                .content("content1")
                 .user(user)
+                .thumbnail("thumbnail1")
                 .build();
         post2 = Post.builder()
                 .title("Post 2")
                 .postUrl("url2")
                 .writable(false)
+                .content("content2")
                 .user(user)
+                .thumbnail("thumbnail2")
                 .build();
         em.persist(post1);
         em.persist(post2);

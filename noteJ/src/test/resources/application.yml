@@ -1,0 +1,59 @@
+spring:
+  config:
+    activate:
+      on-profile: test  # 'test' 프로파일이 활성화될 때만 적용됨
+
+  datasource:
+    url: jdbc:mysql://127.0.0.1:33100/notej_db
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 5
+      connection-timeout: 3000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: create  # 테스트 실행 시 DB 생성 & 종료 시 삭제
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        show_sql: true
+        format_sql: true
+        default_batch_fetch_size: 50  # 테스트 시 batch 크기 조정
+
+  sql:
+    init:
+      mode: always  # 테스트 시작 시 초기 SQL 실행 (data.sql 또는 schema.sql 적용)
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug  # Hibernate SQL 실행 로그 출력
+        orm:
+          jdbc:
+            bind: trace  # SQL 바인딩된 값도 함께 출력
+      springframework:
+        web: DEBUG  # Spring Web 로그 출력
+
+server:
+  port: 8080  # 테스트 환경에서는 별도의 포트 사용
+  serverAddress: localhost
+  env: test
+
+cloud:
+  aws:
+    credentials:
+      access-key: testNoKey
+      secret-key: testSecretNoKey
+    region:
+      static: testNoRegion
+    s3:
+      bucket: testNoBucket
+file:
+  dir: ${fileDir:/Users/piehealthcare/Documents/private/noteJ-storage/}  # 파일 업로드 저장 경로 설정 (기본값 지정)
+
+serverName: test_server  # 테스트 환경의 서버 식별용 이름

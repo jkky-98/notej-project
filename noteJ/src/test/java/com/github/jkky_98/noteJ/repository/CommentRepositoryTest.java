@@ -3,14 +3,16 @@ package com.github.jkky_98.noteJ.repository;
 import com.github.jkky_98.noteJ.domain.Comment;
 import com.github.jkky_98.noteJ.domain.Post;
 import com.github.jkky_98.noteJ.domain.user.User;
-import com.github.jkky_98.noteJ.repository.post.PostRepositoryImpl;
+import com.github.jkky_98.noteJ.domain.user.UserRole;
 import com.github.jkky_98.noteJ.web.config.CacheConfig;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
@@ -18,6 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)  // 기본 H2 사용 막기
+@ActiveProfiles("test")
 @Import({CacheConfig.class})
 @DisplayName("[CommentRepository] Integration Tests")
 class CommentRepositoryTest {
@@ -37,12 +41,17 @@ class CommentRepositoryTest {
                 .username("testUser")
                 .email("testUser@gmail.com")
                 .password("123456")
+                .userRole(UserRole.USER)
                 .build();
         em.persist(user);
 
         Post post = Post.builder()
                 .title("Test Post")
                 .postUrl("test-url")
+                .content("test-content")
+                .postUrl("test-post-url")
+                .thumbnail("test-thumbnail")
+                .writable(false)
                 .user(user)
                 .build();
         em.persist(post);

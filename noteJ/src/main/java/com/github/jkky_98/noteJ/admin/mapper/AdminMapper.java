@@ -2,8 +2,10 @@ package com.github.jkky_98.noteJ.admin.mapper;
 
 import com.github.jkky_98.noteJ.admin.dto.AdminContactForm;
 import com.github.jkky_98.noteJ.admin.dto.AdminContentsForm;
+import com.github.jkky_98.noteJ.admin.dto.AdminUserForm;
 import com.github.jkky_98.noteJ.domain.Contact;
 import com.github.jkky_98.noteJ.domain.Post;
+import com.github.jkky_98.noteJ.domain.user.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -50,5 +52,26 @@ public interface AdminMapper {
     default Page<AdminContactForm> contactPageToAdminContactFormPage(Page<Contact> contactPage) {
         List<AdminContactForm> contactList = AdminContactFormListToAdminContactFormList(contactPage.getContent());
         return new PageImpl<>(contactList, contactPage.getPageable(), contactPage.getTotalElements());
+    }
+
+
+    @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "user.username", target = "username")
+    @Mapping(source = "user.email", target = "email")
+    @Mapping(source = "user.userDesc.blogTitle", target = "blogTitle")
+    @Mapping(source = "user.username", target = "userBlogUrl", qualifiedByName = "getUserBlogUrl")
+    @Mapping(source = "user.createDt", target = "createDt")
+    AdminUserForm AdminUserFormFromUser(User user);
+
+    List<AdminUserForm> AdminUserFormListToAdminUserFormList(List<User> users);
+
+    default Page<AdminUserForm> userPageToAdminUserFormPage(Page<User> userPage) {
+        List<AdminUserForm> userList = AdminUserFormListToAdminUserFormList(userPage.getContent());
+        return new PageImpl<>(userList, userPage.getPageable(), userPage.getTotalElements());
+    }
+
+    @Named("getUserBlogUrl")
+    default String getUserBlogUrl(String username) {
+        return "/@" + username + "/posts";
     }
 }

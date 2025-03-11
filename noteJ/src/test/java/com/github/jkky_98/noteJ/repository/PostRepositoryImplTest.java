@@ -5,6 +5,7 @@ import com.github.jkky_98.noteJ.domain.PostTag;
 import com.github.jkky_98.noteJ.domain.Series;
 import com.github.jkky_98.noteJ.domain.Tag;
 import com.github.jkky_98.noteJ.domain.user.User;
+import com.github.jkky_98.noteJ.domain.user.UserRole;
 import com.github.jkky_98.noteJ.repository.post.PostRepositoryImpl;
 import com.github.jkky_98.noteJ.web.config.CacheConfig;
 import com.github.jkky_98.noteJ.web.controller.form.PostsConditionForm;
@@ -13,16 +14,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)  // 기본 H2 사용 막기
+@ActiveProfiles("test")
 @Import({CacheConfig.class})
 @DisplayName("[PostRepositoryImpl] Integration Tests")
 public class PostRepositoryImplTest {
@@ -47,6 +52,7 @@ public class PostRepositoryImplTest {
                 .username("testUser")
                 .email("testUser@gmail.com")
                 .password("123456")
+                .userRole(UserRole.USER)
                 .build();
 
         em.persist(user);
@@ -63,6 +69,9 @@ public class PostRepositoryImplTest {
         post = Post.builder()
                 .title("Test Post Title")
                 .writable(true)
+                .content("Test Post Content")
+                .postUrl("https://www.google.com/post")
+                .thumbnail("https://www.google.com/thumbnail")
                 .user(user)
                 .postUrl("fgisoda30-dmfklas0-fmklasd")
                 .series(series)

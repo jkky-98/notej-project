@@ -3,7 +3,145 @@
 <!-- Include the header fragment -->
 <div th:insert="~{fragments/header :: header}"></div>
 <body>
-<div th:insert="~{admin/fragments/adminNav :: sidebar}"></div>
-dd
+<style>
+    /* 카드에 호버 효과 및 클릭 커서 설정 */
+    .clickable-card {
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+    }
+    .clickable-card:hover {
+        background-color: #0d6ffd;
+    }
+</style>
+<div class="row">
+    <div class="col-3">
+        <div th:insert="~{admin/fragments/adminNav :: sidebar}"></div>
+    </div>
+    <div class="col-9">
+        <div class="container align-content-center">
+            <!-- 검색 바 -->
+            <div class="my-4">
+                <form class="d-flex" th:action="@{${currentUri}}" method="GET">
+                    <input class="form-control me-2" type="text" placeholder="이름 검색"
+                           aria-label="Search" name="username" th:value="${param.username}">
+                    <input class="form-control me-2" type="email" placeholder="이메일 검색"
+                           aria-label="Search" name="email" th:value="${param.email}">
+                    <input class="form-control me-2" type="text" placeholder="블로그 제목 검색"
+                           aria-label="Search" name="blogTitle" th:value="${param.blogTitle}">
+                    <button class="btn btn-primary" type="submit">검색</button>
+                </form>
+            </div>
+            <div class="container my-4">
+                <!-- 카드 반복 -->
+                <div th:each="user : ${users.content}" class="card clickable-card mb-3"
+                     th:onclick="|location.href='@{{path}(path=${user.userBlogUrl})}'|"
+                     th:id="|user-${user.userId}|"
+                >
+                    <div class="card-body d-flex align-items-center">
+                        <!-- 유저 이메일 -->
+                        <h5 class="mb-0 me-3" th:text="${user.email}">title</h5>
+                        <!-- 사용자명 -->
+                        <p class="mb-0 me-3">Username: <strong th:text="${user.username}">User1</strong></p>
+                        <!-- 블로그 명 -->
+                        <p class="mb-0 me-3">View Count: <strong th:text="${user.blogTitle}">10</strong> |</p>
+                        <!-- 회원가입 날짜 -->
+                        <p class="mb-0 me-3 text-muted">Created: <strong th:text="${#temporals.format(user.createDt, 'yyyy-MM-dd HH:mm')}">2021-09-01</strong></p>
+                        <!-- 삭제 버튼 (카드 클릭 이벤트 방지) -->
+                        <button class="btn btn-danger btn-sm ms-auto"
+                                th:data-user-id="${user.userId}"
+                                onclick="event.stopPropagation(); deleteContent(this.getAttribute('data-user-id'));">
+                            삭제
+                        </button>
+                    </div>
+                </div>
+                <!-- 페이지네이션 UI-->
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <!-- 이전 페이지 -->
+                        <li class="page-item" th:classappend="${users.first} ? 'disabled'">
+                            <a id="prevPage" class="page-link" href="#" aria-disabled="${users.first}">Previous</a>
+                        </li>
+
+                        <!-- 페이지 번호 -->
+                        <li th:each="i : ${#numbers.sequence(0, users.totalPages - 1)}" class="page-item"
+                            th:classappend="${users.number == i} ? 'active'">
+                            <a class="page-link page-number" href="#" th:data-page="${i}" th:text="${i + 1}"></a>
+                        </li>
+
+                        <!-- 다음 페이지 -->
+                        <li class="page-item" th:classappend="${users.last} ? 'disabled'">
+                            <a id="nextPage" class="page-link" href="#" aria-disabled="${users.last}">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function deleteContent(userId) {
+        if (confirm("정말로 삭제하시겠습니까?")) {
+            fetch("/admin/users/delete", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"  // JSON 형식으로 전송
+                },
+                body: JSON.stringify({ userId: userId })  // JSON 바디로 userId 전달
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("삭제 실패");
+                    }
+                    return response.json();  // 서버에서 JSON 응답 기대
+                })
+                .then(data => {
+                    alert("삭제되었습니다.");
+                    document.getElementById("user-" + userId).remove();  // 카드 삭제
+                })
+                .catch(error => alert(error.message + " ERROR"));
+        }
+    }
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // 현재 URL에서 'page' 쿼리 파라미터 가져오기
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentPage = parseInt(urlParams.get("page")) || 0; // Thymeleaf의 Page는 0부터 시작
+
+        // 페이지 이동 함수
+        function updatePage(pageNumber) {
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.set("page", pageNumber);
+            window.location.href = newUrl.toString();
+        }
+
+        // 페이지 번호 클릭 시 이동
+        document.querySelectorAll(".page-number").forEach(function (pageLink) {
+            pageLink.addEventListener("click", function (event) {
+                event.preventDefault();
+                const selectedPage = parseInt(this.getAttribute("data-page"));
+                if (!isNaN(selectedPage)) {
+                    updatePage(selectedPage);
+                }
+            });
+        });
+
+        // 이전 페이지 버튼 클릭 시 이동
+        document.getElementById("prevPage")?.addEventListener("click", function (event) {
+            event.preventDefault();
+            if (currentPage > 0) { // 0이 첫 페이지
+                updatePage(currentPage - 1);
+            }
+        });
+
+        // 다음 페이지 버튼 클릭 시 이동
+        document.getElementById("nextPage")?.addEventListener("click", function (event) {
+            event.preventDefault();
+            updatePage(currentPage + 1);
+        });
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

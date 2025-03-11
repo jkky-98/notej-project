@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-@Profile("local")
+@Profile({"local", "test"})
 public class FileStoreLocal implements FileStore{
 
     @Value("${file.dir}")

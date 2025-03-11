@@ -1,9 +1,6 @@
 package com.github.jkky_98.noteJ.admin.service;
 
-import com.github.jkky_98.noteJ.admin.dto.AdminContactForm;
-import com.github.jkky_98.noteJ.admin.dto.AdminContentsCond;
-import com.github.jkky_98.noteJ.admin.dto.AdminContentsForm;
-import com.github.jkky_98.noteJ.admin.dto.AdminHomeForm;
+import com.github.jkky_98.noteJ.admin.dto.*;
 import com.github.jkky_98.noteJ.admin.mapper.AdminMapper;
 import com.github.jkky_98.noteJ.admin.repository.AdminRepository;
 import com.github.jkky_98.noteJ.domain.Contact;
@@ -13,6 +10,7 @@ import com.github.jkky_98.noteJ.repository.PostRepository;
 import com.github.jkky_98.noteJ.service.PostService;
 import com.github.jkky_98.noteJ.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AdminService {
 
     private final AdminRepository adminRepository;
@@ -30,13 +29,22 @@ public class AdminService {
     private final PostService postService;
     private final UserService userService;
 
+    @Transactional(readOnly = true)
+    public Page<AdminUserForm> getUsers(AdminUsersCond cond, Pageable pageable) {
+        log.info("getUsers cond Email:{}", cond.getEmail());
+        Page<User> users = adminRepository.searchUsersAdmin(cond, pageable);
+        return adminMapper.userPageToAdminUserFormPage(users);
+    }
+
+    @Transactional(readOnly = true)
     public Page<AdminContentsForm> getContents(AdminContentsCond cond, Pageable pageable) {
-        Page<Post> posts = searchPostsAdmin(cond, pageable);
+        Page<Post> posts = adminRepository.searchPostsAdmin(cond, pageable);
         return adminMapper.postPageToAdminContentsFormPage(posts);
     }
 
+    @Transactional(readOnly = true)
     public Page<AdminContactForm> getContacts(Pageable pageable) {
-        Page<Contact> contacts = searchContactsAdmin(pageable);
+        Page<Contact> contacts = adminRepository.searchContactsAdmin(pageable);
         return adminMapper.contactPageToAdminContactFormPage(contacts);
     }
 
@@ -45,16 +53,6 @@ public class AdminService {
         Post postRemoved = postService.findById(postId);
         postRepository.deleteById(postRemoved.getId());
         return postRemoved.getId();
-    }
-
-    @Transactional(readOnly = true)
-    public Page<Post> searchPostsAdmin(AdminContentsCond cond, Pageable pageable) {
-        return adminRepository.searchPostsAdmin(cond, pageable);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<Contact> searchContactsAdmin(Pageable pageable) {
-        return adminRepository.searchContactsAdmin(pageable);
     }
 
     public AdminHomeForm getAdminHomeData() {

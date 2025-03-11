@@ -17,7 +17,7 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 @RestController
-@Profile("local")
+@Profile({"local", "test"})
 @Slf4j
 public class FileApiController {
 

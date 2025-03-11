@@ -1,24 +1,25 @@
-package com.github.jkky_98.noteJ.repository.init;
+package com.github.jkky_98.noteJ.web.util;
 
-import com.github.jkky_98.noteJ.domain.*;
+import com.github.jkky_98.noteJ.domain.Post;
+import com.github.jkky_98.noteJ.domain.PostTag;
+import com.github.jkky_98.noteJ.domain.Series;
+import com.github.jkky_98.noteJ.domain.Tag;
 import com.github.jkky_98.noteJ.domain.user.ThemeMode;
 import com.github.jkky_98.noteJ.domain.user.User;
 import com.github.jkky_98.noteJ.domain.user.UserDesc;
 import com.github.jkky_98.noteJ.domain.user.UserRole;
 import com.github.jkky_98.noteJ.repository.*;
+import com.github.jkky_98.noteJ.service.util.DefaultConst;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.boot.CommandLineRunner;
 
-@Component
+@Service
 @RequiredArgsConstructor
-@Profile("local")
-public class DataInitializer implements CommandLineRunner {
+public class InitializerService {
 
     private final UserRepository userRepository;
     private final PostRepository postRepository;
@@ -26,9 +27,7 @@ public class DataInitializer implements CommandLineRunner {
     private final PostTagRepository postTagRepository;
     private final TagRepository tagRepository;
 
-    @Override
-    public void run(String... args) throws Exception {
-        // 데이터베이스에 초기 데이터 삽입
+    protected void initialize() {
         if (userRepository.count() == 0) {
 
             UserDesc initUserDesc = UserDesc.builder()
@@ -89,6 +88,7 @@ public class DataInitializer implements CommandLineRunner {
                     .writable(false)
                     .series(initSeries)
                     .user(initSignUpUser)
+                    .thumbnail(DefaultConst.DEFAULT_POST_PIC)
                     .postUrl("testPost1")
                     .build();
 
@@ -134,6 +134,7 @@ public class DataInitializer implements CommandLineRunner {
                     .writable(false)
                     .series(initSeries2)
                     .user(initSignUpUser)
+                    .thumbnail(DefaultConst.DEFAULT_POST_PIC)
                     .postUrl("testPost2")
                     .build();
 
@@ -159,8 +160,8 @@ public class DataInitializer implements CommandLineRunner {
                         .writable(true)
                         .series(initSeries)
                         .user(initSignUpUser)
-                        .postUrl("testPost-" + UUID.randomUUID())
-                        .thumbnail("default/thumb.webp")
+                        .postUrl(UUID.randomUUID().toString())
+                        .thumbnail(DefaultConst.DEFAULT_POST_PIC)
                         .postSummary("요약 : " + i + "번째")
                         .build();
 

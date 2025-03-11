@@ -27,16 +27,19 @@ spring:
     prefix: file:src/main/resources/templates/  # 템플릿 파일을 프로젝트 내 경로에서 직접 읽도록 설정 (Hot Reload 반영)
 
   datasource:
-    url: jdbc:h2:tcp://localhost/~/notej  # H2 데이터베이스를 TCP 모드로 실행하여 외부 접근 허용
-    username: sa  # H2 기본 사용자명
-    password:  # H2의 기본 비밀번호 (설정하지 않으면 빈 값)
-    driver-class-name: org.h2.Driver  # H2 데이터베이스 드라이버
+    url: jdbc:mysql://127.0.0.1:33103/notej_db
+    username: ${localDBUsername:username}
+    password: ${localDBPassword:password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
-      connection-timeout: 5000  # 데이터베이스 커넥션 풀에서 연결을 기다리는 최대 시간 (5초)
+      maximum-pool-size: 10  # 커넥션 풀 최대 크기 (동시 접속 가능한 커넥션 수)
+      connection-timeout: 3000  # 커넥션 풀에서 연결을 기다리는 최대 시간 (3초)
+      idle-timeout: 600000  # 사용되지 않는 커넥션이 유지되는 시간 (10분)
+      max-lifetime: 1800000  # 커넥션의 최대 수명 (30분)
 
   jpa:
     hibernate:
-      ddl-auto: create  # 애플리케이션 실행 시 기존 테이블을 삭제하고 새로 생성 (데이터 초기화)
+      ddl-auto: create-drop  # 애플리케이션 실행 시 기존 테이블을 삭제하고 새로 생성 (데이터 초기화)
     properties:
       hibernate:
         show_sql: true  # 실행되는 SQL 쿼리를 콘솔에 출력
@@ -60,6 +63,8 @@ file:
 server:
   port: 8080  # 애플리케이션이 실행될 포트 (로컬 환경에서 8080으로 실행)
   serverAddress: localhost  # 서버 주소 (로컬 환경에서는 localhost)
+  tomcat:
+    uri-encoding: utf-8
 
 cloud:
   aws:

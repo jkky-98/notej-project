@@ -4,19 +4,24 @@ import com.github.jkky_98.noteJ.domain.Like;
 import com.github.jkky_98.noteJ.domain.Post;
 import com.github.jkky_98.noteJ.domain.Series;
 import com.github.jkky_98.noteJ.domain.user.User;
+import com.github.jkky_98.noteJ.domain.user.UserRole;
 import com.github.jkky_98.noteJ.web.config.CacheConfig;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)  // 기본 H2 사용 막기
+@ActiveProfiles("test")
 @Import({CacheConfig.class})
 @DisplayName("[LikeRepository] Integration Tests")
 class LikeRepositoryTest {
@@ -41,11 +46,13 @@ class LikeRepositoryTest {
                 .username("testUser")
                 .email("testUser@gmail.com")
                 .password("123456")
+                .userRole(UserRole.USER)
                 .build();
         userGetLike = User.builder()
                 .username("testUserGetLike")
                 .email("testUserGetLike@gmail.com")
                 .password("123456")
+                .userRole(UserRole.USER)
                 .build();
         em.persist(user);
         em.persist(userGetLike);
@@ -60,7 +67,9 @@ class LikeRepositoryTest {
         post = Post.builder()
                 .title("Test Post Title")
                 .postUrl("unique-post-url")
+                .content("Test Post Content")
                 .writable(true)
+                .thumbnail("unique-thumbnail-url")
                 .user(user)
                 .series(series)
                 .build();
@@ -109,6 +118,9 @@ class LikeRepositoryTest {
         Post anotherPost = Post.builder()
                 .title("Another Post")
                 .postUrl("another-url")
+                .content("Another Post Content")
+                .postUrl("another-url-another-post-url")
+                .thumbnail("another-thumbnail")
                 .writable(true)
                 .user(user)
                 .series(series)
@@ -136,6 +148,9 @@ class LikeRepositoryTest {
         Post anotherPost = Post.builder()
                 .title("Another Post")
                 .postUrl("another-url")
+                .content("Another Post Content")
+                .postUrl("another-url-another-post-url")
+                .thumbnail("another-thumbnail")
                 .writable(true)
                 .user(user)
                 .series(series)

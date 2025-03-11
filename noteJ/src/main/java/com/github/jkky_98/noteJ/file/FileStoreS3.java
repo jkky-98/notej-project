@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-@Profile("!local")
+@Profile({"green", "blue"})
 public class FileStoreS3 implements FileStore {
 
     private final AmazonS3 amazonS3;

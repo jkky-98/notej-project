@@ -14,7 +14,7 @@ public class Contact extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "contact_id", nullable = false)
+    @Column(name = "contact_id")
     private Long id;
 
     @Column(nullable = false)

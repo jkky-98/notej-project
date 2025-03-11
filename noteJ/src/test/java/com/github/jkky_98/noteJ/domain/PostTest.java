@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -227,8 +228,6 @@ public class PostTest {
         // 컨텐츠는 URL 디코딩되어 업데이트되어야 함
         String expectedContent = URLDecoder.decode("Edited%20Content%20with%20encoding", StandardCharsets.UTF_8);
         assertThat(post.getContent()).isEqualTo(expectedContent);
-        // postUrl는 제목 + UUID 형식이므로 제목으로 시작하는지 확인
-        assertThat(post.getPostUrl()).startsWith("Edited Title");
         // 연관된 시리즈가 업데이트되어야 함
         assertThat(post.getSeries()).isEqualTo(series);
     }

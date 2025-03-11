@@ -28,7 +28,7 @@ public class Post extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id", nullable = false)
+    @Column(name = "post_id")
     private Long id;
 
     @Column(nullable = false, length = 50)
@@ -57,11 +57,11 @@ public class Post extends BaseEntity {
 
     //연관관계
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "series_id", nullable = false)
+    @JoinColumn(name = "series_id")
     private Series series;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Builder.Default
@@ -140,7 +140,6 @@ public class Post extends BaseEntity {
     public void updateEditPostTemp(AutoEditPostRequest request, Series series) {
         title = request.getTitle();
         content = decodingContent(request.getContent());
-        postUrl = request.getTitle() + UUID.randomUUID();
         this.series = series;
         thumbnail = DEFAULT_POST_PIC;
     }
@@ -148,4 +147,10 @@ public class Post extends BaseEntity {
     private static String decodingContent(String content) {
         return URLDecoder.decode(content, StandardCharsets.UTF_8);
     }
+
+    public void updatePostUrl(String postUrl) {
+        this.postUrl = postUrl;
+    }
+
+
 }

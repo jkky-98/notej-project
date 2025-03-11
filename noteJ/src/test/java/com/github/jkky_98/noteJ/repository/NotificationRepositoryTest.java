@@ -3,20 +3,25 @@ package com.github.jkky_98.noteJ.repository;
 import com.github.jkky_98.noteJ.domain.Notification;
 import com.github.jkky_98.noteJ.domain.NotificationType;
 import com.github.jkky_98.noteJ.domain.user.User;
+import com.github.jkky_98.noteJ.domain.user.UserRole;
 import com.github.jkky_98.noteJ.web.config.CacheConfig;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)  // 기본 H2 사용 막기
+@ActiveProfiles("test")
 @Import({CacheConfig.class})
 @DisplayName("[NotificationRepository] Integration Tests")
 class NotificationRepositoryTest {
@@ -40,10 +45,12 @@ class NotificationRepositoryTest {
                 .username("receiver")
                 .email("receiver@test.com")
                 .password("123456")
+                .userRole(UserRole.USER)
                 .build();
         sender = User.builder()
                 .username("sender")
                 .email("sender@test.com")
+                .userRole(UserRole.USER)
                 .password("123456")
                 .build();
         em.persist(receiver);
@@ -113,6 +120,7 @@ class NotificationRepositoryTest {
         User newUser = User.builder()
                 .username("noNotiUser")
                 .email("noNotiUser@test.com")
+                .userRole(UserRole.USER)
                 .password("123456")
                 .build();
         em.persist(newUser);
@@ -130,6 +138,7 @@ class NotificationRepositoryTest {
         User newUser = User.builder()
                 .username("noNotiUser")
                 .email("noNotiUser@test.com")
+                .userRole(UserRole.USER)
                 .password("123456")
                 .build();
         em.persist(newUser);
@@ -147,6 +156,7 @@ class NotificationRepositoryTest {
         User readUser = User.builder()
                 .username("readUser")
                 .email("readUser@test.com")
+                .userRole(UserRole.USER)
                 .password("123456")
                 .build();
         em.persist(readUser);

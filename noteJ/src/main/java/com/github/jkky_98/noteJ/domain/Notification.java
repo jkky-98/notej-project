@@ -14,7 +14,7 @@ public class Notification extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "notification_id", nullable = false)
+    @Column(name = "notification_id")
     private Long id;
 
     //읽지 않음 : false
@@ -33,12 +33,12 @@ public class Notification extends BaseEntity {
     // 연관관계
     // 수신자 (알림을 받는 사용자)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receiver_id", nullable = false)
+    @JoinColumn(name = "receiver_id")
     private User receiver;
 
     // 발신자 (알림을 발생시킨 사용자)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id", nullable = false)
+    @JoinColumn(name = "sender_id")
     private User sender;  // 알림을 발생시킨 사용자 (발신자)
 
     public void updateReceiver(User user) {

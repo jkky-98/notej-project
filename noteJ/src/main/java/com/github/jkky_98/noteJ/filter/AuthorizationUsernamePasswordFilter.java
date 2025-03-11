@@ -39,6 +39,7 @@ public class AuthorizationUsernamePasswordFilter implements Filter {
             "/error/403",
             "/actuator/**",
             "/contact/**",
+            "/init/**"
     };
     private static final AntPathMatcher pathMatcher = new AntPathMatcher();
 

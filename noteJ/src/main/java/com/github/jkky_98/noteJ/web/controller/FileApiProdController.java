@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@Profile("!local")
+@Profile({"green", "blue"})
 @RequiredArgsConstructor
 @Slf4j
 public class FileApiProdController {

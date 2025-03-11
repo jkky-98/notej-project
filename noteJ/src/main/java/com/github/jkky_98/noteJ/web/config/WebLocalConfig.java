@@ -7,7 +7,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@Profile("local")
+@Profile({"local", "test"})
 public class WebLocalConfig implements WebMvcConfigurer {
     @Value("${file.dir}")
     private String fileDir;
