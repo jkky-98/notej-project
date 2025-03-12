@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(
+        name = "comment_table"
+)
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // JPA 기본 생성자

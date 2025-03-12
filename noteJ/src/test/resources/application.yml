@@ -16,7 +16,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create  # 테스트 실행 시 DB 생성 & 종료 시 삭제
+      ddl-auto: create-drop  # 테스트 실행 시 DB 생성 & 종료 시 삭제
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect

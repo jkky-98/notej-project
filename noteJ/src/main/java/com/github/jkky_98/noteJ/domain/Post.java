@@ -17,8 +17,7 @@ import static com.github.jkky_98.noteJ.service.util.DefaultConst.DEFAULT_POST_PI
 
 @Entity
 @Table(
-        name = "POST",
-        indexes = @Index(name = "idx_post_url", columnList = "postUrl")
+        name = "post"
 )
 @Getter
 @Builder(toBuilder = true)

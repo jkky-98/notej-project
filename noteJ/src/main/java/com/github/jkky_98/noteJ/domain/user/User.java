@@ -13,8 +13,7 @@ import java.util.List;
 
 @Entity
 @Table(
-        name = "user_table",
-        indexes = @Index(name = "idx_username", columnList = "username")
+        name = "user_table"
 )
 @Getter
 @Builder

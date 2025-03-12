@@ -39,9 +39,12 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create-drop  # 애플리케이션 실행 시 기존 테이블을 삭제하고 새로 생성 (데이터 초기화)
+      ddl-auto: create  # 애플리케이션 실행 시 기존 테이블을 삭제하고 새로 생성 (데이터 초기화)
     properties:
       hibernate:
+        hbm2ddl.drop-cascade: true  # Hibernate가 테이블 삭제 시 FK도 함께 삭제하도록 설정
+        order_updates: true
+        order_inserts: true
         show_sql: true  # 실행되는 SQL 쿼리를 콘솔에 출력
         format_sql: true  # SQL 쿼리를 가독성 좋게 포맷팅하여 출력
         default_batch_fetch_size: 100  # 여러 개의 데이터를 한 번에 조회할 때 Batch 크기 설정 (성능 최적화)
