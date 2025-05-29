@@ -36,4 +36,11 @@ export default createVuetify({
       },
     },
   },
+  defaults: {
+    global: {
+      style: {
+        fontFamily: 'Pretendard Variable, sans-serif',
+      },
+    },
+  },
 })
