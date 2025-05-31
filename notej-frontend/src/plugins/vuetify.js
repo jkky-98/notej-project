@@ -1,5 +1,3 @@
-// plugins/vuetify.js
-
 import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
@@ -10,24 +8,24 @@ export default createVuetify({
     themes: {
       light: {
         colors: {
-          background: '#eef0f2',
-          surface: '#c6c7c4',
-          primary: '#a2999e',
-          secondary: '#846a6a',
-          accent: '#b4b0b1',
-          info: '#5d5353',
-          text: '#353b3c',
+          background: '#ebf5ee',
+          surface: '#d5cfc6',
+          primary: '#78a1bb',
+          secondary: '#506980',
+          accent: '#bfa89e',
+          info: '#8b786d',
+          text: '#283044',
         },
       },
       dark: {
         colors: {
-          background: '#353b3c',
-          surface: '#5d5353',
-          primary: '#a2999e',
-          secondary: '#846a6a',
-          accent: '#b4b0b1',
-          info: '#c6c7c4',
-          text: '#eef0f2',
+          background: '#283044',
+          surface: '#506980',
+          primary: '#78a1bb',
+          secondary: '#bfa89e',
+          accent: '#d5cfc6',
+          info: '#ebf5ee',
+          text: '#ebf5ee',
         },
       },
     },
