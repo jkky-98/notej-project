@@ -1,37 +1,33 @@
-/**
- * plugins/vuetify.js
- *
- * Framework documentation: https://vuetifyjs.com`
- */
+// plugins/vuetify.js
 
-// Styles
 import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
-
-// Composables
 import { createVuetify } from 'vuetify'
 
-// https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
   theme: {
-    defaultTheme: 'light', // ← 이 부분만 조정해도 됨
+    defaultTheme: 'light',
     themes: {
       light: {
         colors: {
-          background: '#bdd4e7',
-          surface: '#aab9cf',
-          primary: '#8693ab',
-          secondary: '#637074',
-          text: '#212227',
+          background: '#eef0f2',
+          surface: '#c6c7c4',
+          primary: '#a2999e',
+          secondary: '#846a6a',
+          accent: '#b4b0b1',
+          info: '#5d5353',
+          text: '#353b3c',
         },
       },
       dark: {
         colors: {
-          background: '#212227',
-          surface: '#637074',
-          primary: '#8693ab',
-          secondary: '#aab9cf',
-          text: '#bdd4e7',
+          background: '#353b3c',
+          surface: '#5d5353',
+          primary: '#a2999e',
+          secondary: '#846a6a',
+          accent: '#b4b0b1',
+          info: '#c6c7c4',
+          text: '#eef0f2',
         },
       },
     },
@@ -41,6 +37,28 @@ export default createVuetify({
       style: {
         fontFamily: 'Pretendard Variable, sans-serif',
       },
+    },
+    VBtn: {
+      color: 'primary',
+      variant: 'flat',
+      rounded: 'lg',
+      elevation: 1,
+    },
+    VTextField: {
+      variant: 'outlined',
+      density: 'comfortable',
+      color: 'primary',
+    },
+    VCard: {
+      elevation: 2,
+      rounded: 'lg',
+    },
+    VAppBar: {
+      color: 'primary',
+      flat: true,
+    },
+    VContainer: {
+      fluid: true,
     },
   },
 })
