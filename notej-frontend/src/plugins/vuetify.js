@@ -39,7 +39,7 @@ export default createVuetify({
       },
     },
     VBtn: {
-      color: 'primary',
+      color: 'info',
       variant: 'flat',
       rounded: 'lg',
       elevation: 1,
@@ -47,14 +47,14 @@ export default createVuetify({
     VTextField: {
       variant: 'outlined',
       density: 'comfortable',
-      color: 'primary',
+      color: 'info',
     },
     VCard: {
       elevation: 2,
       rounded: 'lg',
     },
     VAppBar: {
-      color: 'primary',
+      color: 'info',
       flat: true,
     },
     VContainer: {
