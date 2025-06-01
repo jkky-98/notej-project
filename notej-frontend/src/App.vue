@@ -13,7 +13,18 @@
 </template>
 
 <script setup>
+  import { useTheme } from 'vuetify'
+  import { useThemeStore } from '@/stores/theme'
+
   import NavBar from '@/components/layouts/NavBar.vue'
+  import FloatingContactButton from '@/components/layouts/FloatingContactButton.vue'
+
+  const theme = useTheme()
+  const themeStore = useThemeStore()
+
+  // 로컬스토리지에서 불러온 후 Vuetify에 테마 적용
+  themeStore.setThemeFromStorage()
+  theme.global.name.value = themeStore.isDark ? 'dark' : 'light'
 </script>
 
 <style>

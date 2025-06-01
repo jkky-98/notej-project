@@ -68,9 +68,11 @@
   import { computed } from 'vue'
   import { useRouter } from 'vue-router'
   import { useTheme } from 'vuetify'
+  import { useThemeStore } from '@/stores/theme' // 추가
 
   const router = useRouter()
   const theme = useTheme()
+  const themeStore = useThemeStore()
 
   function onCreatePost () {
     router.push('/new-post')
@@ -85,11 +87,13 @@
   }
 
   function toggleTheme () {
-    theme.global.name.value = theme.global.name.value === 'light' ? 'dark' : 'light'
+    themeStore.toggleTheme()
+    theme.global.name.value = themeStore.isDark ? 'dark' : 'light'
   }
 
-  const isDark = computed(() => theme.global.current.value.dark)
+  const isDark = computed(() => themeStore.isDark)
 </script>
+
 
 <style scoped>
 .transition-colors {
