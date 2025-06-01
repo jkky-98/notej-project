@@ -9,6 +9,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
+    FloatingContactButton: typeof import('./src/components/layouts/FloatingContactButton.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     NavBar: typeof import('./src/components/layouts/NavBar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

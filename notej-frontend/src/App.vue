@@ -6,11 +6,14 @@
     <v-main>
       <router-view />
     </v-main>
+
+    <!-- 오른쪽 하단 문의 버튼 -->
+    <FloatingContactButton />
   </v-app>
 </template>
 
 <script setup>
-import NavBar from '@/components/layouts/NavBar.vue'
+  import NavBar from '@/components/layouts/NavBar.vue'
 </script>
 
 <style>
