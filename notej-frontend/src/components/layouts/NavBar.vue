@@ -53,12 +53,24 @@
       </template>
 
       <v-list>
-        <v-list-item @click="goToProfile">
-          <v-list-item-title>내 프로필</v-list-item-title>
-        </v-list-item>
-        <v-list-item @click="logout">
-          <v-list-item-title>로그아웃</v-list-item-title>
-        </v-list-item>
+        <!-- 로그인 경우 -->
+        <template v-if="isLoggedIn">
+          <v-list-item @click="goToProfile">
+            <v-list-item-title>내 프로필</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="goToBlog">
+            <v-list-item-title>내 블로그</v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="handleLogout">
+            <v-list-item-title>로그아웃</v-list-item-title>
+          </v-list-item>
+        </template>
+        <!-- 로그아웃 상태 경우 -->
+        <template v-else>
+          <v-list-item @click="goToLogin">
+            <v-list-item-title>로그인</v-list-item-title>
+          </v-list-item>
+        </template>
       </v-list>
     </v-menu>
   </v-app-bar>
@@ -68,11 +80,15 @@
   import { computed } from 'vue'
   import { useRouter } from 'vue-router'
   import { useTheme } from 'vuetify'
-  import { useThemeStore } from '@/stores/theme' // 추가
+  import { useThemeStore } from '@/stores/theme'
+  import { useAuthStore } from '@/stores/auth'
 
   const router = useRouter()
   const theme = useTheme()
   const themeStore = useThemeStore()
+  const authStore = useAuthStore()
+
+  const isLoggedIn = computed(() => authStore.isLoggedIn)
 
   function onCreatePost () {
     router.push('/new-post')
@@ -82,8 +98,17 @@
     router.push('/profile')
   }
 
-  function logout () {
-    console.log('로그아웃')
+  function goToBlog () {
+    router.push('/my-blog')
+  }
+
+  function goToLogin () {
+    router.push('/login')
+  }
+
+  function handleLogout () {
+    authStore.logout()
+    router.push('/')
   }
 
   function toggleTheme () {
