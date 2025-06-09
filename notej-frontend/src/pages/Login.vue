@@ -97,12 +97,14 @@
   import { ref } from 'vue'
   import { useAuthStore } from '@/stores/auth'
   import { useRouter } from 'vue-router'
+  import api from '@/utils/axios-interceptor'
 
   const id = ref('')
   const password = ref('')
   const showPassword = ref(false)
   const authStore = useAuthStore()
   const router = useRouter()
+  const backendUrl = import.meta.env.VITE_BACKEND_URL
 
   const togglePassword = () => {
     showPassword.value = !showPassword.value
@@ -110,27 +112,30 @@
 
   const login = async () => {
     try {
-      // 실제 로그인 요청은 백엔드 API 호출로 대체
-      if (id.value === 'test' && password.value === '1234') {
-        document.cookie = 'token=example_token' // 임시 토큰
-        authStore.setUser({ id: id.value })
-        router.push('/') // 로그인 후 메인 페이지로 이동
-      } else {
-        alert('아이디 또는 비밀번호가 틀렸습니다.')
-      }
+      const res = await api.post('/api/auth/credentials/login', {
+        email: id.value,
+        password: password.value,
+      })
+
+      await authStore.fetchUser() // 로그인 후 유저 정보 갱신
+      router.push('/login/success')
     } catch (err) {
       console.error(err)
-      alert('로그인 중 오류 발생')
+      alert('아이디 또는 비밀번호가 틀렸습니다.')
     }
   }
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL
-
+  const setRedirectUriCookie = () => {
+    const target = 'http://localhost:3000/login/success' // 실제 리디렉션 대상
+    document.cookie = `redirect_uri=${target}; path=/`
+  }
   const loginGoogle = () => {
+    setRedirectUriCookie()
     window.location.href = `${backendUrl}/oauth2/authorization/google?mode=login`
   }
 
   const loginNaver = () => {
+    setRedirectUriCookie()
     window.location.href = `${backendUrl}/oauth2/authorization/naver?mode=login`
   }
 </script>

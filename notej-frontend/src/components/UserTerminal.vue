@@ -6,9 +6,9 @@
   import { onMounted } from 'vue'
   import { Terminal } from 'xterm'
   import 'xterm/css/xterm.css'
-  import { useUserStore } from '@/stores/user'
+  import { useAuthStore } from '@/stores/auth'
 
-  const userStore = useUserStore()
+  const authStore = useAuthStore()
 
   let term
   let commandBuffer = ''
@@ -16,8 +16,8 @@
   let historyIndex = 0
 
   const prompt = () => {
-    const name = userStore.username || 'nologin'
-    const color = name === 'nologin' ? '\x1b[1;3;95m' : '\x1b[1;3;94m'
+    const name = authStore.user?.name || authStore.user?.email || 'nologin'
+    const color = authStore.isAuthenticated ? '\x1b[1;3;94m' : '\x1b[1;3;95m'
     return ` ${color}${name}\x1b[0m@notej:# ~ `
   }
 
@@ -116,7 +116,7 @@
     term.writeln('')
     term.writeln(' 🚀 NOTEJ에 오신걸 환영합니다! ' + userColor + '\'help\'' + resetColor + ' 명령어를 입력해보세요.')
     term.writeln('')
-    printAsciiArt(term) // ✅ 여기서 호출
+    printAsciiArt(term)
     term.write(prompt())
 
     term.onData(data => {
@@ -149,7 +149,7 @@
           if (commandHistory.length > 30) commandHistory.shift()
           historyIndex = commandHistory.length
 
-          if (userStore.username !== 'nologin') {
+          if (authStore.isAuthenticated) {
             processCommand(commandBuffer)
           } else {
             term.writeln('⚠️  로그인이 필요합니다 🚫')
@@ -166,7 +166,12 @@
     })
   }
 
-  onMounted(() => {
+  onMounted(async () => {
+    try {
+      await authStore.fetchUser()
+    } catch (e) {
+      console.warn('자동 로그인 실패', e)
+    }
     initTerminal()
   })
 </script>

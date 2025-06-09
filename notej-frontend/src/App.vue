@@ -15,17 +15,31 @@
 <script setup>
   import { useTheme } from 'vuetify'
   import { useThemeStore } from '@/stores/theme'
+  import { useAuthStore } from '@/stores/auth'
+  import { onMounted } from 'vue'
 
   import NavBar from '@/components/layouts/NavBar.vue'
   import FloatingContactButton from '@/components/layouts/FloatingContactButton.vue'
 
   const theme = useTheme()
   const themeStore = useThemeStore()
+  const authStore = useAuthStore()
 
-  // 로컬스토리지에서 불러온 후 Vuetify에 테마 적용
+  // 테마 적용
   themeStore.setThemeFromStorage()
   theme.global.name.value = themeStore.isDark ? 'dark' : 'light'
+
+  // ✅ 앱 시작 시 유저 정보 불러오기
+  onMounted(async () => {
+    try {
+      await authStore.fetchUser()
+    } catch (e) {
+      // 로그인이 안된 경우라면 무시해도 됨
+      console.warn('로그인 정보 없음')
+    }
+  })
 </script>
+
 
 <style>
 /* 전역 스타일 폰트 적용 */

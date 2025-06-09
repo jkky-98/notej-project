@@ -24,31 +24,50 @@
       새 포스트
     </v-btn>
 
-    <v-btn class="mr-1" icon :title="'알림'">
-      <v-icon>mdi-bell-outline</v-icon>
-    </v-btn>
+    <!-- 알림 -->
+    <v-tooltip location="bottom">
+      <template #activator="{ props }">
+        <v-btn class="mr-1" icon v-bind="props">
+          <v-icon>mdi-bell-outline</v-icon>
+        </v-btn>
+      </template>
+      <span>알림</span>
+    </v-tooltip>
 
-    <v-btn class="mr-1" icon :title="'검색'">
-      <v-icon>mdi-magnify</v-icon>
-    </v-btn>
+    <!-- 검색 -->
+    <v-tooltip location="bottom">
+      <template #activator="{ props }">
+        <v-btn class="mr-1" icon v-bind="props">
+          <v-icon>mdi-magnify</v-icon>
+        </v-btn>
+      </template>
+      <span>검색</span>
+    </v-tooltip>
 
-    <v-btn
-      class="mr-2"
-      icon
-      :title="isDark ? '라이트 모드로 전환' : '다크 모드로 전환'"
-      @click="toggleTheme"
-    >
-      <v-icon>{{ isDark ? 'mdi-white-balance-sunny' : 'mdi-weather-night' }}</v-icon>
-    </v-btn>
+    <!-- 다크/라이트 모드 전환 -->
+    <v-tooltip location="bottom">
+      <template #activator="{ props }">
+        <v-btn
+          class="mr-2"
+          icon
+          v-bind="props"
+          @click="toggleTheme"
+        >
+          <v-icon>{{ isDark ? 'mdi-white-balance-sunny' : 'mdi-weather-night' }}</v-icon>
+        </v-btn>
+      </template>
+      <span>{{ isDark ? '라이트 모드로 전환' : '다크 모드로 전환' }}</span>
+    </v-tooltip>
 
     <v-menu offset-y transition="slide-y-transition">
       <template #activator="{ props }">
-        <v-btn v-bind="props" class="rounded-xl elevation-1 transition-all" icon>
-          <v-avatar
-            class="hover:scale-105 transition-transform"
-            image="https://via.placeholder.com/40"
-            size="36"
-          />
+        <v-btn
+          v-bind="props"
+          class="rounded-circle elevation-0"
+          icon
+          :title="'프로필'"
+        >
+          <v-icon size="36">mdi-account-circle</v-icon>
         </v-btn>
       </template>
 
@@ -61,7 +80,7 @@
           <v-list-item @click="goToBlog">
             <v-list-item-title>내 블로그</v-list-item-title>
           </v-list-item>
-          <v-list-item @click="handleLogout">
+          <v-list-item @click="openLogoutConfirmDialog">
             <v-list-item-title>로그아웃</v-list-item-title>
           </v-list-item>
         </template>
@@ -74,6 +93,17 @@
       </v-list>
     </v-menu>
   </v-app-bar>
+
+  <v-dialog v-model="showLogoutConfirm" max-width="400">
+    <v-card class="pa-3">
+      <v-card-title class="text-h6">로그아웃 하시겠습니까?</v-card-title>
+      <v-card-actions class="justify-end">
+        <v-btn text @click="showLogoutConfirm = false">취소</v-btn>
+        <v-btn color="red" variant="tonal" @click="confirmLogout">로그아웃</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
 </template>
 
 <script setup>
@@ -82,13 +112,15 @@
   import { useTheme } from 'vuetify'
   import { useThemeStore } from '@/stores/theme'
   import { useAuthStore } from '@/stores/auth'
+  import { ref } from 'vue'
 
   const router = useRouter()
   const theme = useTheme()
   const themeStore = useThemeStore()
   const authStore = useAuthStore()
+  const showLogoutConfirm = ref(false)
 
-  const isLoggedIn = computed(() => authStore.isLoggedIn)
+  const isLoggedIn = computed(() => authStore.isAuthenticated)
 
   function onCreatePost () {
     router.push('/new-post')
@@ -106,8 +138,13 @@
     router.push('/login')
   }
 
-  function handleLogout () {
+  function openLogoutConfirmDialog () {
+    showLogoutConfirm.value = true
+  }
+
+  function confirmLogout () {
     authStore.logout()
+    showLogoutConfirm.value = false
     router.push('/')
   }
 

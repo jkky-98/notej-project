@@ -1,22 +1,39 @@
 import { defineStore } from 'pinia'
-import Cookies from 'js-cookie'
+import api from '@/utils/axios-interceptor'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null, // 로그인된 사용자 정보
+    user: null,
+    isAuthenticated: false,
   }),
   getters: {
-    isLoggedIn: () => {
-      return !!Cookies.get('token') // 토큰이 있으면 로그인 상태
-    },
+    isCompleted: state => !!state.user?.completed,
   },
   actions: {
-    logout () {
-      Cookies.remove('token') // 토큰 제거
-      this.user = null
+    async fetchUser () {
+      try {
+        const res = await api.get('/api/users/me');
+        this.user = res.data;
+        this.isAuthenticated = true;
+        console.log(res.data);
+      } catch (err) {
+        this.user = null;
+        this.isAuthenticated = false;
+        throw err;
+      }
     },
-    setUser (userData) {
-      this.user = userData
+    async logout () {
+      try {
+        await api.post('/api/users/logout');
+
+        this.user = null
+        this.isAuthenticated = false
+      } catch (err) {
+        console.error('로그아웃 실패:', err)
+        // 실패해도 사용자 정보 제거는 수행 (선택사항)
+        this.user = null
+        this.isAuthenticated = false
+      }
     },
   },
 })
