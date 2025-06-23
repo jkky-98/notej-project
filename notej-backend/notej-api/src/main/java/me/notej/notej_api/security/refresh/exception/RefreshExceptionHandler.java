@@ -1,7 +1,7 @@
 package me.notej.notej_api.security.refresh.exception;
 
 import lombok.extern.slf4j.Slf4j;
-import me.notej.notej_api.security.exception.ErrorResponse;
+import me.notej.notej_api.common.exception.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

@@ -24,8 +24,9 @@ export const useAuthStore = defineStore('auth', {
     },
     async logout () {
       try {
+        console.log('로그아웃 시도')
         await api.post('/api/users/logout');
-
+        console.log('로그아웃 성공')
         this.user = null
         this.isAuthenticated = false
       } catch (err) {

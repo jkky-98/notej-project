@@ -1,6 +1,0 @@
-package me.notej.notej_api.security.domain;
-
-public enum Role {
-    ROLE_USER,
-    ROLE_ADMIN,
-}

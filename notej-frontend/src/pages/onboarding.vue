@@ -72,6 +72,8 @@
   const blogUrl = ref('')
   const blogUrlError = ref('')
 
+  const PROFILE_ENDPORINT = '/api/users/complete-profile'
+
   function onInput () {
     blogUrl.value = blogUrl.value.replace(/[^a-zA-Z]/g, '')
     blogUrlError.value = ''
@@ -86,7 +88,7 @@
   const submit = async () => {
     blogUrlError.value = ''
     try {
-      await api.post('http://localhost:8080/api/users/complete-profile', {
+      await api.post(PROFILE_ENDPORINT, {
         nickname: nickname.value,
         blogTitle: blogTitle.value,
         blogUrl: blogUrl.value,

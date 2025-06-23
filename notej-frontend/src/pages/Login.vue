@@ -105,6 +105,7 @@
   const authStore = useAuthStore()
   const router = useRouter()
   const backendUrl = import.meta.env.VITE_BACKEND_URL
+  const frontendUrl = import.meta.env.VITE_FRONTEND_URL
 
   const togglePassword = () => {
     showPassword.value = !showPassword.value
@@ -126,7 +127,7 @@
   }
 
   const setRedirectUriCookie = () => {
-    const target = 'http://localhost:3000/login/success' // 실제 리디렉션 대상
+    const target = `${frontendUrl}/login/success` // 실제 리디렉션 대상
     document.cookie = `redirect_uri=${target}; path=/`
   }
   const loginGoogle = () => {

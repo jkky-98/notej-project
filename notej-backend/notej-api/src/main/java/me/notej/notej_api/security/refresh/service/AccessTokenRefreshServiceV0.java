@@ -2,12 +2,12 @@ package me.notej.notej_api.security.refresh.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import me.notej.notej_api.security.domain.Member;
+import me.notej.notej_api.core.domain.Member;
 import me.notej.notej_api.security.jwt.TokenProvider;
 import me.notej.notej_api.security.refresh.domain.RefreshToken;
 import me.notej.notej_api.security.refresh.dto.AccessTokenRefreshResponse;
 import me.notej.notej_api.security.refresh.exception.InvalidRefreshTokenException;
-import me.notej.notej_api.security.repository.RefreshTokenRepository;
+import me.notej.notej_api.security.refresh.repository.RefreshTokenRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

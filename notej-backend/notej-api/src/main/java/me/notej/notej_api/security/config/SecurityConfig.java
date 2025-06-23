@@ -2,11 +2,11 @@ package me.notej.notej_api.security.config;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import me.notej.notej_api.security.HttpCookieOAuth2AuthorizationRequestRepository;
-import me.notej.notej_api.security.auth.credentials.service.CredentialsUserDetailsService;
-import me.notej.notej_api.security.auth.oauth2.handler.OAuth2AuthenticationFailureHandler;
-import me.notej.notej_api.security.auth.oauth2.handler.OAuth2AuthenticationSuccessHandler;
-import me.notej.notej_api.security.auth.oauth2.service.CustomOAuth2UserService;
+import me.notej.notej_api.security.oauth2.handler.HttpCookieOAuth2AuthorizationRequestRepository;
+import me.notej.notej_api.security.credentials.service.CredentialsUserDetailsService;
+import me.notej.notej_api.security.oauth2.handler.OAuth2AuthenticationFailureHandler;
+import me.notej.notej_api.security.oauth2.handler.OAuth2AuthenticationSuccessHandler;
+import me.notej.notej_api.security.oauth2.service.CustomOAuth2UserService;
 import me.notej.notej_api.security.jwt.JwtAuthorizationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +15,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -64,7 +63,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable) // Authorization: Basic 인증 막음(JWT 기반이라)
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/credentials/**", "/api/refresh", "/api/users/logout").permitAll()
+                        .requestMatchers("/api/auth/credentials/**", "/api/refresh").permitAll()
                         .requestMatchers("/login", "/error/**", "/logo/**", "/js/**", "/default-ui.css, /favicon.ico").permitAll()
                         .anyRequest().authenticated() // 나머지 경로는 모두 인가 필요
                 )
