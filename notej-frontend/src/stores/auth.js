@@ -5,14 +5,18 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
     isAuthenticated: false,
+    refreshFailed: false,
   }),
   getters: {
     isCompleted: state => !!state.user?.completed,
+    blogUrlName: state => state.user?.blogUrl || null,
+    blogUsername: state => state.user?.blogUsername || null,
+    blogTitle: state => state.user?.blogTitle || null,
   },
   actions: {
     async fetchUser () {
       try {
-        const res = await api.get('/api/users/me');
+        const res = await api.get('/api/secure/users/me');
         this.user = res.data;
         this.isAuthenticated = true;
         console.log(res.data);
@@ -25,15 +29,14 @@ export const useAuthStore = defineStore('auth', {
     async logout () {
       try {
         console.log('로그아웃 시도')
-        await api.post('/api/users/logout');
+        await api.post('/api/secure/users/logout')
         console.log('로그아웃 성공')
-        this.user = null
-        this.isAuthenticated = false
       } catch (err) {
         console.error('로그아웃 실패:', err)
-        // 실패해도 사용자 정보 제거는 수행 (선택사항)
+      } finally {
         this.user = null
         this.isAuthenticated = false
+        this.refreshFailed = true // 리프레시 실패 플래그도 켬
       }
     },
   },

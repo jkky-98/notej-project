@@ -131,7 +131,12 @@
   }
 
   function goToBlog () {
-    router.push('/my-blog')
+    const blogUrl = authStore.user?.blogUrl
+    if (blogUrl) {
+      router.push(`/@${blogUrl}`)
+    } else {
+      router.push('/onboarding') // 초기 설정 안된 경우
+    }
   }
 
   function goToLogin () {
