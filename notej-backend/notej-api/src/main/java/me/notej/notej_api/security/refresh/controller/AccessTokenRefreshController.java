@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.notej.notej_api.security.oauth2.util.CookieUtils;
-import me.notej.notej_api.common.exception.ErrorResponse;
+import me.notej.notej_api.global.exception.ErrorResponse;
 import me.notej.notej_api.security.refresh.service.AccessTokenRefreshService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

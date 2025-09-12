@@ -2,7 +2,7 @@ package me.notej.notej_api.security.credentials.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import me.notej.notej_api.common.exception.ErrorResponse;
+import me.notej.notej_api.global.exception.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;

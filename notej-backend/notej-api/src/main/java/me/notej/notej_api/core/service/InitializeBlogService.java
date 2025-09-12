@@ -2,8 +2,10 @@ package me.notej.notej_api.core.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import me.notej.notej_api.core.blogmain.domain.Blog;
 import me.notej.notej_api.core.dto.CompleteProfileRequest;
 import me.notej.notej_api.core.domain.Member;
+import me.notej.notej_api.core.blogmain.repository.BlogRepository;
 import me.notej.notej_api.core.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class InitializeBlogService {
 
     private final MemberRepository memberRepository;
+    private final BlogRepository blogRepository;
 
     @Transactional
     public void initializeBlog(final String memberUuid, final CompleteProfileRequest request) {
@@ -20,13 +23,25 @@ public class InitializeBlogService {
         Member member = memberRepository.findByMemberUuid(memberUuid)
                 .orElseThrow(() -> new EntityNotFoundException("유저가 없음: " + memberUuid));
 
-        if (memberRepository.existsByBlogUrl(request.blogUrl())) {
+        if (member.getBlog() != null) {
+            throw new RuntimeException("ALREADY_INITIALIZED_BLOG");
+        }
+
+        if (blogRepository.existsByUrl(request.blogUrl())) {
             throw new IllegalArgumentException("DUPLICATE_BLOG_URL");
         }
 
-        member.setBlogUsername(request.nickname());
-        member.setBlogTitle(request.blogTitle());
+        if (request.blogUrl() == null || request.blogUrl().isBlank()) {
+            throw new IllegalArgumentException("BLOG_URL_MUST_NOT_BE_EMPTY");
+        }
+
+        Blog blog = Blog.builder()
+                .username(request.nickname())
+                .title(request.blogTitle())
+                .url(request.blogUrl())
+                .build();
+        blogRepository.save(blog);
+        member.setBlog(blog);
         member.setCompleted(true);
-        member.setBlogUrl(request.blogUrl());
     }
 }

@@ -2,6 +2,8 @@ package me.notej.notej_api.core.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import me.notej.notej_api.core.blogmain.domain.Blog;
+import me.notej.notej_api.global.baseentity.BaseTimeEntity;
 import me.notej.notej_api.security.oauth2.user.OAuth2Provider;
 import me.notej.notej_api.security.oauth2.domain.OAuth2UserConnection;
 import me.notej.notej_api.security.common.Role;
@@ -19,7 +21,7 @@ import java.util.Set;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-public class Member {
+public class Member extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
@@ -36,12 +38,9 @@ public class Member {
 
     private String nickname;
 
-    private String blogUsername;
-
-    private String blogTitle;
-
-    @Column(unique = true)
-    private String blogUrl;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "blog_id", unique = true)
+    private Blog blog;
 
     // -------------------------------------------------------
     // 역할(role) 컬렉션: Set<Role>

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.notej.notej_api.core.domain.Member;
 import me.notej.notej_api.core.repository.MemberRepository;
+import me.notej.notej_api.security.oauth2.util.CookieUtils;
 import me.notej.notej_api.security.refresh.repository.RefreshTokenRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/users")
+@RequestMapping("/api/secure/users")
 public class LogoutController {
 
     private final RefreshTokenRepository refreshTokenRepository;
@@ -50,8 +51,9 @@ public class LogoutController {
                             refreshTokenRepository.save(rt);
                         });
 
-                expireCookie("access_token", response);
-                expireCookie("refresh_token", response);
+                // 쿠키 삭제를 CookieUtils 메서드로 처리
+                CookieUtils.deleteCookie(request, response, "access_token");
+                CookieUtils.deleteCookie(request, response, "refresh_token");
             } else {
                 log.warn("로그아웃 요청 시 인증 정보 없음");
             }
@@ -60,7 +62,7 @@ public class LogoutController {
             return ResponseEntity.ok().build();
 
         } catch (Exception e) {
-            log.error("로그아웃 처리 중 예외 발생", e); // ❗ 꼭 넣어야 실제 예외 추적 가능
+            log.error("로그아웃 처리 중 예외 발생", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

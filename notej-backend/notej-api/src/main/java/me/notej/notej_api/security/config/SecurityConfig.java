@@ -63,7 +63,8 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable) // Authorization: Basic 인증 막음(JWT 기반이라)
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/credentials/**", "/api/refresh").permitAll()
+                        .requestMatchers("/api/secure/**").authenticated()
+                        .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/login", "/error/**", "/logo/**", "/js/**", "/default-ui.css, /favicon.ico").permitAll()
                         .anyRequest().authenticated() // 나머지 경로는 모두 인가 필요
                 )

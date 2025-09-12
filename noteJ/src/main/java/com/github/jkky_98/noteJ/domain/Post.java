@@ -26,14 +26,13 @@ import static com.github.jkky_98.noteJ.service.util.DefaultConst.DEFAULT_POST_PI
 public class Post extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     @Column(name = "post_id")
     private Long id;
 
-    @Column(nullable = false, length = 50)
     private String title;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     private String postSummary;
@@ -41,18 +40,14 @@ public class Post extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String postUrl;
 
-    @Column(nullable = false)
     private String thumbnail;
 
-    @Column(nullable = false, columnDefinition = "TINYINT(1)")
     private Boolean writable;
 
     @Version
     private Integer version;
 
-    @Builder.Default
-    @Column(nullable = false)
-    private int viewCount = 0;
+    private int viewCount;
 
     //연관관계
     @ManyToOne(fetch = FetchType.LAZY)
@@ -139,6 +134,7 @@ public class Post extends BaseEntity {
     public void updateEditPostTemp(AutoEditPostRequest request, Series series) {
         title = request.getTitle();
         content = decodingContent(request.getContent());
+        postUrl = request.getTitle() + UUID.randomUUID();
         this.series = series;
         thumbnail = DEFAULT_POST_PIC;
     }
@@ -146,10 +142,4 @@ public class Post extends BaseEntity {
     private static String decodingContent(String content) {
         return URLDecoder.decode(content, StandardCharsets.UTF_8);
     }
-
-    public void updatePostUrl(String postUrl) {
-        this.postUrl = postUrl;
-    }
-
-
 }

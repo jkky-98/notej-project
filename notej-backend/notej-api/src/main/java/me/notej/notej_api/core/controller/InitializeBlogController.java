@@ -2,10 +2,8 @@ package me.notej.notej_api.core.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import me.notej.notej_api.common.exception.ErrorResponse;
 import me.notej.notej_api.core.service.InitializeBlogService;
 import me.notej.notej_api.core.dto.CompleteProfileRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
@@ -14,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/users")
+@RequestMapping("/api/secure/users")
 public class InitializeBlogController {
 
     private final InitializeBlogService initializeBlogService;
@@ -24,11 +22,6 @@ public class InitializeBlogController {
             Authentication authentication,
             @RequestBody CompleteProfileRequest request
     ) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(ErrorResponse.of(HttpStatus.UNAUTHORIZED.value(), "인증되지 않은 사용자입니다"));
-        }
 
         User user = (User) authentication.getPrincipal();
         String memberUuid = user.getUsername();

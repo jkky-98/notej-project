@@ -8,7 +8,7 @@ import me.notej.notej_api.security.credentials.dto.CredentialsLoginResponse;
 import me.notej.notej_api.security.credentials.dto.CredentialsSignUpRequest;
 import me.notej.notej_api.security.credentials.service.CredentialsService;
 import me.notej.notej_api.security.oauth2.util.CookieUtils;
-import me.notej.notej_api.common.exception.ErrorResponse;
+import me.notej.notej_api.global.exception.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
