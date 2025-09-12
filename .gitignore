@@ -18,6 +18,8 @@
 *.zip
 *.tar.gz
 *.rar
+**/.env
+
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
@@ -61,5 +63,14 @@ Temporary Items
 ### macOS Patch ###
 # iCloud generated files
 *.icloud
+
+### Vue ###
+### Vuejs ###
+# Recommended template: Node.gitignore
+
+node_modules/
+dist/
+npm-debug.log
+yarn-error.log
 
 # End of https://www.toptal.com/developers/gitignore/api/macos

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>PieLink 로그인</title>
+  <!-- Bootstrap CSS -->
+  <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+  />
+</head>
+<body class="bg-light">
+<div class="container d-flex align-items-center justify-content-center min-vh-100">
+  <div class="card shadow-sm w-100" style="max-width: 420px;">
+    <div class="card-body p-4">
+      <h2 class="card-title text-center mb-4">PieLink</h2>
+
+      <!-- 1) 폼 로그인 -->
+      <form th:action="@{/login}" method="post" class="mb-4">
+        <!-- (CSRF 사용 시) <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/> -->
+        <div class="form-floating mb-3">
+          <input
+                  type="text"
+                  name="username"
+                  class="form-control"
+                  id="floatingUsername"
+                  placeholder="아이디"
+                  required
+          />
+          <label for="floatingUsername">아이디</label>
+        </div>
+        <div class="form-floating mb-3">
+          <input
+                  type="password"
+                  name="password"
+                  class="form-control"
+                  id="floatingPassword"
+                  placeholder="비밀번호"
+                  required
+          />
+          <label for="floatingPassword">비밀번호</label>
+        </div>
+        <button class="btn btn-primary w-100" type="submit">로그인</button>
+      </form>
+
+      <div class="text-center text-muted mb-3">또는 소셜 계정으로 로그인</div>
+
+      <!-- 2) 소셜 로그인 버튼 -->
+      <div class="d-grid gap-2 mb-4">
+        <a
+                th:href="@{/oauth2/authorization/google(mode='login')}"
+                class="btn btn-outline-danger btn-lg"
+        >
+          <i class="bi bi-google me-2"></i>Google 로그인
+        </a>
+        <a th:href="@{/oauth2/authorization/naver(mode='login')}"
+           class="btn btn-outline-success btn-lg d-flex align-items-center justify-content-center">
+          <img th:src="@{/logo/naver_icon.svg}"
+               alt="Naver logo"
+               width="24"
+               class="me-2"/>
+          Naver 로그인
+        </a>
+      </div>
+
+      <!-- 3) 회원가입 링크 -->
+      <div class="text-center">
+        아직 계정이 없으신가요?
+        <a th:href="@{/signup}">회원가입</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap Bundle JS -->
+<script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+></script>
+<!-- Optional: Bootstrap Icons (소셜 아이콘용) -->
+<link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+/>
+</body>
+</html>
