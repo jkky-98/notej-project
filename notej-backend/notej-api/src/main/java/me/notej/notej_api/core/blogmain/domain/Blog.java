@@ -5,7 +5,11 @@ import lombok.*;
 import me.notej.notej_api.global.baseentity.BaseTimeEntity;
 
 @Entity
-@Table(name="blog")
+@Table(name="blog",
+        indexes = {
+                @Index(name = "idx_blog_url", columnList = "url")
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
