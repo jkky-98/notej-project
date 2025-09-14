@@ -1,6 +1,6 @@
 package me.notej.notej_api.security.refresh.repository;
 
-import me.notej.notej_api.core.domain.Member;
+import me.notej.notej_api.core.member.domain.Member;
 import me.notej.notej_api.security.refresh.domain.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 

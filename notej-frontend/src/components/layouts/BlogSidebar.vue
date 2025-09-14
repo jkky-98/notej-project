@@ -32,7 +32,7 @@
         <v-btn
           block
           class="mb-2"
-          color="primary"
+          color="success"
           size="small"
           variant="tonal"
           @click="openAddCategoryDialog(null)"

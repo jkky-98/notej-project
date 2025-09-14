@@ -1,4 +1,4 @@
-package me.notej.notej_api.core.domain;
+package me.notej.notej_api.core.member.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "member")
+@Table(name = "member"
+)
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

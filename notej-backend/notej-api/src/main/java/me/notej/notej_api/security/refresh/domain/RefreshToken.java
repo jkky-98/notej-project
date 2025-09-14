@@ -2,7 +2,7 @@ package me.notej.notej_api.security.refresh.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import me.notej.notej_api.core.domain.Member;
+import me.notej.notej_api.core.member.domain.Member;
 
 import java.time.Instant;
 

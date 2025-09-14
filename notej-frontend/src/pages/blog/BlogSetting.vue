@@ -5,13 +5,22 @@
         <v-card class="pa-4 mb-4">
           <v-card-title class="text-h5 mb-4">프로필 설정</v-card-title>
 
-          <!-- 프로필 이미지 (클릭 가능하게만) -->
+          <!-- 프로필 이미지 (클릭 시 바로 파일 선택 창 열림, 이미지 업로드 중일 때 로딩) -->
           <div class="d-flex justify-center mb-6">
             <v-avatar class="mb-3 cursor-pointer" size="150" @click="triggerImageUpload">
+              <!-- imageUploadLoading 중일 때 로딩 스피너 추가 (옵션) -->
+              <v-progress-circular
+                v-if="imageUploadLoading"
+                color="primary"
+                indeterminate
+                size="60"
+                width="6"
+              />
               <v-img
+                v-else
                 alt="프로필 이미지"
                 cover
-                :src="displayProfileData.profileImage || defaultProfilePic"
+                :src="imagePreviewUrl || displayProfileData.profileImage || defaultProfilePic"
               />
               <input
                 ref="imageInput"
@@ -23,6 +32,11 @@
             </v-avatar>
           </div>
 
+          <!--
+            나머지 v-form (블로그 제목/소개글 편집) 및 보기 모드 부분은
+            이전과 완전히 동일하게 유지.
+            여기에 로딩 상태는 'loading'만 연결하면 됨.
+          -->
           <v-form v-if="isEditing" ref="form" @submit.prevent="saveProfile">
             <!-- 편집 모드: 블로그 제목 -->
             <v-text-field
@@ -102,51 +116,49 @@
 
 <script setup>
   import { onMounted, reactive, ref } from 'vue'
-  import { useRoute } from 'vue-router'
-  import { useAuthStore } from '@/stores/auth'
   import { useBlogStore } from '@/stores/blog'
   import defaultProfilePic from '@/assets/defaults/profile.png'
+  import { compressImage, createImageFormData, validateImage } from '@/utils/imageUtils'
 
-  const router = useRoute()
-  const authStore = useAuthStore()
   const blogStore = useBlogStore()
 
-  // 현재 보여줄 프로필 데이터
+  // 현재 보여줄 프로필 데이터 (Backend or S3 URL)
   const displayProfileData = ref({
     title: '',
     bio: '',
-    profileImage: null, // URL은 여기서도 사용하지 않음
+    profileImage: null, // S3 URL을 저장할 곳 (기본값 null)
   })
 
-  // 편집을 위한 임시 데이터
+  // 편집을 위한 임시 데이터 (bio, title 전용)
   const editProfileData = reactive({
     title: '',
     bio: '',
   })
 
   // UI 상태
-  const isEditing = ref(false)
-  const loading = ref(false)
+  const isEditing = ref(false) // 블로그 제목/소개글 편집 폼 토글
+  const loading = ref(false) // 블로그 제목/소개글 저장 액션 로딩
+  const imageUploadLoading = ref(false) // 프로필 이미지 업로드 액션 로딩 (따로 분리)
+
   const snackbar = ref(false)
   const snackbarText = ref('')
   const snackbarColor = ref('success')
-  const form = ref(null)
-  const imageInput = ref(null) // 파일 input 요소 참조
+  const form = ref(null) // 블로그 제목/소개글 폼 ref
+  const imageInput = ref(null) // 파일 input 요소 ref
+
+  // 프로필 이미지 미리보기 URL (이건 '프론트에서만' 사용할 임시 URL)
+  const imagePreviewUrl = ref(null)
 
   // 컴포넌트 마운트 시 데이터 로드
   onMounted(async () => {
-    if (!authStore.isAuthenticated) {
-      router.push('/login')
-      return
-    }
 
-    loading.value = true
+    loading.value = true // 초기 데이터 로딩 시 general loading 사용
     try {
       const res = await blogStore.fetchMyProfile()
       displayProfileData.value = {
         title: res.title || '',
         bio: res.bio || '',
-        profileImage: res.profileImage || null,
+        profileImage: res.profilePicture || null, // 초기 로딩 시 S3 URL 가져옴
       }
     } catch (error) {
       showSnackbar('프로필 정보를 불러오는데 실패했습니다', 'error')
@@ -156,66 +168,118 @@
     }
   })
 
-  // 이미지 파일 선택 input 트리거
+  // --- 프로필 이미지 처리 로직 ---
+
+  // 이미지 파일 선택 input 트리거 (버튼 클릭 시 바로 파일 선택 창 띄움)
   function triggerImageUpload () {
     imageInput.value.click()
   }
 
-  // 이미지 파일이 선택되었을 때 (실제 업로드 X, 선택 여부만 확인)
-  function handleImageSelected (event) {
-    const file = event.target.files[0]
-    if (file) {
-      console.log('이미지 파일이 선택되었습니다:', file.name)
-      showSnackbar(`이미지 "${file.name}"이 선택되었습니다.`, 'info')
-    // 여기서는 파일 선택만 하고, 실제 업로드는 이 컴포넌트에서 처리하지 않음.
-    // 만약 별도의 이미지 업로드 페이지로 이동해야 한다면 router.push를 사용.
-    // router.push({ path: '/image-upload', query: { someParam: 'value' }});
+  // 이미지 파일이 선택되었을 때 (파일 업로드 및 미리보기 처리)
+  async function handleImageSelected (event) {
+    const file = event.target.files[0];
+
+    // 파일 없으면 종료
+    if (!file) {
+      if (imagePreviewUrl.value) URL.revokeObjectURL(imagePreviewUrl.value);
+      imagePreviewUrl.value = null;
+      event.target.value = null;
+      return;
     }
-    // 파일 인풋 초기화 (같은 파일을 다시 선택해도 change 이벤트 발생하도록)
-    event.target.value = '';
+
+    // 이미지 유효성 검증
+    const validation = validateImage(file);
+    if (!validation.valid) {
+      showSnackbar(validation.error, 'error');
+      event.target.value = null;
+      return;
+    }
+
+    // 로딩 시작
+    imageUploadLoading.value = true;
+
+    try {
+      // 미리보기용 URL 생성 (압축 전 원본)
+      if (imagePreviewUrl.value) URL.revokeObjectURL(imagePreviewUrl.value);
+      imagePreviewUrl.value = URL.createObjectURL(file);
+
+      // 이미지 압축
+      const compressedFile = await compressImage(file);
+      showSnackbar('이미지 압축 완료, 업로드 중...', 'info');
+
+      // FormData 생성 및 업로드
+      const formData = createImageFormData(compressedFile);
+      const newImageUrl = await blogStore.updateProfileImage(formData);
+
+      // 성공 시 프로필 이미지 URL 업데이트
+      displayProfileData.value.profileImage = newImageUrl;
+      if (blogStore.user) {
+        blogStore.user.profilePicture = newImageUrl;
+      }
+      showSnackbar('프로필 이미지가 업데이트되었습니다', 'success');
+
+    } catch (error) {
+      console.error('이미지 처리/업로드 실패:', error);
+      showSnackbar('이미지 업로드에 실패했습니다', 'error');
+
+      // 실패 시 미리보기 초기화
+      if (imagePreviewUrl.value) URL.revokeObjectURL(imagePreviewUrl.value);
+      imagePreviewUrl.value = null;
+    } finally {
+      imageUploadLoading.value = false;
+      event.target.value = null;
+    }
   }
 
-  // '수정하기' 버튼 클릭 시 편집 모드 시작
+  // --- 블로그 제목/소개글 편집 로직 ---
+
+  // 편집 모드 시작
   function startEdit () {
+    isEditing.value = true
+    // 현재 표시되는 값으로 편집 데이터 초기화 (이미지는 이제 별개!)
     editProfileData.title = displayProfileData.value.title
     editProfileData.bio = displayProfileData.value.bio
-    isEditing.value = true
   }
 
-  // '취소' 버튼 클릭 시 편집 모드 취소
+  // 편집 취소
   function cancelEdit () {
     isEditing.value = false
-    // 폼 유효성 메시지 초기화
-    form.value?.resetValidation()
+    // 편집 데이터는 여기서 굳이 초기화할 필요 없음 (재시작 시 덮어써짐)
+    // 이미지 미리보기는 이미지 로직에 속하므로 여기서 초기화 불필요
   }
 
-  // 프로필 저장
+  // 프로필 정보(제목, 소개글) 저장 (이미지 로직은 완전히 분리)
   async function saveProfile () {
     const { valid } = await form.value.validate()
     if (!valid) return
 
-    loading.value = true
-
+    loading.value = true // general loading 시작 (제목/소개글 저장 전용)
     try {
-      // URL과 이미지는 여기서 수정하지 않으므로 전송 데이터에 포함하지 않음
-      await blogStore.updateMyProfile({
+      const updatedProfile = {
         title: editProfileData.title,
-        bio: editProfileData.bio || '',
-      })
+        bio: editProfileData.bio,
+      }
+      // Pinia 스토어 액션 호출 (제목/소개글 업데이트 전용)
+      // 백엔드에서 업데이트 성공 시 HTTP 200 OK만 보내줘도 됨.
+      // 여기서 res 값으로 displayProfileData를 업데이트하지 않음!
+      await blogStore.updateMyProfile(updatedProfile)
 
-      // 성공 시 displayProfileData를 업데이트하고 보기 모드로 전환
+      // *** 중요 변경사항: editProfileData의 값을 displayProfileData로 바로 복사 ***
       displayProfileData.value.title = editProfileData.title
       displayProfileData.value.bio = editProfileData.bio
-      isEditing.value = false
-      showSnackbar('프로필이 저장되었습니다', 'success')
+
+      showSnackbar('프로필 정보가 성공적으로 업데이트되었습니다', 'success')
+      isEditing.value = false // 편집 모드 종료
 
     } catch (error) {
-      showSnackbar('프로필 저장에 실패했습니다', 'error')
-      console.error('프로필 저장 에러:', error)
+      showSnackbar('프로필 정보 업데이트에 실패했습니다', 'error')
+      console.error('프로필 정보 업데이트 에러:', error)
     } finally {
-      loading.value = false
+      loading.value = false // general loading 종료
     }
   }
+
+  // --- 유틸리티 함수 ---
 
   // 스낵바 표시 함수
   function showSnackbar (text, color = 'success') {
@@ -223,4 +287,5 @@
     snackbarColor.value = color
     snackbar.value = true
   }
+
 </script>

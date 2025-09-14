@@ -23,7 +23,7 @@ import java.util.Date;
 public class TokenProvider {
 
     // 액세스 토큰 30분
-    private static final long ACCESS_TOKEN_EXPIRE_MS  = 1000L * 5;
+    private static final long ACCESS_TOKEN_EXPIRE_MS  = 1000L * 60 * 30;
     // 리프레시 토큰 7일
     private static final long REFRESH_TOKEN_EXPIRE_MS = 1000L * 60 * 60 * 24 * 7;
 

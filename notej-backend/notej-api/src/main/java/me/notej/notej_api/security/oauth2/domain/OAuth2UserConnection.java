@@ -2,7 +2,7 @@ package me.notej.notej_api.security.oauth2.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import me.notej.notej_api.core.domain.Member;
+import me.notej.notej_api.core.member.domain.Member;
 import me.notej.notej_api.security.oauth2.user.OAuth2Provider;
 
 import java.time.Instant;

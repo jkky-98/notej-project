@@ -64,6 +64,7 @@ export const useBlogStore = defineStore('blog', {
       try {
         const res = await api.get(`/api/blog/${blogUrlName}/info`)
         this.user = res.data.user || this.user
+        console.log(res.data.user)
       } catch (e) {
         console.error('블로그 정보 가져오기 실패:', e)
       } finally {
@@ -121,6 +122,7 @@ export const useBlogStore = defineStore('blog', {
     async fetchMyProfile () {
       try {
         const res = await api.get('/api/secure/blog/my-profile')
+        console.log('프로필 데이터 GET : ' , res.data)
         // myProfile 상태가 없다면 state에 추가해야 함!
         this.myProfile = res.data
         return res.data
@@ -179,6 +181,21 @@ export const useBlogStore = defineStore('blog', {
       } catch (error) {
         console.error('카테고리 순서 업데이트 실패:', error);
         throw error;
+      }
+    },
+
+    // stores/blog.js에 추가
+    async updateProfileImage (formData) {
+      try {
+        const res = await api.post('/api/secure/blog/profile-image', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data', // 파일 업로드 시 필수
+          },
+        })
+        return res.data.profileImageUrl // 백엔드가 S3 URL 반환한다고 가정
+      } catch (error) {
+        console.error('프로필 이미지 업데이트 실패:', error)
+        throw error
       }
     },
 

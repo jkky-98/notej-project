@@ -1,7 +1,7 @@
 package me.notej.notej_api.security.oauth2.repository;
 
 import me.notej.notej_api.security.oauth2.user.OAuth2Provider;
-import me.notej.notej_api.core.domain.Member;
+import me.notej.notej_api.core.member.domain.Member;
 import me.notej.notej_api.security.oauth2.domain.OAuth2UserConnection;
 import org.springframework.data.jpa.repository.JpaRepository;
 

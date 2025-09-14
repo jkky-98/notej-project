@@ -2,7 +2,7 @@ package me.notej.notej_api.security.credentials.service;
 
 import lombok.RequiredArgsConstructor;
 import me.notej.notej_api.security.credentials.domain.CredentialsUserConnection;
-import me.notej.notej_api.core.domain.Member;
+import me.notej.notej_api.core.member.domain.Member;
 import me.notej.notej_api.security.credentials.repository.CredentialsUserConnectionRepository;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,10 +1,10 @@
-package me.notej.notej_api.core.controller;
+package me.notej.notej_api.core.member.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.notej.notej_api.core.blogmain.domain.Blog;
-import me.notej.notej_api.core.domain.Member;
-import me.notej.notej_api.core.repository.MemberRepository;
+import me.notej.notej_api.core.member.domain.Member;
+import me.notej.notej_api.core.member.repository.MemberRepository;
 import me.notej.notej_api.security.common.dto.UserInfoResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;

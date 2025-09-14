@@ -1,6 +1,6 @@
-package me.notej.notej_api.core.repository;
+package me.notej.notej_api.core.member.repository;
 
-import me.notej.notej_api.core.domain.Member;
+import me.notej.notej_api.core.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -2,6 +2,8 @@ package me.notej.notej_api.core.post.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import me.notej.notej_api.core.blogmain.domain.Blog;
+import me.notej.notej_api.core.category.domain.Category;
 import me.notej.notej_api.global.baseentity.BaseTimeEntity;
 
 @Entity
@@ -24,5 +26,14 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
+    @Column(columnDefinition = "TEXT")
+    private String bio;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "blog_id")
+    private Blog blog;
 }
