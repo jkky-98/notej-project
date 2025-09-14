@@ -1,0 +1,40 @@
+# src/main/resources/application-local.yml
+
+spring:
+  # H2 데이터베이스 설정 (로컬 전용)
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/notej-api
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+    # HikariCP 공통 설정 (여기에서 모두 포함)
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 3000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # JPA H2 Dialect 및 DDL-Auto (로컬 전용)
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create # 로컬 개발용이므로 'create'
+      show-sql: true # 개발 편의를 위해 SQL 콘솔 출력
+      # JPA 공통 속성 (여기에서 모두 포함)
+      properties:
+        hibernate:
+          jdbc:
+            batch_size: 100
+          format_sql: true
+          order_inserts: true
+          order_updates: true
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY_ID}
+      secret-key: ${AWS_SECRET_ACCESS_KEY}
+    region:
+      static: ${AWS_REGION}
+    s3:
+      bucket: ${S3_BUCKET_NAME}
