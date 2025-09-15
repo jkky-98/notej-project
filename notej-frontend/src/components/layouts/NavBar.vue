@@ -123,7 +123,7 @@
   const isLoggedIn = computed(() => authStore.isAuthenticated)
 
   function onCreatePost () {
-    router.push('/new-post')
+    router.push('/write')
   }
 
   function goToProfile () {

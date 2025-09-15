@@ -23,6 +23,12 @@ const routes = [
     name: 'login',
     component: () => import('@/pages/Login.vue'), // 너의 실제 로그인 페이지 경로로 변경
   },
+  {
+    path: '/write',
+    name: 'write',
+    component: () => import('@/pages/blog/Write.vue'),
+    meta: { requiresAuth: true }, // 인증 필요
+  },
   // ... 기타 라우트들
 ]
 

@@ -13,10 +13,14 @@ declare module 'vue' {
     FloatingContactButton: typeof import('./src/components/layouts/FloatingContactButton.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     NavBar: typeof import('./src/components/layouts/NavBar.vue')['default']
+    PostForm: typeof import('./src/components/post/PostForm.vue')['default']
     PostList: typeof import('./src/components/PostList.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TagInput: typeof import('./src/components/tag/TagInput.vue')['default']
+    ToastEditor: typeof import('./src/components/editor/ToastEditor.vue')['default']
     TopPostInCategory: typeof import('./src/components/TopPostInCategory.vue')['default']
+    TuiEditorWithTagify: typeof import('./src/components/TuiEditorWithTagify.vue')['default']
     UserTerminal: typeof import('./src/components/UserTerminal.vue')['default']
   }
 }

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
@@ -14,7 +15,8 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -65,33 +67,51 @@ public class S3Bucket {
     }
 
     /**
-     * S3에서 파일 삭제
+     * S3에서 이미지를 byte[] 형태로 가져오는 메서드
+     * @param s3Key 가져올 파일의 S3 키
+     * @return 파일 데이터를 담은 byte 배열
      */
-    public void deleteFile(String fileUrl) {
-        if (fileUrl == null || fileUrl.isEmpty()) {
-            log.warn("삭제할 파일 URL이 null 또는 비어있습니다.");
-            return;
-        }
-
+    public byte[] getImageBytes(String s3Key) {
         try {
-            // URL에서 키 추출 (https://bucket.s3.region.amazonaws.com/profile-images/uuid.jpg)
-            // 더 안전하게 키 추출
-            String key = getKeyFromS3Url(fileUrl, bucket);
-
-            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(bucket)
-                    .key(key)
+                    .key(s3Key)
                     .build();
 
-            s3Client.deleteObject(deleteObjectRequest);
-            log.info("S3 파일 삭제 성공: {}", fileUrl);
+            ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(getObjectRequest);
 
+            // InputStream을 byte[]로 변환
+            return s3Object.readAllBytes();
+
+        } catch (NoSuchKeyException e) {
+            log.warn("S3 객체를 찾을 수 없음: {}", s3Key);
+            throw new IllegalArgumentException("요청한 이미지를 찾을 수 없습니다: " + s3Key);
         } catch (S3Exception e) {
-            log.warn("S3 파일 삭제 실패 - S3 오류: {}", e.awsErrorDetails().errorMessage(), e);
-            // 파일이 없거나 삭제 권한이 없는 경우 등은 무시 (파일이 없을 땐 NoSuchKeyException)
-        } catch (Exception e) {
-            log.warn("S3 파일 삭제 중 예상치 못한 오류 발생: {}", e.getMessage(), e);
+            log.error("S3에서 이미지 다운로드 중 오류 발생: {}", e.awsErrorDetails().errorMessage(), e);
+            throw new RuntimeException("S3에서 이미지를 가져오는 중 오류 발생: " + e.getMessage());
+        } catch (IOException e) {
+            log.error("이미지 데이터 읽기 중 IO 오류 발생: {}", e.getMessage(), e);
+            throw new RuntimeException("이미지 데이터를 읽는 중 오류 발생: " + e.getMessage());
         }
+    }
+    /**
+     * S3 객체 키로부터 전체 URL을 생성합니다.
+     * @param s3Key S3 객체 키 (경로)
+     * @return 완전한 S3 URL
+     */
+    public String getFullUrlFromS3Key(String s3Key) {
+        if (s3Key == null || s3Key.isEmpty()) {
+            throw new IllegalArgumentException("S3 키는 null이거나 비어있을 수 없습니다.");
+        }
+
+        // 리전 정보를 S3 클라이언트에서 동적으로 가져옴
+        String region = s3Client.serviceClientConfiguration().region().id();
+
+        // URL 형식: https://{bucket}.s3.{region}.amazonaws.com/{key}
+        return String.format("https://%s.s3.%s.amazonaws.com/%s",
+                bucket,
+                region,
+                s3Key);
     }
 
     /**
@@ -192,4 +212,121 @@ public class S3Bucket {
         PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
         return presignedRequest.url().toString();
     }
+
+    /**
+     * S3에 파일 업로드 및 "Status: delete" 태그 추가
+     * - 임시 파일로 분류되어 1일 후 삭제 규칙에 포함됩니다.
+     * @param file 업로드할 파일
+     * @param dirName S3 내부에 생성할 디렉토리 경로 (예: "posts/username")
+     * @return S3에 저장된 파일의 키 (경로)
+     */
+    public String uploadWithTemporaryDeletionTag(MultipartFile file, String dirName) {
+        // validateFile(file); // 서비스 계층에서 이미 검증
+
+        String s3Key = createFileName(file.getOriginalFilename(), dirName);
+
+        try {
+            // 1. PutObjectRequest로 파일 업로드
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(s3Key)
+                    .contentType(file.getContentType())
+                    .contentLength(file.getSize())
+                    .build();
+
+            RequestBody requestBody = RequestBody.fromInputStream(file.getInputStream(), file.getSize());
+            s3Client.putObject(putObjectRequest, requestBody);
+
+            // 2. "Status: delete" 태그 추가
+            Tag temporaryTag = Tag.builder().key("Status").value("delete").build();
+            Tagging tagging = Tagging.builder().tagSet(Collections.singletonList(temporaryTag)).build();
+
+            PutObjectTaggingRequest putTaggingRequest = PutObjectTaggingRequest.builder()
+                    .bucket(bucket)
+                    .key(s3Key)
+                    .tagging(tagging)
+                    .build();
+            s3Client.putObjectTagging(putTaggingRequest);
+
+            log.info("S3 파일 업로드 및 'Status: delete' 태그 추가 성공: {}", s3Key);
+            return s3Key; // S3 Key (경로) 반환
+
+        } catch (IOException e) {
+            log.error("S3 파일 업로드 중 IO 오류 발생: {}", e.getMessage(), e);
+            throw new RuntimeException("파일 업로드 중 오류 발생", e);
+        } catch (S3Exception e) {
+            log.error("S3 서비스 오류 발생 ({}): {}", s3Key, e.awsErrorDetails().errorMessage(), e);
+            throw new RuntimeException("S3 서비스 오류: " + e.awsErrorDetails().errorMessage(), e);
+        }
+    }
+
+    /**
+     * S3 객체에서 "Status: delete" 태그 제거
+     * - 임시 파일이 아님을 표시하여 1일 후 삭제 규칙에서 제외시킵니다.
+     * @param s3Key 태그를 제거할 객체의 S3 키
+     * @return 성공 여부 (객체를 찾을 수 없는 경우 false)
+     */
+    public boolean removeTemporaryDeletionTag(String s3Key) {
+        try {
+            // 1. 현재 객체의 모든 태그 가져오기
+            GetObjectTaggingRequest getTaggingRequest = GetObjectTaggingRequest.builder()
+                    .bucket(bucket)
+                    .key(s3Key)
+                    .build();
+            GetObjectTaggingResponse getTaggingResponse = s3Client.getObjectTagging(getTaggingRequest);
+            List<Tag> currentTags = new ArrayList<>(getTaggingResponse.tagSet());
+
+            // 2. "Status: delete" 태그만 필터링하여 제거
+            List<Tag> updatedTags = currentTags.stream()
+                    .filter(tag -> !(tag.key().equals("Status") && tag.value().equals("delete")))
+                    .collect(Collectors.toList());
+
+            // 3. 업데이트된 태그 세트로 객체 태그 다시 설정 (태그가 하나도 없으면 빈 리스트 전달)
+            PutObjectTaggingRequest putTaggingRequest = PutObjectTaggingRequest.builder()
+                    .bucket(bucket)
+                    .key(s3Key)
+                    .tagging(Tagging.builder().tagSet(updatedTags).build())
+                    .build();
+
+            s3Client.putObjectTagging(putTaggingRequest);
+
+            log.info("S3 객체 {} 에서 'Status: delete' 태그 제거 성공.", s3Key);
+            return true;
+        } catch (NoSuchKeyException e) {
+            log.warn("S3 객체 태그 제거 실패: 객체 {} 를 찾을 수 없습니다.", s3Key);
+            return false;
+        } catch (S3Exception e) {
+            log.error("S3 객체 태그 제거 중 S3 오류 발생 ({}): {}", s3Key, e.awsErrorDetails().errorMessage(), e);
+            return false;
+        } catch (Exception e) {
+            log.error("S3 객체 태그 제거 중 알 수 없는 오류 발생 ({}): {}", s3Key, e.getMessage(), e);
+            return false;
+        }
+    }
+
+    // --- 기존 유틸리티 메서드들 ---
+
+    /**
+     * S3에서 파일 삭제 (fileUrl에서 s3Key 추출)
+     */
+    public void deleteFile(String fileUrl) {
+        if (fileUrl == null || fileUrl.isEmpty()) {
+            log.warn("삭제할 파일 URL이 null 또는 비어있습니다.");
+            return;
+        }
+        String s3Key = getKeyFromS3Url(fileUrl, bucket);
+        try {
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(s3Key)
+                    .build();
+            s3Client.deleteObject(deleteObjectRequest);
+            log.info("S3 파일 삭제 성공: {}", fileUrl);
+        } catch (S3Exception e) {
+            log.warn("S3 파일 삭제 실패 - S3 오류: {}", e.awsErrorDetails().errorMessage(), e);
+        } catch (Exception e) {
+            log.warn("S3 파일 삭제 중 예상치 못한 오류 발생: {}", e.getMessage(), e);
+        }
+    }
+
 }
