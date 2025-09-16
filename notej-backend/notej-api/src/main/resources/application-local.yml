@@ -18,7 +18,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: create # 로컬 개발용이므로 'create'
+      ddl-auto: update # 로컬 개발용이므로 'create' / update 사용도 가능
       show-sql: true # 개발 편의를 위해 SQL 콘솔 출력
       # JPA 공통 속성 (여기에서 모두 포함)
       properties:

@@ -7,55 +7,61 @@ import me.notej.notej_api.aws.s3.S3Bucket;
 import me.notej.notej_api.core.member.domain.Member;
 import me.notej.notej_api.core.member.repository.MemberRepository;
 import me.notej.notej_api.core.post.dto.EditorImageUploadResponse;
+import me.notej.notej_api.core.post.dto.PostThumbnailImageUploadResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Duration;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class EditorImageService {
+public class PostImageService {
 
     private final S3Bucket s3Bucket;
     private final MemberRepository memberRepository;
 
+    // 모든 이미지 업로드에 공통되는 핵심 로직 (member 찾기, S3 업로드)
     @Transactional
     public EditorImageUploadResponse uploadImage(Authentication authentication, MultipartFile imageFile) {
-        // 이미지 파일 검증 로직
-        validateImageFile(imageFile);
+        String s3Key = performS3Upload(authentication, imageFile, "posts"); // 'posts' 기본 경로
+        return new EditorImageUploadResponse(s3Key);
+    }
 
-        // 유저 뽑기
+    @Transactional
+    public PostThumbnailImageUploadResponse uploadThumbnail(Authentication authentication, MultipartFile imageFile) {
+        String s3Key = performS3Upload(authentication, imageFile, "posts/thumbnail"); // 'posts/thumbnail' 경로
+        return new PostThumbnailImageUploadResponse(s3Key);
+    }
+
+    private String performS3Upload(Authentication authentication, MultipartFile imageFile, String dirPath) {
+        validateImageFile(imageFile); // 먼저 파일 검증
+
         User user = (User) authentication.getPrincipal();
         String memberUuid = user.getUsername();
 
-        Member member = memberRepository.findByMemberUuid(memberUuid).orElseThrow(() -> new EntityNotFoundException("USER_NOT_FOUND"));
+        Member member = memberRepository.findByMemberUuid(memberUuid)
+                .orElseThrow(() -> new EntityNotFoundException("USER_NOT_FOUND"));
         Long memberId = member.getId();
 
-        // S3 파일 저장 로직, 임시 태그 필요
+        String finalDirPath = dirPath + "/" + memberId; // memberId를 경로에 추가
+
         try {
-            // 사진 객체 저장시 memberId 별로 경로 분리를 위해 memberId를 최종경로에 추가
-            String dirName = "posts/" + memberId;
-
-            // S3에 업로드 + Status: delete 태그 추가
-            String s3Key = s3Bucket.uploadWithTemporaryDeletionTag(imageFile, dirName);
-
-            log.info("[EditorImageService][uploadImage] 에디터 사진 비동기 업로드 성공 : {}", s3Key );
-            return new EditorImageUploadResponse(s3Key);
+            String s3Key = s3Bucket.uploadWithTemporaryDeletionTag(imageFile, finalDirPath);
+            log.info("[PostImageService][performS3Upload] 이미지 S3 업로드 성공 (경로: {}) : {}", finalDirPath, s3Key);
+            return s3Key;
         } catch (RuntimeException e) {
-            log.error("이미지 업로드 서비스 실패: {}", e.getMessage(), e);
+            log.error("이미지 S3 업로드 중 RuntimeException 발생 (경로: {}) : {}", finalDirPath, e.getMessage(), e);
             throw e;
         } catch (Exception e) {
-            log.error("예상치 못한 이미지 업로드 서비스 오류: {}", e.getMessage(), e);
+            log.error("예상치 못한 이미지 S3 업로드 오류 (경로: {}) : {}", finalDirPath, e.getMessage(), e);
             throw new RuntimeException("이미지 업로드 중 알 수 없는 오류가 발생했습니다.", e);
         }
     }
 
     public byte[] downloadImage(String filename) {
-        log.info("[EditorImageService][downloadImage] 에디터 사진 비동기 다운로드 성공 : {}", filename);
+        log.info("[EditorImageService][downloadImage] 사진 비동기 다운로드 성공 : {}", filename);
         return s3Bucket.getImageBytes(filename);
     }
 

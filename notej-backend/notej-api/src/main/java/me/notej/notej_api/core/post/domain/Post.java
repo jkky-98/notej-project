@@ -29,6 +29,10 @@ public class Post extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT")
     private String bio;
 
+    private boolean active;
+
+    private String thumbnail;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;

@@ -15,6 +15,7 @@ declare module 'vue' {
     NavBar: typeof import('./src/components/layouts/NavBar.vue')['default']
     PostForm: typeof import('./src/components/post/PostForm.vue')['default']
     PostList: typeof import('./src/components/PostList.vue')['default']
+    PublishModal: typeof import('./src/components/PublishModal.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     TagInput: typeof import('./src/components/tag/TagInput.vue')['default']

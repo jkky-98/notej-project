@@ -28,6 +28,15 @@ public class CategoryController {
         return ResponseEntity.ok(categoryAll);
     }
 
+    @GetMapping("/api/secure/category")
+    public ResponseEntity<?> getCategoriesSecure(
+            Authentication authentication
+    ) {
+        CategoryAllResponse categoryAll = categoryService.getCategoryAll(authentication);
+        log.info("[CategoryController][getCategories] CategoryController - getCategories() categoryAll : {}", categoryAll);
+        return ResponseEntity.ok(categoryAll);
+    }
+
     @PostMapping("/api/secure/blog/categories")
     public ResponseEntity<?> createCategory(
             Authentication authentication,

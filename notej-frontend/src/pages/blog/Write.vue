@@ -2,7 +2,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="12">
+      <v-col class="pb-0 pt-0" cols="12">
         <v-text-field
           v-model="title"
           class="title-input"
@@ -14,7 +14,7 @@
 
     <!-- 태그 입력 필드 (네가 준 템플릿 그대로 사용) -->
     <v-row>
-      <v-col cols="12">
+      <v-col class="pb-0 pt-0" cols="12">
         <v-label class="mb-2">태그</v-label> <!-- Vuetify 스타일 라벨 -->
         <div
           ref="tagifyEl"
@@ -44,7 +44,7 @@
     <!-- 버튼 및 스낵바 (나머지 코드 그대로) -->
     <div class="d-flex justify-end mt-4">
       <v-btn class="mr-2" color="grey" @click="saveTemporary">임시저장</v-btn>
-      <v-btn color="primary" @click="publishPost">발행하기</v-btn>
+      <v-btn color="primary" @click="openPublishModal">발행하기</v-btn>
     </div>
 
     <v-snackbar
@@ -58,13 +58,14 @@
       </template>
     </v-snackbar>
   </v-container>
+  <PublishModal v-if="postStore.isPublishModalOpen" />
 </template>
 <script setup>
   import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
   import { usePostStore } from '@/stores/post';
   import { useThemeStore } from '@/stores/theme';
-
+  import PublishModal from '@/components/PublishModal.vue';
   import Editor from '@toast-ui/editor';
   import '@toast-ui/editor/dist/toastui-editor.css';
   import '@toast-ui/editor/dist/theme/toastui-editor-dark.css';
@@ -84,7 +85,7 @@
   const toastEditor = ref(null);
   const autoSaveTimer = ref(null);
   const currentPostId = ref(route.query.id || null);
-  const isPublic = ref(false);
+
 
   // 태그 관련 상태
   const tagsInput = ref('');
@@ -142,7 +143,7 @@
       },
       events: {
         change: () => {
-          if (!isPublic.value) {
+          if (!postStore.isPublic.value) {
             resetAutoSaveTimer();
           }
         },
@@ -194,6 +195,10 @@
     themeStore.setThemeFromStorage();
     await nextTick();
 
+    if (!currentPostId.value) {
+      postStore.startNewPost();
+    }
+
     if (currentPostId.value) {
       try {
         const post = await loadPostData(currentPostId.value);
@@ -241,7 +246,7 @@
     if (autoSaveTimer.value) {
       clearInterval(autoSaveTimer.value);
     }
-    if (!isPublic.value) {
+    if (!postStore.isPublic.value) {
       autoSaveTimer.value = setInterval(autoSavePost, AUTO_SAVE_INTERVAL_MS);
       console.log('자동저장 타이머 시작');
     }
@@ -251,7 +256,7 @@
     if (autoSaveTimer.value) {
       clearInterval(autoSaveTimer.value);
     }
-    if (!isPublic.value) {
+    if (!postStore.isPublic.value) {
       autoSaveTimer.value = setInterval(autoSavePost, AUTO_SAVE_INTERVAL_MS);
     }
   };
@@ -265,8 +270,8 @@
   };
 
   const autoSavePost = async () => {
-    if (isPublic.value) {
-      console.log('Post가 공개 상태이므로 자동 저장을 건너뜜');
+    if (postStore.isPublic.value) {
+      console.log('Post가 공개 상태이므로 자동 저장을 건너뜀');
       return;
     }
 
@@ -284,11 +289,10 @@
         content,
         tags: tags.value, // 태그 정보도 함께 저장
         isPublic: false,
-        status: 'TEMP_SAVE',
       });
-
-      if (!currentPostId.value && result.id) {
-        currentPostId.value = result.id;
+      console.log('저장 결과 : ', result);
+      if (!currentPostId.value && result) {
+        currentPostId.value = result;
         router.replace({ query: { id: currentPostId.value } });
         showToast('success', '글이 자동저장되었습니다!');
       } else if (currentPostId.value) {
@@ -306,9 +310,9 @@
       const post = await postStore.getPost(postId);
 
       title.value = post.title || '';
-      isPublic.value = post.isPublic || false;
+      postStore.isPublic.value = postStore.isPublic || false;
 
-      if (!isPublic.value) {
+      if (!postStore.isPublic.value) {
         startAutoSaveTimer();
       } else {
         console.log('로드된 Post는 공개 상태이므로 자동 저장 타이머를 시작하지 않습니다.');
@@ -336,7 +340,6 @@
         content,
         tags: tags.value, // 태그 정보도 함께 저장
         isPublic: false,
-        status: 'TEMP_SAVE',
       });
 
       if (!currentPostId.value && result.id) {
@@ -351,7 +354,7 @@
   };
 
   // 발행 함수
-  const publishPost = async () => {
+  const openPublishModal = async () => {
     const content = editor.value?.getMarkdown() || '';
 
     if (!title.value.trim()) {
@@ -364,23 +367,17 @@
       return;
     }
 
-    try {
-      const result = await postStore.savePost({
-        id: currentPostId.value,
-        title: title.value,
-        content,
-        tags: tags.value, // 태그 정보도 함께 저장
-        isPublic: true,
-        status: 'PUBLISHED',
-      });
+    // pinia에 데이터 업데이트
+    postStore.setPostDraft({
+      id: currentPostId.value,
+      title: title.value,
+      content,
+      tags: tags.value,
+      isPublic: false,
+    });
 
-      currentPostId.value = result.id;
-      showToast('success', '글이 성공적으로 발행되었습니다!');
-      router.push(`/post/${currentPostId.value}`);
-    } catch (error) {
-      console.error('발행 실패:', error);
-      showToast('error', '발행 실패!');
-    }
+    postStore.openPublishModal();
+
   };
 
   // 토스트 메시지 표시 함수

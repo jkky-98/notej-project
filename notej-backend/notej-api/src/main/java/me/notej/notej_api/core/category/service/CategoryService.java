@@ -3,6 +3,7 @@ package me.notej.notej_api.core.category.service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.notej.notej_api.core.blogmain.domain.Blog;
 import me.notej.notej_api.core.category.domain.Category;
 import me.notej.notej_api.core.category.dto.CategoryAllResponse;
 import me.notej.notej_api.core.category.dto.CategoryCreateRequest;
@@ -32,6 +33,29 @@ public class CategoryService {
         List<Category> allByBlogUrl = categoryRepository.findAllByBlog_Url(blogUrl);
 
         List<CategoryResponse> categoryResponses = allByBlogUrl.stream()
+                .sorted(Comparator.comparing(Category::getSeq)) // seq 기준으로 정렬해야 프론트엔드가 그대로 사용해서 카테고리 랜더링 정렬가능
+                .map(category -> new CategoryResponse(
+                        category.getId(),
+                        category.getParent() != null ? category.getParent().getId() : null,
+                        category.getName(),
+                        category.getSeq()
+                ))
+                .toList();
+
+        return new CategoryAllResponse(categoryResponses);
+    }
+
+    @Transactional(readOnly = true)
+    public CategoryAllResponse getCategoryAll(final Authentication authentication) {
+
+        User user = (User) authentication.getPrincipal();
+        String memberUuid = user.getUsername();
+
+        Member member = memberRepository.findByMemberUuid(memberUuid).orElseThrow(() -> new EntityNotFoundException("USER_NOT_FOUND"));
+        Blog blog = member.getBlog();
+        List<Category> categories = categoryRepository.findAllByBlog(blog);
+
+        List<CategoryResponse> categoryResponses = categories.stream()
                 .sorted(Comparator.comparing(Category::getSeq)) // seq 기준으로 정렬해야 프론트엔드가 그대로 사용해서 카테고리 랜더링 정렬가능
                 .map(category -> new CategoryResponse(
                         category.getId(),
