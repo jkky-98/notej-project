@@ -99,8 +99,7 @@ public class PostService {
         post.setThumbnail(thumbnailUrl);
 
         // 태그 업데이트
-        // ToDo : 태그 처리 어떻게 할 건지 고민 해보자, Post에 엮인 태그 모두 삭제후 다시 태그 인서트 하는 방식이 가장 쉬운데, 더 생각해보셈
-        // ToDo : 프론트엔드 함수 정리좀 하자 너무 방대해짐 분리하고 pinia에서 중앙 관리하던 지금 존나 복잡함
-        return null;
+        tagService.updateTags(tags, postId);
+        return post.getId();
     }
 }

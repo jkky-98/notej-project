@@ -94,6 +94,7 @@
     </v-menu>
   </v-app-bar>
 
+  <!-- 로그아웃 확인 다이얼로그 -->
   <v-dialog v-model="showLogoutConfirm" max-width="400">
     <v-card class="pa-3">
       <v-card-title class="text-h6">로그아웃 하시겠습니까?</v-card-title>
@@ -104,43 +105,116 @@
     </v-card>
   </v-dialog>
 
-</template>
+  <!-- 글쓰기 페이지 이동 확인 다이얼로그 -->
+  <v-dialog v-model="confirmDialog" max-width="400">
+    <v-card>
+      <v-card-title class="text-h5">
+        주의
+      </v-card-title>
 
+      <v-card-text>
+        작성 중인 게시글이 초기화될 수 있습니다. 초기화하시겠습니까?
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer />
+        <v-btn color="grey-darken-1" variant="text" @click="cancelNavigation">
+          아니오
+        </v-btn>
+        <v-btn color="error" variant="text" @click="proceedNavigation">
+          예
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</template>
 <script setup>
-  import { computed } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { computed, nextTick, ref } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
   import { useTheme } from 'vuetify'
   import { useThemeStore } from '@/stores/theme'
   import { useAuthStore } from '@/stores/auth'
-  import { ref } from 'vue'
 
   const router = useRouter()
+  const route = useRoute()
   const theme = useTheme()
   const themeStore = useThemeStore()
   const authStore = useAuthStore()
-  const showLogoutConfirm = ref(false)
 
+  const showLogoutConfirm = ref(false)
   const isLoggedIn = computed(() => authStore.isAuthenticated)
 
+  // 라우팅 관련 상태 변수
+  const confirmDialog = ref(false)
+  const pendingTargetPath = ref(null)
+  const isRefreshingCurrentWritePage = ref(false)
+
+  // 모든 네비게이션 요청 처리 공통 함수
+  function handleAnyNavigation (targetPath) {
+    // 현재 /write 페이지에 있는지 확인
+    const isOnWritePage = route.path === '/write' || route.path.startsWith('/write?id=')
+
+    if (isOnWritePage) {
+      if (targetPath === '/write') {
+        // 현재 /write 페이지에서 다시 /write 버튼을 누른 경우 (새로고침 의도)
+        isRefreshingCurrentWritePage.value = true
+      } else {
+        // /write 페이지에서 다른 페이지로 이동하려는 경우
+        isRefreshingCurrentWritePage.value = false
+      }
+      pendingTargetPath.value = targetPath
+      confirmDialog.value = true // 확인 다이얼로그 표시
+    } else {
+      // /write 페이지가 아니면 바로 이동
+      router.push(targetPath)
+    }
+  }
+
+  // 네비게이션 함수들
   function onCreatePost () {
-    router.push('/write')
+    handleAnyNavigation('/write')
   }
 
   function goToProfile () {
-    router.push('/profile')
+    handleAnyNavigation('/profile')
   }
 
   function goToBlog () {
     const blogUrl = authStore.user?.blogUrl
     if (blogUrl) {
-      router.push(`/@${blogUrl}`)
+      handleAnyNavigation(`/@${blogUrl}`)
     } else {
-      router.push('/onboarding') // 초기 설정 안된 경우
+      handleAnyNavigation('/onboarding')
     }
   }
 
   function goToLogin () {
-    router.push('/login')
+    handleAnyNavigation('/login')
+  }
+
+  // 다이얼로그 '예' 버튼 클릭 시 실행될 함수
+  function proceedNavigation () {
+    confirmDialog.value = false // 다이얼로그 닫기
+
+    if (isRefreshingCurrentWritePage.value) {
+      // /write 페이지에서 다시 /write 버튼을 눌러 리마운트 요청한 경우
+      nextTick(() => {
+        router.go(0) // 현재 페이지 강제 새로고침
+      })
+    } else if (pendingTargetPath.value) {
+      // /write 페이지에서 다른 곳으로 이동하려던 경우
+      router.push(pendingTargetPath.value)
+    }
+
+    // 상태 초기화
+    pendingTargetPath.value = null
+    isRefreshingCurrentWritePage.value = false
+  }
+
+  // 다이얼로그 '아니오' 버튼 클릭 시 실행될 함수
+  function cancelNavigation () {
+    confirmDialog.value = false // 다이얼로그 닫기
+    pendingTargetPath.value = null // 목적지 정보 삭제
+    isRefreshingCurrentWritePage.value = false // 상태 초기화
   }
 
   function openLogoutConfirmDialog () {

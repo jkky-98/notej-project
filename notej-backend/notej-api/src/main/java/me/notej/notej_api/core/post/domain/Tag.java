@@ -3,6 +3,9 @@ package me.notej.notej_api.core.post.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "tag")
 @Getter
@@ -19,4 +22,13 @@ public class Tag {
 
     @Column(nullable = false, length = 20)
     private String name;
+
+    @OneToMany(mappedBy = "tag")
+    @Builder.Default
+    private List<PostTag> postTags = new ArrayList<>();
+
+    public void addPostTag(PostTag postTag) {
+        this.postTags.add(postTag);
+        postTag.setTag(this);
+    }
 }

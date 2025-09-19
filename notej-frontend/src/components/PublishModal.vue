@@ -198,11 +198,12 @@
   }
 
   async function handleFinalPublish () {
-    if (!postStore.postDraft?.title) {
+    console.log('handleFinalPublish 동작 - postStore.publishPost() 동작 실행 이전 검증 작업 진행 시작')
+    if (!postStore.post?.title) {
       showToast('warning', '제목을 입력해주세요!');
       return;
     }
-    if (!postStore.postDraft?.content) {
+    if (!postStore.post?.content) {
       showToast('warning', '내용을 입력해주세요!');
       return;
     }
@@ -216,14 +217,13 @@
     }
 
     try {
-      const result = await postStore.publishPost();
+      const result = await postStore.publishPost()
 
       if (result) {
         showToast('success', '글이 성공적으로 발행되었습니다!');
         router.push(`/post/${result.id}`);
         postStore.closePublishModal();
-        // 발행 성공 후 postDraft 초기화 (선택 사항)
-        postStore.postDraft = null;
+        // 발행 성공 후 post.js 초기화 (toDO)
       }
     } catch (error) {
       console.error('최종 발행 실패:', error);

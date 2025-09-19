@@ -6,6 +6,9 @@ import me.notej.notej_api.core.blogmain.domain.Blog;
 import me.notej.notej_api.core.category.domain.Category;
 import me.notej.notej_api.global.baseentity.BaseTimeEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "post")
 @Getter
@@ -33,6 +36,10 @@ public class Post extends BaseTimeEntity {
 
     private String thumbnail;
 
+    @OneToMany(mappedBy = "post")
+    @Builder.Default
+    private List<PostTag> postTags = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
@@ -40,4 +47,10 @@ public class Post extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "blog_id")
     private Blog blog;
+
+    public void addPostTag(PostTag postTag) {
+        postTags.add(postTag);
+        postTag.setPost(this);
+    }
+
 }

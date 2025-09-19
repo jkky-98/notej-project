@@ -26,12 +26,14 @@ public class PostController {
         return ResponseEntity.ok(postId);
     }
 
-    @PutMapping("/api/secure/post")
+    @PutMapping("/api/secure/post/{id}")
     public ResponseEntity<?> updatePost(
-            @RequestParam Long postId,
+            @PathVariable Long id,
             @RequestBody PostUpdateRequest request
     ) {
-        postService.updatePost(postId, request);
+        log.info("[PostController][updatePost] PostController - updatePost() request : {}", request);
+        Long postId = postService.updatePost(id, request);
+        return ResponseEntity.ok(postId);
     }
 
 }

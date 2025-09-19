@@ -8,6 +8,14 @@ export const usePostStore = defineStore('post', {
     currentPost: null,
     isLoading: false,
     error: null,
+    // 모달 이전 데이터
+    post : {
+      id: null,
+      title: '',
+      content: '',
+      tags: [],
+      isPublic: false,
+    },
     // 발행 모달 관련 상태 추가
     isPublishModalOpen: false,
     thumbnailUrl: '',
@@ -16,15 +24,43 @@ export const usePostStore = defineStore('post', {
     selectedCategory: null, // 수정 프로세스에선 이게 차있을 수 있음.
     shortDescription: '',
     categories: [],
-    // 임시 저장용 draft 객체
-    postDraft: null,
 
   }),
   getters: {
     hasThumbnailToDisplay: state => !!state.displayedThumbnailUrl,
+    // 태그 목록 가져오기
+    getTags: state => state.post.tags,
+    // 태그 개수
+    tagCount: state => state.post.tags.length,
   },
 
   actions: {
+    // 태그 추가 액션
+    addTag (tag) {
+      // 이미 존재하는 태그인지 확인
+      if (!this.post.tags.includes(tag)) {
+        this.post.tags.push(tag);
+        console.log('태그 추가됨:', tag);
+      }
+    },
+
+    // 태그 제거 액션
+    removeTag (tag) {
+      const index = this.post.tags.indexOf(tag);
+      if (index !== -1) {
+        this.post.tags.splice(index, 1);
+        console.log('태그 제거됨:', tag);
+      }
+    },
+    // 태그 전체 설정 (덮어쓰기)
+    setTags (tags) {
+      this.post.tags = [...tags];
+    },
+
+    // 태그 전체 초기화
+    clearTags () {
+      this.post.tags = [];
+    },
     // 새 글 작성 시작할 때 호출할 액션
     resetPublishModalState () {
       this.thumbnailUrl = '';
@@ -35,9 +71,42 @@ export const usePostStore = defineStore('post', {
     },
     // Write.vue에서 새 글 작성 시작할 때 호출
     startNewPost () {
-      this.postDraft = null;
-      this.resetPublishModalState();
+    // 새로운 포스트를 시작할 때 post를 빈 객체로 초기화 (null 아님!)
+      this.post = {
+        id: null, // 새로운 포스트는 ID가 없겠지
+        title: '', // 제목도 비어있고
+        content: '', // 내용도 비어있고
+        tags: [], // 태그 배열도 비어있어야지
+        isPublic: false,
+      // 만약 다른 기본값이 있다면 여기에 추가
+      };
+      this.resetPublishModalState(); // 이건 원래대로
     },
+
+    async startEditPost (postId) {
+      this.isLoading = true;
+      this.error = null;
+
+      let response;
+      try {
+        response = await api.get(`/api/secure/post/${postId}`);
+        // 데이터 배치
+        this.post.id = response.id;
+        this.post.title = response.title;
+        this.post.content = response.content;
+        this.post.tags = response.tags;
+        this.post.isPublic = response.active;
+        this.selectedCategory = response.categoryName;
+        this.thumbnailUrl = response.thumbnailUrl;
+        this.shortDescription = response.bio;
+      } catch (error) {
+        this.error = error.message || '작성 게시글 데이터 불러오기중 오류 발생'
+        throw error;
+      } finally {
+        this.isLoading = false;
+      }
+    },
+
     async savePost (postData) {
       this.isLoading = true;
       this.error = null;
@@ -221,7 +290,7 @@ export const usePostStore = defineStore('post', {
       this.error = null;
 
       // postDraft 데이터가 없으면 발행 불가 (유효성 검사는 컴포넌트에서 했지만, 여기서도 한 번 더 체크)
-      if (!this.postDraft) {
+      if (!this.post) {
         this.error = '발행할 게시글 정보가 없습니다.';
         this.isLoading = false;
         throw new Error('발행할 게시글 정보가 없습니다.');
@@ -230,10 +299,10 @@ export const usePostStore = defineStore('post', {
       try {
         const postData = {
           // postDraft에서 핵심 데이터 가져오기
-          id: this.postDraft.id, // 수정 시 필요
-          title: this.postDraft.title,
-          content: this.postDraft.content,
-          tags: this.postDraft.tags, // draft에 저장된 태그도 함께
+          id: this.post.id,
+          title: this.post.title,
+          content: this.post.content,
+          tags: this.post.tags, // draft에 저장된 태그도 함께
 
           // 모달에서 설정된 추가 정보
           thumbnailUrl: this.thumbnailUrl,
