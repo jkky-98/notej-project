@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import me.notej.notej_api.aws.s3.S3Bucket;
 import me.notej.notej_api.core.blogmain.domain.Blog;
 import me.notej.notej_api.core.category.domain.Category;
 import me.notej.notej_api.core.category.dto.CategoryResponse;
@@ -31,6 +32,8 @@ public class PostService {
     private final CategoryRepository categoryRepository;
     private final PostRepository postRepository;
     private final TagService tagService;
+    private final S3Bucket s3Bucket;
+    private final PostImageService postImageService;
 
     @Transactional
     public Long savePost(final Authentication authentication,final PostCreateRequest request) {
@@ -70,13 +73,15 @@ public class PostService {
         for (String tag : tags) {
             tagService.saveTag(tag, newPost.getId());
         }
+        // 썸네일 처리
 
         log.info("[PostService][savePost] PostService - savePost() newPost : {}", newPost);
         return postSaved.getId();
     }
 
     @Transactional
-    public Long updatePost(Long postId, PostUpdateRequest request) {
+    public Long updatePost(final Long postId, final PostUpdateRequest request) {
+
         Post post = postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("POST_NOT_FOUND"));
 
         String title = request.title();
@@ -90,6 +95,13 @@ public class PostService {
         Category category = null;
         if (categoryId != null) {
             category = categoryRepository.findById(request.categoryId()).orElseThrow(() -> new EntityNotFoundException("CATEGORY_NOT_FOUND"));
+        }
+        // 썸네일 변경 작업
+        String thumbnailUrlBefore = post.getThumbnail();
+        if (!thumbnailUrlBefore.equals(thumbnailUrl)) {
+            // 기존 썸네일 삭제
+            postImageService.deleteImage(thumbnailUrlBefore);
+            // 새로운 썸네일은 미리 업로드 되어있음.
         }
 
         // 더티-체킹 업데이트
@@ -111,13 +123,9 @@ public class PostService {
 
         List<String> tags = tagService.getTagsFromPost(post.getId());
 
-        CategoryResponse categoryResponse = null;
+        Long categoryId = null;
         if (post.getCategory() != null) {
-            categoryResponse = new CategoryResponse(
-                    post.getCategory().getId(),
-                    post.getCategory().getParent() != null ? post.getCategory().getId() : null,
-                    post.getCategory().getName(),
-                    post.getCategory().getSeq());
+            categoryId = post.getCategory().getId();
         }
 
 
@@ -127,7 +135,7 @@ public class PostService {
                 post.getContent(),
                 tags,
                 post.isActive(),
-                categoryResponse,
+                categoryId,
                 post.getThumbnail(),
                 post.getBio()
         );

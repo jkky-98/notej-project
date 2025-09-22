@@ -25,17 +25,21 @@ public class PostImageService {
     // 모든 이미지 업로드에 공통되는 핵심 로직 (member 찾기, S3 업로드)
     @Transactional
     public EditorImageUploadResponse uploadImage(Authentication authentication, MultipartFile imageFile) {
-        String s3Key = performS3Upload(authentication, imageFile, "posts"); // 'posts' 기본 경로
+        String s3Key = performS3Upload(authentication, imageFile, "posts", true); // 'posts' 기본 경로
         return new EditorImageUploadResponse(s3Key);
     }
 
     @Transactional
     public PostThumbnailImageUploadResponse uploadThumbnail(Authentication authentication, MultipartFile imageFile) {
-        String s3Key = performS3Upload(authentication, imageFile, "posts/thumbnail"); // 'posts/thumbnail' 경로
+        String s3Key = performS3Upload(authentication, imageFile, "posts/thumbnail", false); // 'posts/thumbnail' 경로
         return new PostThumbnailImageUploadResponse(s3Key);
     }
 
-    private String performS3Upload(Authentication authentication, MultipartFile imageFile, String dirPath) {
+    public void deleteImage(String s3Key) {
+        s3Bucket.deleteFile(s3Key);
+    }
+
+    private String performS3Upload(Authentication authentication, MultipartFile imageFile, String dirPath, boolean isUseTempTag) {
         validateImageFile(imageFile); // 먼저 파일 검증
 
         User user = (User) authentication.getPrincipal();
@@ -48,7 +52,12 @@ public class PostImageService {
         String finalDirPath = dirPath + "/" + memberId; // memberId를 경로에 추가
 
         try {
-            String s3Key = s3Bucket.uploadWithTemporaryDeletionTag(imageFile, finalDirPath);
+            String s3Key = null;
+            if (isUseTempTag) {
+                s3Key = s3Bucket.uploadWithTemporaryDeletionTag(imageFile, finalDirPath);
+            } else {
+                s3Key = s3Bucket.upload(imageFile, finalDirPath);
+            }
             log.info("[PostImageService][performS3Upload] 이미지 S3 업로드 성공 (경로: {}) : {}", finalDirPath, s3Key);
             return s3Key;
         } catch (RuntimeException e) {

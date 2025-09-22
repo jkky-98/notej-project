@@ -96,7 +96,7 @@ export const usePostStore = defineStore('post', {
         this.post.content = response.data.content;
         this.post.tags = response.data.tags;
         this.post.isPublic = response.data.active;
-        this.selectedCategory = response.data.categoryName;
+        this.selectedCategory = response.data.categoryId;
         this.thumbnailUrl = response.data.thumbnailUrl;
         this.shortDescription = response.data.bio;
 
@@ -204,9 +204,9 @@ export const usePostStore = defineStore('post', {
         });
 
         // S3 키만 저장
-        this.thumbnailKey = response.data.url; // 응답 데이터의 키가 's3Key'라고 가정
+        this.thumbnailUrl = response.data.url; // 응답 데이터의 키가 's3Key'라고 가정
         console.log('uploadThumbnail 성공 : 도착 데이터 - ', response.data)
-        console.log('업로드된 썸네일 키:', this.thumbnailKey);
+        console.log('업로드된 썸네일 키:', this.thumbnailUrl);
 
         // ★★★ S3 키를 받았으면, 이제 해당 키로 이미지를 가져와서 displayedThumbnailUrl 업데이트
         await this.fetchAndSetDisplayedThumbnail();
@@ -223,7 +223,7 @@ export const usePostStore = defineStore('post', {
     // 썸네일 바이트 데이터를 가져와서 displayedThumbnailUrl을 설정하는 액션
     async fetchAndSetDisplayedThumbnail () {
       console.log('fetchAndSetDisplayedThumbnail 실행');
-      if (!this.thumbnailKey) {
+      if (!this.thumbnailUrl) {
         this.displayedThumbnailUrl = null; // 키가 없으면 초기화
         return;
       }
@@ -232,7 +232,7 @@ export const usePostStore = defineStore('post', {
       try {
         const response = await api.get(`/api/secure/post/thumbnail`, {
           params: {
-            filename: this.thumbnailKey,
+            filename: this.thumbnailUrl,
           },
           responseType: 'arraybuffer', // 바이트 데이터 요청
         });

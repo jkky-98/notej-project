@@ -1,7 +1,5 @@
 package me.notej.notej_api.core.post.dto;
 
-import me.notej.notej_api.core.category.dto.CategoryResponse;
-
 import java.util.List;
 
 public record PostResponse(
@@ -10,7 +8,7 @@ public record PostResponse(
     String content,
     List<String> tags,
     boolean active,
-    CategoryResponse category,
+    Long categoryId,
     String thumbnailUrl,
     String bio
 ) {

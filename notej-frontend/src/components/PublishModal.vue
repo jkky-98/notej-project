@@ -63,7 +63,7 @@
                 <v-card-title class="text-subtitle-1 pb-2">카테고리 선택</v-card-title>
                 <v-card-text>
                   <v-select
-                    v-model="postStore.selectedCategory"
+                    v-model="selectedCategoryComputed"
                     density="comfortable"
                     hide-details
                     item-title="name"
@@ -142,6 +142,11 @@
 
   const postStore = usePostStore();
   const router = useRouter();
+
+  const selectedCategoryComputed = computed({
+    get: () => postStore.selectedCategory,
+    set: value => { postStore.selectedCategory = value },
+  })
 
   // 스낵바 상태
   const snackbar = ref({
@@ -238,10 +243,18 @@
   };
 
 
-  onMounted(() => {
+  onMounted( async () => {
+    console.log('PublishModal.vue Mount동작 START');
+    console.log('postStore id 값 : ', postStore.post.id);
+    console.log('postStore ThumbnailURL 값 : ', postStore.thumbnailUrl);
     // 해당 회원의 카테고리 가져오기
     if (postStore.categories.length === 0) {
       postStore.getCategories();
+    }
+
+    if (postStore.post.id && postStore.thumbnailUrl) {
+      await postStore.fetchAndSetDisplayedThumbnail();
+      console.log('PublishModal.vue Mount동작 썸네일 이미지 가져오기 : ', postStore.displayedThumbnailUrl);
     }
   });
 

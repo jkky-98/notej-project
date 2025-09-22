@@ -199,6 +199,9 @@
           tagify.value.addTags(postStore.getTags);
         }
       }
+
+      // 자동저장 시작
+      startAutoSave();
     }
   });
   // 태그 추가 이벤트 핸들러
