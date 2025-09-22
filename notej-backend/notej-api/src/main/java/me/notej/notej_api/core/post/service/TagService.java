@@ -47,6 +47,15 @@ public class TagService {
         log.info("[TagService][saveTag] TagService - saveTag() tag : {}", tag);
     }
 
+    @Transactional(readOnly = true)
+    public List<String> getTagsFromPost(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("POST_NOT_FOUND"));
+
+        return post.getPostTags().stream()
+                .map(pt -> pt.getTag().getName())
+                .toList();
+    }
+
     @Transactional
     public void updateTags(List<String> requestTags, Long postId) {
 

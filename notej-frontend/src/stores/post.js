@@ -91,14 +91,17 @@ export const usePostStore = defineStore('post', {
       try {
         response = await api.get(`/api/secure/post/${postId}`);
         // 데이터 배치
-        this.post.id = response.id;
-        this.post.title = response.title;
-        this.post.content = response.content;
-        this.post.tags = response.tags;
-        this.post.isPublic = response.active;
-        this.selectedCategory = response.categoryName;
-        this.thumbnailUrl = response.thumbnailUrl;
-        this.shortDescription = response.bio;
+        this.post.id = response.data.id;
+        this.post.title = response.data.title;
+        this.post.content = response.data.content;
+        this.post.tags = response.data.tags;
+        this.post.isPublic = response.data.active;
+        this.selectedCategory = response.data.categoryName;
+        this.thumbnailUrl = response.data.thumbnailUrl;
+        this.shortDescription = response.data.bio;
+
+        console.log('포스트 데이터 가져옴 : ', this.post);
+        console.log('포스트 백엔드 데이터 : ', response);
       } catch (error) {
         this.error = error.message || '작성 게시글 데이터 불러오기중 오류 발생'
         throw error;

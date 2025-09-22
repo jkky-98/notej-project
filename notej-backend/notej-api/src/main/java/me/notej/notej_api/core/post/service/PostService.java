@@ -6,11 +6,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.notej.notej_api.core.blogmain.domain.Blog;
 import me.notej.notej_api.core.category.domain.Category;
+import me.notej.notej_api.core.category.dto.CategoryResponse;
 import me.notej.notej_api.core.category.repository.CategoryRepository;
 import me.notej.notej_api.core.member.domain.Member;
 import me.notej.notej_api.core.member.repository.MemberRepository;
 import me.notej.notej_api.core.post.domain.Post;
 import me.notej.notej_api.core.post.dto.PostCreateRequest;
+import me.notej.notej_api.core.post.dto.PostResponse;
 import me.notej.notej_api.core.post.dto.PostUpdateRequest;
 import me.notej.notej_api.core.post.repository.PostRepository;
 import org.springframework.security.core.Authentication;
@@ -101,5 +103,33 @@ public class PostService {
         // 태그 업데이트
         tagService.updateTags(tags, postId);
         return post.getId();
+    }
+
+    @Transactional(readOnly = true)
+    public PostResponse getPost(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("POST_NOT_FOUND"));
+
+        List<String> tags = tagService.getTagsFromPost(post.getId());
+
+        CategoryResponse categoryResponse = null;
+        if (post.getCategory() != null) {
+            categoryResponse = new CategoryResponse(
+                    post.getCategory().getId(),
+                    post.getCategory().getParent() != null ? post.getCategory().getId() : null,
+                    post.getCategory().getName(),
+                    post.getCategory().getSeq());
+        }
+
+
+        return new PostResponse(
+                post.getId(),
+                post.getTitle(),
+                post.getContent(),
+                tags,
+                post.isActive(),
+                categoryResponse,
+                post.getThumbnail(),
+                post.getBio()
+        );
     }
 }

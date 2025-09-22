@@ -180,6 +180,7 @@
     } else {
       await postStore.startEditPost(currentPostId.value);
       initializeTuiEditor(postStore.post.content);
+      title.value = postStore.post.title;
       const input = document.querySelector('.custom-tagify-input')
       if (tagifyEl.value) {
         tagify.value = new Tagify(input, {
@@ -194,7 +195,7 @@
           },
         });
 
-        if (postStore.getTags.length > 0) {
+        if (!postStore.getTags || postStore.getTags.length > 0) {
           tagify.value.addTags(postStore.getTags);
         }
       }
