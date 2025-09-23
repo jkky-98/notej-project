@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.notej.notej_api.core.post.dto.PostCreateRequest;
 import me.notej.notej_api.core.post.dto.PostResponse;
+import me.notej.notej_api.core.post.dto.PostWriteResponse;
 import me.notej.notej_api.core.post.dto.PostUpdateRequest;
 import me.notej.notej_api.core.post.service.PostService;
 import org.springframework.http.ResponseEntity;
@@ -38,10 +39,18 @@ public class PostController {
     }
 
     @GetMapping("/api/secure/post/{id}")
-    public ResponseEntity<PostResponse> getPost(
+    public ResponseEntity<PostWriteResponse> getPostSecure(
             @PathVariable Long id
     ) {
-        PostResponse response = postService.getPost(id);
+        PostWriteResponse response = postService.getPostWritable(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/api/post/{postId}")
+    public ResponseEntity<PostResponse> getPost(
+            @PathVariable Long postId
+    ) {
+        PostResponse response = postService.getPost(postId);
         return ResponseEntity.ok(response);
     }
 

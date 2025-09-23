@@ -42,7 +42,14 @@ public class PostImageController {
     }
 
     @GetMapping("/secure/post/thumbnail")
-    public byte[] getThumbnailImage(
+    public byte[] getThumbnailImageInWrite(
+            @RequestParam String filename
+    ) {
+        return postImageService.downloadImage(filename);
+    }
+
+    @GetMapping("/post/thumbnail")
+    public byte[] getThumbnailImageInRead(
             @RequestParam String filename
     ) {
         return postImageService.downloadImage(filename);

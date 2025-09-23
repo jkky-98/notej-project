@@ -30,6 +30,11 @@ const routes = [
     meta: { requiresAuth: true }, // 인증 필요
   },
   {
+    path: '/@:blogUrlName/post/:postId',
+    name: 'postView',
+    component: () => import('@/pages/blog/PostView.vue'),
+  },
+  {
     path: '/test/tagify',
     name: 'test-tagify',
     component: () => import('@/pages/TagifyTest.vue'),

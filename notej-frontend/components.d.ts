@@ -18,6 +18,7 @@ declare module 'vue' {
     PublishModal: typeof import('./src/components/PublishModal.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TableOfContents: typeof import('./src/components/TableOfContents.vue')['default']
     TagInput: typeof import('./src/components/tag/TagInput.vue')['default']
     ToastEditor: typeof import('./src/components/editor/ToastEditor.vue')['default']
     TopPostInCategory: typeof import('./src/components/TopPostInCategory.vue')['default']

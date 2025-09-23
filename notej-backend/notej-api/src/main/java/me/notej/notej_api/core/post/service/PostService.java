@@ -1,19 +1,19 @@
 package me.notej.notej_api.core.post.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.notej.notej_api.aws.s3.S3Bucket;
 import me.notej.notej_api.core.blogmain.domain.Blog;
 import me.notej.notej_api.core.category.domain.Category;
-import me.notej.notej_api.core.category.dto.CategoryResponse;
+import me.notej.notej_api.core.category.dto.CategoryInPostResponse;
 import me.notej.notej_api.core.category.repository.CategoryRepository;
 import me.notej.notej_api.core.member.domain.Member;
 import me.notej.notej_api.core.member.repository.MemberRepository;
 import me.notej.notej_api.core.post.domain.Post;
 import me.notej.notej_api.core.post.dto.PostCreateRequest;
 import me.notej.notej_api.core.post.dto.PostResponse;
+import me.notej.notej_api.core.post.dto.PostWriteResponse;
 import me.notej.notej_api.core.post.dto.PostUpdateRequest;
 import me.notej.notej_api.core.post.repository.PostRepository;
 import org.springframework.security.core.Authentication;
@@ -118,7 +118,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PostResponse getPost(Long postId) {
+    public PostWriteResponse getPostWritable(Long postId) {
         Post post = postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("POST_NOT_FOUND"));
 
         List<String> tags = tagService.getTagsFromPost(post.getId());
@@ -129,7 +129,7 @@ public class PostService {
         }
 
 
-        return new PostResponse(
+        return new PostWriteResponse(
                 post.getId(),
                 post.getTitle(),
                 post.getContent(),
@@ -138,6 +138,32 @@ public class PostService {
                 categoryId,
                 post.getThumbnail(),
                 post.getBio()
+        );
+    }
+
+    @Transactional(readOnly = true)
+    public PostResponse getPost(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new EntityNotFoundException("POST_NOT_FOUND"));
+
+        List<String> tags = tagService.getTagsFromPost(post.getId());
+
+        CategoryInPostResponse category = null;
+        if (post.getCategory() != null) {
+            category = new CategoryInPostResponse(
+                    post.getCategory().getId(),
+                    post.getCategory().getName()
+            );
+        }
+        String memberUuid = postRepository.findMemberUuidByPostId(post.getId()).orElseThrow(() -> new EntityNotFoundException("MEMBER_NOT_FOUND"));
+
+        return new PostResponse(
+                post.getTitle(),
+                post.getContent(),
+                tags,
+                category,
+                post.getThumbnail(),
+                post.getBio(),
+                memberUuid
         );
     }
 }
