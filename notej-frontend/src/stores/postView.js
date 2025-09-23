@@ -1,7 +1,6 @@
 // stores/PostView.js
 import { defineStore } from 'pinia';
 import api from '@/utils/axios-interceptor'; // axios-interceptor 경로 확인해줘!
-import { useRouter } from 'vue-router'; // 삭제 후 리다이렉션 등 필요 시 사용 가능
 
 export const usePostViewStore = defineStore('postView', {
   state: () => ({
@@ -11,7 +10,12 @@ export const usePostViewStore = defineStore('postView', {
     tableOfContents: [], // 목록 상태 관리
     thumbnailBytes: null,
     // 추후 확장성을 위해 추가될 상태들
-    // comments: [],
+    comments: [],
+    commentsLoading: false,
+    commentsError: null,
+    replyTo: null,
+    commentContent: '', // 새 댓글 내용
+    submittingComment: false,
     // relatedPosts: [],
   }),
 
@@ -42,9 +46,25 @@ export const usePostViewStore = defineStore('postView', {
       const blob = new Blob([state.thumbnailBytes], { type: 'image/jpeg' });
       return URL.createObjectURL(blob);
     },
-
     // 썸네일 데이터 존재 여부 확인
     hasThumbnail: state => !!state.thumbnailBytes,
+    // 댓글 관련 getters
+    sortedComments: state => {
+      // 시간순 정렬 (오래된 것부터)
+      return [...state.comments].sort((a, b) =>
+        new Date(a.createdAt) - new Date(b.createdAt)
+      )
+    },
+    // 부모 댓글만 필터링 (parentId가 없는 댓글)
+    parentComments: state => {
+      return state.sortedComments.filter(comment => !comment.parentId)
+    },
+    // 특정 댓글의 답글 가져오기 함수 반환
+    getRepliesFor: state => parentId => {
+      return state.sortedComments.filter(comment => comment.parentId === parentId)
+    },
+    // 총 댓글 수
+    totalComments: state => state.comments.length,
   },
 
   actions: {
@@ -91,12 +111,9 @@ export const usePostViewStore = defineStore('postView', {
     async deletePost (postId) {
       this.loading = true;
       this.error = null;
-      const router = useRouter(); // 액션 내에서 useRouter 사용
       try {
-        await api.delete(`/api/posts/${postId}`); // API 엔드포인트 확인!
+        await api.delete(`/api/secure/post/${postId}`); // API 엔드포인트 확인!
         console.log(`게시글 ${postId} 삭제 성공`);
-        // 성공 시 특정 페이지로 리다이렉트 (예: 메인 페이지)
-        router.push('/');
         // 삭제 후 상태 초기화
         this.resetPostState();
         return true;
@@ -148,5 +165,83 @@ export const usePostViewStore = defineStore('postView', {
       this.tableOfContents = tempToc;
     },
     // (추후) 댓글 추가, 관련 게시글 불러오기 등 확장 가능
+    // 댓글 목록 가져오기
+    async fetchComments (postId) {
+      this.commentsLoading = true
+      this.commentsError = null
+
+      try {
+        const response = await api.get(`/api/comments/post/${postId}`)
+        this.comments = response.data
+      } catch (error) {
+        console.error('댓글을 불러오는 중 오류가 발생했습니다:', error)
+        this.commentsError = '댓글을 불러오는 데 실패했습니다.'
+      } finally {
+        this.commentsLoading = false
+      }
+    },
+    // 댓글 작성
+    async addComment (postId) {
+      if (!this.commentContent.trim()) return
+
+      this.submittingComment = true
+      console.log('댓글에 대한 게시글 id : ', postId);
+      try {
+        const response = await api.post('/api/secure/comments', {
+          postId,
+          content: this.commentContent,
+          parentId: this.replyTo,
+        })
+
+        // 새 댓글 추가
+        this.comments.push(response.data)
+
+        // 폼 초기화
+        this.resetCommentForm()
+
+        return true
+      } catch (error) {
+        console.error('댓글 작성 중 오류가 발생했습니다:', error)
+        return false
+      } finally {
+        this.submittingComment = false
+      }
+    },
+
+    // 댓글 삭제
+    async deleteComment (commentId) {
+      try {
+        await api.delete(`/api/comments/${commentId}`)
+
+        // 삭제된 댓글과 그 답글들 모두 제거
+        this.comments = this.comments.filter(c =>
+          c.id !== commentId && c.parentId !== commentId
+        )
+
+        return true
+      } catch (error) {
+        console.error('댓글 삭제 중 오류가 발생했습니다:', error)
+        return false
+      }
+    },
+
+    // 답글 모드 설정
+    setReplyTo (commentId) {
+      this.replyTo = commentId
+    },
+
+    // 댓글 폼 초기화
+    resetCommentForm () {
+      this.commentContent = ''
+      this.replyTo = null
+    },
+
+    // 댓글 상태 초기화 (페이지 이동 시)
+    resetCommentState () {
+      this.comments = []
+      this.commentsLoading = false
+      this.commentsError = null
+      this.resetCommentForm()
+    },
   },
 });

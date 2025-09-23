@@ -30,7 +30,7 @@ const routes = [
     meta: { requiresAuth: true }, // 인증 필요
   },
   {
-    path: '/@:blogUrlName/post/:postId',
+    path: '/post/:postId',
     name: 'postView',
     component: () => import('@/pages/blog/PostView.vue'),
   },

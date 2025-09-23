@@ -11,6 +11,7 @@ import me.notej.notej_api.core.category.repository.CategoryRepository;
 import me.notej.notej_api.core.member.domain.Member;
 import me.notej.notej_api.core.member.repository.MemberRepository;
 import me.notej.notej_api.core.post.domain.Post;
+import me.notej.notej_api.core.post.domain.PostTag;
 import me.notej.notej_api.core.post.dto.PostCreateRequest;
 import me.notej.notej_api.core.post.dto.PostResponse;
 import me.notej.notej_api.core.post.dto.PostWriteResponse;
@@ -165,5 +166,20 @@ public class PostService {
                 post.getBio(),
                 memberUuid
         );
+    }
+
+    public void deletePost(Long id) {
+        // post 조회
+        Post post = postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("POST_NOT_FOUND"));
+        List<PostTag> postTags = post.getPostTags();
+
+        // 태그 삭제
+        postTags.forEach(pt -> tagService.deletePostTagAndTag(pt.getId()));
+
+        // 썸네일 삭제
+        postImageService.deleteImage(post.getThumbnail());
+
+        // post 삭제
+        postRepository.delete(post);
     }
 }

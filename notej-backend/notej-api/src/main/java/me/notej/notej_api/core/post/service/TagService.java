@@ -55,6 +55,14 @@ public class TagService {
                 .map(pt -> pt.getTag().getName())
                 .toList();
     }
+    @Transactional
+    public void deletePostTagAndTag(Long postTagId) {
+        PostTag postTag = postTagRepository.findById(postTagId).orElseThrow(() -> new EntityNotFoundException("POST_TAG_NOT_FOUND"));
+        Tag tag = postTag.getTag();
+
+        postTagRepository.delete(postTag);
+        tagRepository.delete(tag);
+    }
 
     @Transactional
     public void updateTags(List<String> requestTags, Long postId) {

@@ -139,7 +139,6 @@
   import { useRouter } from 'vue-router';
   import { usePostStore } from '@/stores/post';
 
-
   const postStore = usePostStore();
   const router = useRouter();
 
@@ -223,10 +222,9 @@
 
     try {
       const result = await postStore.publishPost()
-
       if (result) {
         showToast('success', '글이 성공적으로 발행되었습니다!');
-        router.push(`/post/${result.id}`);
+        router.push(`/post/${result}`);
         postStore.closePublishModal();
         // 발행 성공 후 post.js 초기화 (toDO)
       }

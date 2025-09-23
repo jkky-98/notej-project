@@ -83,14 +83,7 @@
               #{{ tag }}
             </v-chip>
           </div>
-          <!-- (추후) 댓글 컴포넌트 영역 -->
-          <!--
-          <v-card class="mt-8 pa-4" flat>
-            <v-card-title class="text-h6">댓글</v-card-title>
-            <CommentComponent :postId="currentPostId" />
-          </v-card>
-          -->
-
+          <CommentComponent />
         </v-card>
       </v-col>
       <!-- 목차 컴포넌트 - 오른쪽에 고정 -->
@@ -143,7 +136,7 @@
   import { usePostViewStore } from '@/stores/postView'; // Pinia 스토어 임포트
   import { useAuthStore } from '@/stores/auth'; // 로그인 정보 스토어 임포트
   import '@toast-ui/editor/dist/toastui-editor-viewer.css';
-
+  import CommentComponent from '@/components/CommentComponent.vue'
   // TUI Viewer 임포트 및 CSS
   import Viewer from '@toast-ui/editor/dist/toastui-editor-viewer';
   import '@toast-ui/editor/dist/toastui-editor-viewer.css';
@@ -163,6 +156,14 @@
   const activeHeading = ref(''); // 현재 활성화된 헤딩을 추적하는 ref 추가
 
   const showDeleteConfirm = ref(false); // 삭제 확인 다이얼로그 상태
+
+  // 스낵바 상태
+  const snackbar = ref({
+    show: false,
+    text: '',
+    color: 'success',
+    timeout: 3000,
+  });
 
   // 현재 게시글 ID
   const currentPostId = computed(() => route.params.postId);
@@ -227,6 +228,7 @@
     if (newId && newId !== oldId) {
       console.log(`게시글 ID 변경 감지: ${oldId} -> ${newId}. 게시글 다시 로드.`);
       postViewStore.resetPostState(); // 이전 게시글 상태 초기화
+      postViewStore.resetCommentState();
       await loadPost(newId);
     }
   }, { immediate: true }); // 컴포넌트 로드 시 즉시 실행
@@ -235,6 +237,7 @@
   onBeforeUnmount(() => {
     console.log('PostView 컴포넌트 언마운트, 상태 초기화 및 TUI Viewer 파괴');
     postViewStore.resetPostState();
+    postViewStore.resetCommentState();
     if (tuiViewerInstance) {
       tuiViewerInstance.destroy();
       tuiViewerInstance = null;
@@ -254,7 +257,8 @@
 
   // 게시글 수정 페이지로 이동
   const goToEdit = () => {
-    router.push({ name: 'WritePost', query: { id: currentPostId.value } }); // 'WritePost'는 너의 게시글 작성/수정 컴포넌트의 라우터 이름
+    // 'WritePost'는 너의 게시글 작성/수정 컴포넌트의 라우터 이름
+    router.push({ name: 'write', query: { id: currentPostId.value } });
   };
 
   // 삭제 확인 다이얼로그 열기
@@ -267,11 +271,10 @@
     showDeleteConfirm.value = false; // 다이얼로그 닫기
     const success = await postViewStore.deletePost(currentPostId.value);
     if (success) {
-    // 삭제 성공 시 토스트 메시지 등 알림 (Vuetify 스낵바 사용하면 됨)
-    // showToast('success', '게시글이 삭제되었습니다.');
+      router.push('/');
     } else {
-    // 삭제 실패 시 에러 메시지
-    // showToast('error', postViewStore.error);
+      // 삭제 실패 시 에러 메시지
+      showToast('error', postViewStore.error);
     }
   };
 
@@ -353,6 +356,13 @@
     }
   };
   watch(() => themeStore.isDark, updateCodeBlockStyles, { immediate: true });
+
+  // 토스트 메시지 표시 함수
+  const showToast = (type, message) => {
+    snackbar.value.text = message;
+    snackbar.value.color = type === 'success' ? 'success' : type === 'error' ? 'error' : 'warning';
+    snackbar.value.show = true;
+  };
 </script>
 
 <style scoped>

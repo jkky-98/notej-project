@@ -54,4 +54,12 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/api/secure/post/{id}")
+    public ResponseEntity<?> deletePost(
+            @PathVariable Long id
+    ) {
+        postService.deletePost(id);
+        return ResponseEntity.ok("POST_DELETE_SUCCESS");
+    }
+
 }

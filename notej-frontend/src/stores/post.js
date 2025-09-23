@@ -316,6 +316,7 @@ export const usePostStore = defineStore('post', {
 
         // savePost 액션 재사용
         const result = await this.savePost(postData); // postData 통째로 넘김
+        console.log('savePost 결과 : ',result);
         this.closePublishModal();
         return result;
       } catch (error) {
