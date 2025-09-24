@@ -17,6 +17,10 @@ export const usePostViewStore = defineStore('postView', {
     commentContent: '', // 새 댓글 내용
     submittingComment: false,
     // relatedPosts: [],
+    // 카테고리 기준 관련 포스트 상태관리
+    relatedPosts: [], // 같은 카테고리의 포스트 목록
+    relatedPostsLoading: false,
+    relatedPostsError: null,
   }),
 
   getters: {
@@ -137,6 +141,9 @@ export const usePostViewStore = defineStore('postView', {
         // Blob URL이 생성된 경우 해제 (컴포넌트에서 처리해야 함)
         this.thumbnailBytes = null;
       }
+      this.relatedPosts = [];
+      this.relatedPostsLoading = false;
+      this.relatedPostsError = null;
     },
 
     // 목차 데이터 설정
@@ -243,5 +250,26 @@ export const usePostViewStore = defineStore('postView', {
       this.commentsError = null
       this.resetCommentForm()
     },
+
+    // 같은 카테고리의 포스트 목록 가져오기
+    async fetchRelatedPosts (postId, categoryId) {
+      if (!categoryId) return; // 카테고리가 없으면 실행하지 않음
+      console.log('fetch 함수 시작 : ', postId, ' cate : ', categoryId);
+      try {
+        this.relatedPostsLoading = true;
+        this.relatedPostsError = null;
+
+        // API 호출 (백엔드에서 현재 포스트 포함 5개 제한 처리)
+        const response = await api.get(`/api/posts/related?categoryId=${categoryId}&currentPostId=${postId}`);
+        console.log('백엔드 데이터(관련 포스트 최대 5개) ', response.data)
+        this.relatedPosts = response.data;
+      } catch (error) {
+        this.relatedPostsError = error.message;
+        console.error('관련 포스트 로드 오류:', error);
+      } finally {
+        this.relatedPostsLoading = false;
+      }
+    },
+
   },
 });

@@ -12,16 +12,16 @@ import me.notej.notej_api.core.member.domain.Member;
 import me.notej.notej_api.core.member.repository.MemberRepository;
 import me.notej.notej_api.core.post.domain.Post;
 import me.notej.notej_api.core.post.domain.PostTag;
-import me.notej.notej_api.core.post.dto.PostCreateRequest;
-import me.notej.notej_api.core.post.dto.PostResponse;
-import me.notej.notej_api.core.post.dto.PostWriteResponse;
-import me.notej.notej_api.core.post.dto.PostUpdateRequest;
+import me.notej.notej_api.core.post.dto.*;
 import me.notej.notej_api.core.post.repository.PostRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -158,6 +158,7 @@ public class PostService {
         String memberUuid = postRepository.findMemberUuidByPostId(post.getId()).orElseThrow(() -> new EntityNotFoundException("MEMBER_NOT_FOUND"));
 
         return new PostResponse(
+                post.getId(),
                 post.getTitle(),
                 post.getContent(),
                 tags,
@@ -181,5 +182,16 @@ public class PostService {
 
         // post 삭제
         postRepository.delete(post);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostViewRelatedPostResponse> getRelatedPosts(Long categoryId, Long currentPostId) {
+        Post post = postRepository.findById(currentPostId).orElseThrow(() -> new EntityNotFoundException("POST_NOT_FOUND"));
+        LocalDateTime updatedAt = post.getUpdated_at();
+
+        List<Post> postsRelated = postRepository.findByCategoryIdAndCreatedAtLessThanEqual(categoryId, updatedAt, PageRequest.of(0, 4));
+        return postsRelated.stream()
+                .map(PostViewRelatedPostResponse::fromEntity)
+                .toList();
     }
 }

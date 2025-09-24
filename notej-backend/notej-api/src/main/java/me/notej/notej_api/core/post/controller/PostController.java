@@ -2,14 +2,13 @@ package me.notej.notej_api.core.post.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import me.notej.notej_api.core.post.dto.PostCreateRequest;
-import me.notej.notej_api.core.post.dto.PostResponse;
-import me.notej.notej_api.core.post.dto.PostWriteResponse;
-import me.notej.notej_api.core.post.dto.PostUpdateRequest;
+import me.notej.notej_api.core.post.dto.*;
 import me.notej.notej_api.core.post.service.PostService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -62,4 +61,13 @@ public class PostController {
         return ResponseEntity.ok("POST_DELETE_SUCCESS");
     }
 
+    @GetMapping("/api/posts/related")
+    public ResponseEntity<List<PostViewRelatedPostResponse>> getRelatedPosts(
+            @RequestParam Long categoryId,
+            @RequestParam Long currentPostId
+    ) {
+        List<PostViewRelatedPostResponse> relatedPosts = postService.getRelatedPosts(categoryId, currentPostId);
+        log.info("[PostController][getRelatedPosts] PostController - getRelatedPosts() relatedPosts : {}", relatedPosts);
+        return ResponseEntity.ok(relatedPosts);
+    }
 }

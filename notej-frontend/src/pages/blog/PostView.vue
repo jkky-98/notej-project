@@ -19,13 +19,70 @@
       <v-col cols="12" lg="8" md="10">
         <v-card class="pa-6 pa-md-8" flat>
 
-          <!-- 카테고리 -->
-          <v-chip class="mb-4" color="secondary" label>
-            {{ postViewStore.getPostCategoryName }}
-          </v-chip>
+          <!-- 카테고리 칩 -->
+          <div class="position-relative">
+            <v-chip
+              class="mb-4"
+              color="secondary"
+              label
+              @click="toggleRelatedPosts"
+            >
+              {{ postViewStore.post?.category?.name || '카테고리 없음' }}
+              <v-icon end :icon="showRelatedPosts ? 'mdi-chevron-up' : 'mdi-chevron-down'" />
+            </v-chip>
+
+            <!-- 관련 포스트 목록 -->
+            <v-expand-transition>
+              <v-card
+                v-if="showRelatedPosts && postViewStore.post?.category"
+                border
+                class="related-posts-card mt-1 mb-4"
+                flat
+              >
+                <v-card-title class="text-subtitle-1 pa-3">
+                  같은 카테고리의 포스트
+                </v-card-title>
+
+                <v-divider />
+
+                <v-list v-if="postViewStore.relatedPostsLoading" class="pa-0">
+                  <v-list-item>
+                    <v-progress-circular indeterminate />
+                  </v-list-item>
+                </v-list>
+
+                <v-list v-else-if="postViewStore.relatedPostsError" class="pa-0">
+                  <v-list-item>
+                    <v-alert density="compact" type="error">
+                      {{ postViewStore.relatedPostsError }}
+                    </v-alert>
+                  </v-list-item>
+                </v-list>
+
+                <v-list v-else-if="postViewStore.relatedPosts && postViewStore.relatedPosts.length > 0" class="pa-0">
+                  <v-list-item
+                    v-for="relatedPost in postViewStore.relatedPosts"
+                    :key="relatedPost.id"
+                    :class="{ 'current-post': relatedPost.id === postViewStore.post.id }"
+                    :to="`/post/${relatedPost.id}`"
+                  >
+                    <v-list-item-title>{{ relatedPost.title }}</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+
+                <v-list v-else class="pa-0">
+                  <v-list-item>
+                    <v-list-item-title class="text-center text-subtitle-2 text-medium-emphasis">
+                      같은 카테고리의 다른 포스트가 없습니다.
+                    </v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-card>
+            </v-expand-transition>
+          </div>
 
           <!-- 제목 -->
-          <v-card-title class="text-h4 text-sm-h3 font-weight-bold pa-0 mb-0 text-wrap custom-line-height">
+          <v-card-title class="text-h4 text-sm-h3 font-weight-bold pa-0 mb-4 text-wrap custom-line-height">
             {{ postViewStore.getPostTitle }}
           </v-card-title>
           <!-- 메타 정보 (작성자 bio, 조회수 등) -->
@@ -42,9 +99,22 @@
             <!-- 조회수 정보 (왼쪽) -->
             <div class="d-flex flex-wrap align-center">
               <v-chip class="pa-0" size="small" variant="text">
-                조회수: {{ postViewStore.getPostViews }}
+                조회수 : {{ postViewStore.getPostViews }}
               </v-chip>
-              <!-- 필요하다면 여기에 작성일자 같은 다른 메타 정보 추가 -->
+              <v-chip class="pl-3" size="small" variant="text">
+                작성자 :
+              </v-chip>
+              <!-- blogUsername이 있고 blogUrlName이 있다면 클릭 가능하게 함 -->
+              <v-chip
+                v-if="authStore.blogUsername"
+                class="ma-0 pa-0 author-username-chip"
+                :disabled="!authStore.blogUrlName"
+                link
+                variant="text"
+                @click="goToAuthorProfile"
+              >
+                {{ authStore.blogUsername }}
+              </v-chip>
             </div>
 
             <!-- 수정/삭제 버튼 (오른쪽) -->
@@ -157,6 +227,24 @@
 
   const showDeleteConfirm = ref(false); // 삭제 확인 다이얼로그 상태
 
+  // 관련 포스트 목록 표시 여부
+  const showRelatedPosts = ref(false);
+
+  // 관련 포스트 목록 토글 함수
+  const toggleRelatedPosts = () => {
+    console.log('run toggle related post');
+    showRelatedPosts.value = !showRelatedPosts.value;
+    console.log(showRelatedPosts.value)
+    console.log(postViewStore.post?.category)
+    console.log(postViewStore.relatedPosts.length === 0)
+    console.log(postViewStore.post.id)
+    console.log(postViewStore.post.category.categoryId)
+    // 처음 열 때만 데이터 로드
+    if (showRelatedPosts.value && postViewStore.post?.category && postViewStore.relatedPosts.length === 0) {
+      postViewStore.fetchRelatedPosts(postViewStore.post.id, postViewStore.post.category.categoryId);
+    }
+  };
+
   // 스낵바 상태
   const snackbar = ref({
     show: false,
@@ -167,7 +255,12 @@
 
   // 현재 게시글 ID
   const currentPostId = computed(() => route.params.postId);
-
+  // 블로그 작성자 프로필로 이동하는 함수
+  const goToAuthorProfile = () => {
+    if (authStore.blogUrlName) { // blogUrlName이 존재할 때만 이동
+      router.push(`/@${authStore.blogUrlName}`);
+    }
+  };
   // 게시글 수정/삭제 권한 확인
   const canEditOrDelete = computed(() => {
     console.log('로그인 상태 : ', authStore.isAuthenticated);
@@ -363,6 +456,22 @@
     snackbar.value.color = type === 'success' ? 'success' : type === 'error' ? 'error' : 'warning';
     snackbar.value.show = true;
   };
+
+  // 카테고리 메뉴 표시 여부
+  const showCategoryMenu = ref(false);
+
+  // 카테고리 메뉴 토글 함수
+  const toggleCategoryMenu = () => {
+    showCategoryMenu.value = !showCategoryMenu.value;
+  };
+
+  // 카테고리 클릭 시 해당 카테고리 페이지로 이동
+  const navigateToCategory = categoryId => {
+    if (authStore.blogUrlName) {
+      router.push(`/@${authStore.blogUrlName}/posts/?category=${categoryId}`);
+    }
+    showCategoryMenu.value = false; // 메뉴 닫기
+  };
 </script>
 
 <style scoped>
@@ -457,5 +566,16 @@
 
 .toastui-editor-popup-body button:hover {
   background-color: #f1f1f1;
+}
+
+/* 작성자 칩에 호버 시 밑줄 효과 및 커서 변경 */
+.author-username-chip:deep(.v-chip__content):hover {
+  text-decoration: underline !important; /* Vuetify 기본 스타일을 덮어쓰기 위해 !important 사용 */
+  cursor: pointer; /* 마우스 오버 시 손가락 모양 커서로 변경 */
+}
+/* 현재 포스트 강조 표시 */
+.current-post {
+  background-color: rgba(var(--v-theme-secondary), 0.1);
+  font-weight: bold;
 }
 </style>
