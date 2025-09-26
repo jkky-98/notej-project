@@ -19,6 +19,6 @@ public class ProfileImageService {
             return null;
         }
 
-        return s3Bucket.generateSignedUrl(objectKey, Duration.ofMinutes(30));
+        return s3Bucket.extractSignedUrl(objectKey, Duration.ofMinutes(30));
     }
 }

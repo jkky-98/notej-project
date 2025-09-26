@@ -8,7 +8,6 @@ import me.notej.notej_api.aws.s3.S3Bucket;
 import me.notej.notej_api.core.blogmain.domain.Blog;
 import me.notej.notej_api.core.blogmain.dto.BlogProfileResponse;
 import me.notej.notej_api.core.blogmain.dto.BlogProfileUpdateRequest;
-import me.notej.notej_api.core.blogmain.repository.BlogRepository;
 import me.notej.notej_api.core.member.domain.Member;
 import me.notej.notej_api.core.member.repository.MemberRepository;
 import org.springframework.security.core.Authentication;
@@ -17,14 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Duration;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class BlogProfileService {
 
-    private final BlogRepository blogRepository;
     private final MemberRepository memberRepository;
     private final S3Bucket s3Bucket;
     private final ProfileImageService profileImageService;
@@ -73,7 +69,7 @@ public class BlogProfileService {
         }
 
         // 2. 새 프로필 이미지 S3에 업로드
-        String s3ImageObjectKey = s3Bucket.upload(imageFile, "profile-images");
+        String s3ImageObjectKey = s3Bucket.createImage(imageFile, "profile-images");
 
         // 3. 저장한 s3 이미지 경로를 DB에 저장
         blog.setProfileImage(s3ImageObjectKey);

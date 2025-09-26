@@ -32,7 +32,7 @@ public class S3Bucket {
     /**
      * S3에 파일 업로드
      */
-    public String upload(MultipartFile file, String dirName) {
+    public String createImage(MultipartFile file, String dirName) {
         // 1. 파일 유효성 검사
         validateFile(file);
 
@@ -71,7 +71,7 @@ public class S3Bucket {
      * @param s3Key 가져올 파일의 S3 키
      * @return 파일 데이터를 담은 byte 배열
      */
-    public byte[] getImageBytes(String s3Key) {
+    public byte[] getBytesFromObject(String s3Key) {
         try {
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                     .bucket(bucket)
@@ -99,7 +99,7 @@ public class S3Bucket {
      * @param s3Key S3 객체 키 (경로)
      * @return 완전한 S3 URL
      */
-    public String getFullUrlFromS3Key(String s3Key) {
+    public String getObjectUrlFromKey(String s3Key) {
         if (s3Key == null || s3Key.isEmpty()) {
             throw new IllegalArgumentException("S3 키는 null이거나 비어있을 수 없습니다.");
         }
@@ -118,7 +118,7 @@ public class S3Bucket {
      * S3 URL에서 객체 키(경로) 추출 유틸리티
      * 안전성을 높이기 위해 좀 더 정교하게 구현
      */
-    private String getKeyFromS3Url(String fileUrl, String bucketName) {
+    private String getObjectKeyFromS3Url(String fileUrl, String bucketName) {
         String bucketDomain = ".s3." + s3Client.serviceClientConfiguration().region().id() + ".amazonaws.com/";
         String oldBucketDomain = ".s3.amazonaws.com/"; // 이전 버전 또는 us-east-1의 경우
 
@@ -194,7 +194,7 @@ public class S3Bucket {
      * @param expiration
      * @return
      */
-    public String generateSignedUrl(String objectKey, Duration expiration) {
+    public String extractSignedUrl(String objectKey, Duration expiration) {
         if (objectKey == null || objectKey.isEmpty()) {
             return null;
         }
@@ -220,7 +220,7 @@ public class S3Bucket {
      * @param dirName S3 내부에 생성할 디렉토리 경로 (예: "posts/username")
      * @return S3에 저장된 파일의 키 (경로)
      */
-    public String uploadWithTemporaryDeletionTag(MultipartFile file, String dirName) {
+    public String createImageWithTempTag(MultipartFile file, String dirName) {
         // validateFile(file); // 서비스 계층에서 이미 검증
 
         String s3Key = createFileName(file.getOriginalFilename(), dirName);
@@ -266,7 +266,7 @@ public class S3Bucket {
      * @param s3Key 태그를 제거할 객체의 S3 키
      * @return 성공 여부 (객체를 찾을 수 없는 경우 false)
      */
-    public boolean removeTemporaryDeletionTag(String s3Key) {
+    public boolean deleteTempTag(String s3Key) {
         try {
             // 1. 현재 객체의 모든 태그 가져오기
             GetObjectTaggingRequest getTaggingRequest = GetObjectTaggingRequest.builder()
@@ -314,7 +314,7 @@ public class S3Bucket {
             log.warn("삭제할 파일 URL이 null 또는 비어있습니다.");
             return;
         }
-        String s3Key = getKeyFromS3Url(fileUrl, bucket);
+        String s3Key = getObjectKeyFromS3Url(fileUrl, bucket);
         try {
             DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
                     .bucket(bucket)

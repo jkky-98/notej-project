@@ -265,10 +265,10 @@
         title: title.value,
         content,
         tags: postStore.getTags, // 태그 정보도 함께 저장
-        isPublic: postStore.post.isPublic,
+        active: postStore.post.isPublic,
         thumbnailUrl: postStore.thumbnailUrl,
         selectedCategory: postStore.selectedCategory,
-        shortDescription: postStore.shortDescription,
+        bio: postStore.shortDescription,
       });
       if (!currentPostId.value && result) {
         currentPostId.value = result;

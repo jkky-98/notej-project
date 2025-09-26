@@ -9,7 +9,7 @@
         class="mb-4"
         dense
         hide-details
-        label="아이디"
+        label="이메일"
         prepend-inner-icon="mdi-account"
         variant="outlined"
       />
@@ -113,16 +113,20 @@
 
   const login = async () => {
     try {
-      const res = await api.post('/api/auth/credentials/login', {
+      await api.post('/api/auth/credentials/login', {
         email: id.value,
         password: password.value,
       })
 
-      await authStore.fetchUser() // 로그인 후 유저 정보 갱신
+      await authStore.fetchUser();
       router.push('/login/success')
     } catch (err) {
       console.error(err)
       alert('아이디 또는 비밀번호가 틀렸습니다.')
+      // 로그인 실패 시, 인증 상태를 초기화하고 isInitialized도 false로 유지 (기본값)
+      authStore.user = null;
+      authStore.isAuthenticated = false;
+      authStore.refreshFailed = true; // 실패 플래그 설정 (선택 사항)
     }
   }
 

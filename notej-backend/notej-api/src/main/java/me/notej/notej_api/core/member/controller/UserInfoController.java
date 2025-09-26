@@ -20,7 +20,7 @@ public class UserInfoController {
     private final MemberRepository memberRepository;
 
     @GetMapping("/api/secure/users/me")
-    public UserInfoResponse getCurrentUser(Authentication authentication) {
+    public UserInfoResponse getCurrentMember(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new RuntimeException("인증되지 않은 사용자");
         }

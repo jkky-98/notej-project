@@ -10,14 +10,11 @@ import me.notej.notej_api.core.blogmain.dto.SideBarBlogInfoResponse;
 import me.notej.notej_api.core.blogmain.repository.BlogRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
-
 @Service
 @RequiredArgsConstructor
 public class SidebarBlogInfoService {
 
     private final BlogRepository blogRepository;
-    private final S3Bucket s3Bucket;
     private final ProfileImageService profileImageService;
 
     public SideBarBlogInfoResponse getSideBarBlogInfo(String blogUrl) {

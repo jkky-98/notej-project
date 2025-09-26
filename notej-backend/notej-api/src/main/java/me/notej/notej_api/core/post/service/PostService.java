@@ -46,10 +46,10 @@ public class PostService {
 
         String title = request.title();
         String content = request.content();
-        String shortDescription = request.shortDescription();
+        String bio = request.bio();
         List<String> tags = request.tags();
         Long categoryId = request.categoryId();
-        Boolean isPublic = request.isPublic();
+        Boolean active = request.active();
         String thumbnailUrl = request.thumbnailUrl();
 
         // 카테고리 존재시 엔티티 불러오기
@@ -62,9 +62,9 @@ public class PostService {
                 .blog(blog)
                 .title(title)
                 .content(content)
-                .bio(shortDescription)
+                .bio(bio)
                 .category(category)
-                .active(isPublic)
+                .active(active)
                 .thumbnail(thumbnailUrl)
                 .build();
 
@@ -87,10 +87,10 @@ public class PostService {
 
         String title = request.title();
         String content = request.content();
-        String shortDescription = request.shortDescription();
+        String bio = request.bio();
         List<String> tags = request.tags();
         Long categoryId = request.categoryId();
-        Boolean isPublic = request.isPublic();
+        Boolean active = request.active();
         String thumbnailUrl = request.thumbnailUrl();
 
         Category category = null;
@@ -108,9 +108,9 @@ public class PostService {
         // 더티-체킹 업데이트
         post.setTitle(title);
         post.setContent(content);
-        post.setBio(shortDescription);
+        post.setBio(bio);
         post.setCategory(category);
-        post.setActive(isPublic);
+        post.setActive(active);
         post.setThumbnail(thumbnailUrl);
 
         // 태그 업데이트

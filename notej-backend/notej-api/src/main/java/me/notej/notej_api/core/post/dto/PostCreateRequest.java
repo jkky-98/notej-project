@@ -9,10 +9,10 @@ public record PostCreateRequest(
         String title,
         @NotNull
         String content,
-        String shortDescription,
+        String bio,
         List<String> tags,
         Long categoryId,
-        Boolean isPublic,
+        Boolean active,
         String thumbnailUrl
 ) {
 }

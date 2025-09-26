@@ -32,7 +32,7 @@
   // ✅ 앱 시작 시 유저 정보 불러오기
   onMounted(async () => {
     try {
-      await authStore.fetchUser()
+      await authStore.initializeAuth();
     } catch (e) {
       // 로그인이 안된 경우라면 무시해도 됨
       console.warn('로그인 정보 없음')

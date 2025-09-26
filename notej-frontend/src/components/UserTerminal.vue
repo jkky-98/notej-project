@@ -167,12 +167,7 @@
   }
 
   onMounted(async () => {
-    try {
-      await authStore.fetchUser()
-    } catch (e) {
-      console.warn('자동 로그인 실패', e)
-    }
-    initTerminal()
+    initTerminal();
   })
 </script>
 

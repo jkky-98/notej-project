@@ -54,9 +54,9 @@ public class PostImageService {
         try {
             String s3Key = null;
             if (isUseTempTag) {
-                s3Key = s3Bucket.uploadWithTemporaryDeletionTag(imageFile, finalDirPath);
+                s3Key = s3Bucket.createImageWithTempTag(imageFile, finalDirPath);
             } else {
-                s3Key = s3Bucket.upload(imageFile, finalDirPath);
+                s3Key = s3Bucket.createImage(imageFile, finalDirPath);
             }
             log.info("[PostImageService][performS3Upload] 이미지 S3 업로드 성공 (경로: {}) : {}", finalDirPath, s3Key);
             return s3Key;
@@ -71,7 +71,7 @@ public class PostImageService {
 
     public byte[] downloadImage(String filename) {
         log.info("[EditorImageService][downloadImage] 사진 비동기 다운로드 성공 : {}", filename);
-        return s3Bucket.getImageBytes(filename);
+        return s3Bucket.getBytesFromObject(filename);
     }
 
     private void validateImageFile(MultipartFile imageFile) {

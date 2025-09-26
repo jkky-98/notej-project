@@ -38,7 +38,7 @@ public class PostController {
     }
 
     @GetMapping("/api/secure/post/{id}")
-    public ResponseEntity<PostWriteResponse> getPostSecure(
+    public ResponseEntity<PostWriteResponse> getPostAuthorized(
             @PathVariable Long id
     ) {
         PostWriteResponse response = postService.getPostWritable(id);

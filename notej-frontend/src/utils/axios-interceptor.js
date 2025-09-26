@@ -12,18 +12,18 @@ const LOGOUT_ENDPOINT = '/api/users/logout'
 let isRefreshing = false
 let refreshSubscribers = []
 
-function subscribeTokenRefresh(resolve, reject) {
+function subscribeTokenRefresh (resolve, reject) {
   console.log('[subscribeTokenRefresh] 새로운 재시도 요청 대기 등록')
   refreshSubscribers.push({ resolve, reject })
 }
 
-function onRefreshed() {
+function onRefreshed () {
   console.log('[onRefreshed] 모든 대기 요청 재시도 실행')
   refreshSubscribers.forEach(({ resolve }) => resolve())
   refreshSubscribers = []
 }
 
-function onRefreshFailed(error) {
+function onRefreshFailed (error) {
   console.log('[onRefreshFailed] 모든 대기 요청 에러 처리')
   refreshSubscribers.forEach(({ reject }) => reject(error))
   refreshSubscribers = []

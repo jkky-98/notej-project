@@ -23,16 +23,16 @@ public class CategoryController {
     public ResponseEntity<?> getCategories(
             @PathVariable String blogUrl
     ) {
-        CategoryAllResponse categoryAll = categoryService.getCategoryAll(blogUrl);
+        CategoryAllResponse categoryAll = categoryService.getCategories(blogUrl);
         log.info("[CategoryController][getCategories] CategoryController - getCategories() categoryAll : {}", categoryAll);
         return ResponseEntity.ok(categoryAll);
     }
 
-    @GetMapping("/api/secure/category")
-    public ResponseEntity<?> getCategoriesSecure(
+    @GetMapping("/api/secure/categories")
+    public ResponseEntity<?> getCategoriesAuthorized(
             Authentication authentication
     ) {
-        CategoryAllResponse categoryAll = categoryService.getCategoryAll(authentication);
+        CategoryAllResponse categoryAll = categoryService.getCategories(authentication);
         log.info("[CategoryController][getCategories] CategoryController - getCategories() categoryAll : {}", categoryAll);
         return ResponseEntity.ok(categoryAll);
     }

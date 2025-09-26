@@ -158,7 +158,7 @@ export const usePostStore = defineStore('post', {
       this.error = null;
 
       try {
-        const response = await api.get('/api/secure/category');
+        const response = await api.get('/api/secure/categories');
         console.log('가져온 카테고리 데이터 : {}', response.data);
         this.categories = response.data.categoryAll;
         console.log('Pinia stores에 저장된 categories:', this.categories); // 잘 저장되었는지 확인
@@ -260,16 +260,6 @@ export const usePostStore = defineStore('post', {
       return `data:image/jpeg;base64,${base64}`;
     },
 
-    // 발행 모달 관련 액션들 추가
-    // 임시 저장용 draft 설정 함수 추가
-    setPostDraft (draftData) {
-      console.log('Pinia에 저장되는 postDraft 데이터:', draftData);
-      this.postDraft = { ...draftData };
-
-      // 디버깅을 위해 저장 후 상태도 확인
-      console.log('저장 후 Pinia postDraft 상태:', this.postDraft);
-    },
-
     openPublishModal () {
       this.isPublishModalOpen = true;
     },
@@ -309,9 +299,9 @@ export const usePostStore = defineStore('post', {
 
           // 모달에서 설정된 추가 정보
           thumbnailUrl: this.thumbnailUrl,
-          isPublic: this.isPublic,
+          active: this.isPublic,
           categoryId: this.selectedCategory,
-          shortDescription: this.shortDescription,
+          bio: this.shortDescription,
         };
 
         // savePost 액션 재사용

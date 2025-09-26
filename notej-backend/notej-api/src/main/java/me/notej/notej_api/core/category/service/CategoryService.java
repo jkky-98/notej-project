@@ -29,10 +29,10 @@ public class CategoryService {
     private final MemberRepository memberRepository;
 
     @Transactional(readOnly = true)
-    public CategoryAllResponse getCategoryAll(final String blogUrl) {
-        List<Category> allByBlogUrl = categoryRepository.findAllByBlog_Url(blogUrl);
+    public CategoryAllResponse getCategories(final String blogUrl) {
+        List<Category> categories = categoryRepository.findAllByBlog_Url(blogUrl);
 
-        List<CategoryResponse> categoryResponses = allByBlogUrl.stream()
+        List<CategoryResponse> categoryResponses = categories.stream()
                 .sorted(Comparator.comparing(Category::getSeq)) // seq 기준으로 정렬해야 프론트엔드가 그대로 사용해서 카테고리 랜더링 정렬가능
                 .map(category -> new CategoryResponse(
                         category.getId(),
@@ -46,7 +46,7 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    public CategoryAllResponse getCategoryAll(final Authentication authentication) {
+    public CategoryAllResponse getCategories(final Authentication authentication) {
 
         User user = (User) authentication.getPrincipal();
         String memberUuid = user.getUsername();
