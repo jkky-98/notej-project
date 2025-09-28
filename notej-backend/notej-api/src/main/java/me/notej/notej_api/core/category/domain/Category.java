@@ -30,6 +30,7 @@ public class Category extends BaseTimeEntity {
     private Category parent;
 
     @OneToMany(mappedBy = "parent")
+    @Builder.Default
     private List<Category> children = new ArrayList<>();
 
     @Column(nullable = false, length = 20)

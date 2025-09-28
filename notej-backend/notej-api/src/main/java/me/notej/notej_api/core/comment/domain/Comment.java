@@ -39,6 +39,7 @@ public class Comment extends BaseTimeEntity {
     private Comment parent;
 
     @OneToMany(mappedBy = "parent")
+    @Builder.Default
     private List<Comment> children = new ArrayList<>();
 
     // 댓글이 최상위 댓글인지 확인

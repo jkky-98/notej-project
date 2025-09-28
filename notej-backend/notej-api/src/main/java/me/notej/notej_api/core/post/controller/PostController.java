@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.notej.notej_api.core.post.dto.*;
 import me.notej.notej_api.core.post.service.PostService;
+import me.notej.notej_api.global.page.PageResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -69,5 +71,23 @@ public class PostController {
         List<PostViewRelatedPostResponse> relatedPosts = postService.getRelatedPosts(categoryId, currentPostId);
         log.info("[PostController][getRelatedPosts] PostController - getRelatedPosts() relatedPosts : {}", relatedPosts);
         return ResponseEntity.ok(relatedPosts);
+    }
+
+    @GetMapping("/api/{blogUrl}/posts")
+    public ResponseEntity<PageResponse<PostFilteredResponse>> getPostsFiltered(
+            @PathVariable String blogUrl,
+            @RequestParam(required = false) String categoryName,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String tagName,
+            @RequestParam(defaultValue = "latest") String sortBy,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer limit
+    ) {
+        // 서비스 계층 호출 (page는 0부터 시작하므로 1 빼줌)
+        Page<PostFilteredResponse> filteredPosts = postService.getFilteredPosts(
+                blogUrl, categoryName, search, tagName, sortBy, page - 1, limit);
+
+        // PageResponse 객체로 변환하여 반환
+        return ResponseEntity.ok(PageResponse.from(filteredPosts));
     }
 }

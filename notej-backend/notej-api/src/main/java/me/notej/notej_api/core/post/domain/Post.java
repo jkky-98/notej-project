@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import me.notej.notej_api.core.blogmain.domain.Blog;
 import me.notej.notej_api.core.category.domain.Category;
+import me.notej.notej_api.core.comment.domain.Comment;
 import me.notej.notej_api.global.baseentity.BaseTimeEntity;
 
 import java.util.ArrayList;
@@ -39,6 +40,10 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post")
     @Builder.Default
     private List<PostTag> postTags = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post")
+    @Builder.Default
+    private List<Comment> comments = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")

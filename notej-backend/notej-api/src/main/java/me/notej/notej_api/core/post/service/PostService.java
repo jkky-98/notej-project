@@ -14,6 +14,8 @@ import me.notej.notej_api.core.post.domain.Post;
 import me.notej.notej_api.core.post.domain.PostTag;
 import me.notej.notej_api.core.post.dto.*;
 import me.notej.notej_api.core.post.repository.PostRepository;
+import me.notej.notej_api.core.post.repository.PostRepositoryCustom;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -35,6 +37,7 @@ public class PostService {
     private final TagService tagService;
     private final S3Bucket s3Bucket;
     private final PostImageService postImageService;
+    private final PostRepositoryCustom PostRepositoryImpl;
 
     @Transactional
     public Long savePost(final Authentication authentication,final PostCreateRequest request) {
@@ -193,5 +196,12 @@ public class PostService {
         return postsRelated.stream()
                 .map(PostViewRelatedPostResponse::fromEntity)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostFilteredResponse> getFilteredPosts(String blogUrl, String categoryName, String search, String tagName, String sortBy, int page, int limit) {
+        Pageable pageable = PageRequest.of(page, limit);
+        Page<Post> postPage = PostRepositoryImpl.findFilteredPosts(blogUrl, categoryName, search, tagName, sortBy, pageable);
+        return postPage.map(PostFilteredResponse::fromEntity);
     }
 }

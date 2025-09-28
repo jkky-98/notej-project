@@ -35,16 +35,9 @@ const routes = [
     component: () => import('@/pages/blog/PostView.vue'),
   },
   {
-    path: '/test/tagify',
-    name: 'test-tagify',
-    component: () => import('@/pages/TagifyTest.vue'),
-    meta: { requiresAuth: true }, // 인증 필요
-  },
-  {
-    path: '/test/tagify-error',
-    name: 'test-tagify-error',
-    component: () => import('@/pages/TagifyTestError.vue'),
-    meta: { requiresAuth: true }, // 인증 필요
+    path: '/test/scroll',
+    name: 'test-scroll',
+    component: () => import('@/pages/TestInfiniteScroll.vue'),
   },
   // ... 기타 라우트들
 ]
