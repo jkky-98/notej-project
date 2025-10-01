@@ -34,11 +34,6 @@ const routes = [
     name: 'postView',
     component: () => import('@/pages/blog/PostView.vue'),
   },
-  {
-    path: '/test/scroll',
-    name: 'test-scroll',
-    component: () => import('@/pages/TestInfiniteScroll.vue'),
-  },
   // ... 기타 라우트들
 ]
 

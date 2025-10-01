@@ -133,11 +133,30 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+  <v-snackbar
+    v-model="snackbar.show"
+    :color="snackbar.color"
+    position="bottom"
+    :timeout="snackbar.timeout"
+  >
+    {{ snackbar.text }}
+
+    <template #actions>
+      <v-btn
+        color="white"
+        variant="text"
+        @click="snackbar.show = false"
+      >
+        닫기
+      </v-btn>
+    </template>
+  </v-snackbar>
 </template>
 <script setup>
   import { computed, onMounted, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { usePostStore } from '@/stores/post';
+  import { compressImage, validateImage } from '@/utils/imageUtils';
 
   const postStore = usePostStore();
   const router = useRouter();
@@ -188,10 +207,26 @@
     const file = event.target.files[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append('image', file);
+    // 이미지 유효성 검증
+    const validation = validateImage(file, 5); // 최대 5MB로 제한
+    console.log(validation);
+    if (!validation.valid) {
+      showToast('error', validation.error);
+      console.log('showToast - error');
+      return;
+    }
 
     try {
+      // 이미지 압축 처리
+      const compressedFile = await compressImage(file, {
+        maxSizeMB: 0.5, // 썸네일은 500KB 이하로 압축
+        maxWidthOrHeight: 1200, // 썸네일에 적합한 크기
+      });
+
+      // FormData 생성 및 업로드
+      const formData = new FormData();
+      formData.append('image', compressedFile, file.name);
+
       const response = await postStore.uploadThumbnail(formData);
       postStore.setThumbnail(response.url);
       showToast('success', '썸네일 업로드 완료!');

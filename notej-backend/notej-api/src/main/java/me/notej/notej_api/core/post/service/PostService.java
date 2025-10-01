@@ -78,7 +78,13 @@ public class PostService {
             tagService.saveTag(tag, newPost.getId());
         }
         // 썸네일 처리
-
+        // 썸네일 변경 작업
+        String thumbnailUrlBefore = postSaved.getThumbnail();
+        if (!thumbnailUrlBefore.equals(thumbnailUrl)) {
+            // 기존 썸네일 삭제
+            postImageService.deleteImage(thumbnailUrlBefore);
+            // 새로운 썸네일은 미리 업로드 되어있음.
+        }
         log.info("[PostService][savePost] PostService - savePost() newPost : {}", newPost);
         return postSaved.getId();
     }

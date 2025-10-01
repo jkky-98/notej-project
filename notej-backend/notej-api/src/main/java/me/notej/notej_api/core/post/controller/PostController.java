@@ -83,9 +83,13 @@ public class PostController {
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer limit
     ) {
+        log.info("[PostController][getPostsFiltered] PostController - getPostsFiltered() blogUrl : {}, categoryName : {}, search : {}, tagName : {}, sortBy : {}, page : {}, limit : {}",
+                blogUrl, categoryName, search, tagName, sortBy, page, limit);
         // 서비스 계층 호출 (page는 0부터 시작하므로 1 빼줌)
         Page<PostFilteredResponse> filteredPosts = postService.getFilteredPosts(
                 blogUrl, categoryName, search, tagName, sortBy, page - 1, limit);
+
+        log.info("[PostController][getPostsFiltered] PostController - getPostsFiltered() filteredPosts : {}", filteredPosts);
 
         // PageResponse 객체로 변환하여 반환
         return ResponseEntity.ok(PageResponse.from(filteredPosts));

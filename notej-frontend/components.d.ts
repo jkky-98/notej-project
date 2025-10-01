@@ -9,6 +9,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
+    BlogMainPost: typeof import('./src/components/PostList.vue')['default']
     BlogSidebar: typeof import('./src/components/layouts/BlogSidebar.vue')['default']
     CommentComponent: typeof import('./src/components/CommentComponent.vue')['default']
     CommentItem: typeof import('./src/components/CommentItem.vue')['default']
@@ -20,6 +21,7 @@ declare module 'vue' {
     PublishModal: typeof import('./src/components/PublishModal.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SearchBar: typeof import('./src/components/SearchBar.vue')['default']
     TableOfContents: typeof import('./src/components/TableOfContents.vue')['default']
     TagInput: typeof import('./src/components/tag/TagInput.vue')['default']
     ToastEditor: typeof import('./src/components/editor/ToastEditor.vue')['default']
