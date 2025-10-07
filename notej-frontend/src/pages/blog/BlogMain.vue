@@ -20,9 +20,10 @@
         </v-card>
       </v-col>
 
-      <v-col cols="2">
+      <v-col class="pl-6" cols="2">
         <v-card>
-          <!-- 이 부분은 그대로 두거나 필요한 콘텐츠를 추가해 -->
+          <!-- 태그 리스트를 가져올 부분 -->
+          <TagList />
         </v-card>
       </v-col>
     </v-row>
@@ -34,6 +35,7 @@
   import { useRoute } from 'vue-router'
   import { useBlogStore } from '@/stores/blog'
   import { useBlogPostStore } from '@/stores/blogMainPost'
+  import { useBlogMaintagStore } from '@/stores/blogMaintag' // 태그 스토어
 
   import BlogSidebar from '@/components/layouts/BlogSidebar.vue'
   import PostList from '@/components/PostList.vue'
@@ -42,6 +44,7 @@
   const route = useRoute()
   const blogStore = useBlogStore()
   const blogPostStore = useBlogPostStore()
+  const blogMaintagStore = useBlogMaintagStore()
 
   onMounted(async () => {
     const blogUrlName = route.params.blogUrlName;
@@ -49,6 +52,9 @@
     await blogStore.fetchBlogCategories(route.params.blogUrlName)
     // 블로그 URL 설정 후 초기 포스트 로드
     blogPostStore.setBlogUrl(blogUrlName)
-    blogPostStore.loadMorePosts()
+    blogPostStore.loadMorePosts();
+
+    // ⭐️ 태그 리스트 데이터 로드
+    await blogMaintagStore.fetchTags(blogUrlName);
   })
 </script>

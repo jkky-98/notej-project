@@ -24,6 +24,7 @@ declare module 'vue' {
     SearchBar: typeof import('./src/components/SearchBar.vue')['default']
     TableOfContents: typeof import('./src/components/TableOfContents.vue')['default']
     TagInput: typeof import('./src/components/tag/TagInput.vue')['default']
+    TagList: typeof import('./src/components/TagList.vue')['default']
     ToastEditor: typeof import('./src/components/editor/ToastEditor.vue')['default']
     TopPostInCategory: typeof import('./src/components/TopPostInCategory.vue')['default']
     TuiEditorWithTagify: typeof import('./src/components/TuiEditorWithTagify.vue')['default']

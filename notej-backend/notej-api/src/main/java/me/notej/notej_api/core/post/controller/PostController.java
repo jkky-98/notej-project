@@ -19,7 +19,7 @@ public class PostController {
 
     private final PostService postService;
 
-    @PostMapping("/api/secure/post")
+    @PostMapping("/api/posts")
     public ResponseEntity<?> createPost(
             Authentication authentication,
             @RequestBody PostCreateRequest request
@@ -29,7 +29,7 @@ public class PostController {
         return ResponseEntity.ok(postId);
     }
 
-    @PutMapping("/api/secure/post/{id}")
+    @PutMapping("/api/posts/{id}")
     public ResponseEntity<?> updatePost(
             @PathVariable Long id,
             @RequestBody PostUpdateRequest request
@@ -39,7 +39,7 @@ public class PostController {
         return ResponseEntity.ok(postId);
     }
 
-    @GetMapping("/api/secure/post/{id}")
+    @GetMapping("/api/posts/{id}/edit")
     public ResponseEntity<PostWriteResponse> getPostAuthorized(
             @PathVariable Long id
     ) {
@@ -47,15 +47,15 @@ public class PostController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/api/post/{postId}")
+    @GetMapping("/api/posts/{id}")
     public ResponseEntity<PostResponse> getPost(
-            @PathVariable Long postId
+            @PathVariable Long id
     ) {
-        PostResponse response = postService.getPost(postId);
+        PostResponse response = postService.getPost(id);
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/api/secure/post/{id}")
+    @DeleteMapping("/api/posts/{id}")
     public ResponseEntity<?> deletePost(
             @PathVariable Long id
     ) {
@@ -63,12 +63,12 @@ public class PostController {
         return ResponseEntity.ok("POST_DELETE_SUCCESS");
     }
 
-    @GetMapping("/api/posts/related")
+    @GetMapping("/api/posts/{id}/related")
     public ResponseEntity<List<PostViewRelatedPostResponse>> getRelatedPosts(
-            @RequestParam Long categoryId,
-            @RequestParam Long currentPostId
+            @PathVariable Long id,
+            @RequestParam Long categoryId
     ) {
-        List<PostViewRelatedPostResponse> relatedPosts = postService.getRelatedPosts(categoryId, currentPostId);
+        List<PostViewRelatedPostResponse> relatedPosts = postService.getRelatedPosts(categoryId, id);
         log.info("[PostController][getRelatedPosts] PostController - getRelatedPosts() relatedPosts : {}", relatedPosts);
         return ResponseEntity.ok(relatedPosts);
     }

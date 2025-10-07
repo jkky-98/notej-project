@@ -72,7 +72,7 @@
   const blogUrl = ref('')
   const blogUrlError = ref('')
 
-  const PROFILE_ENDPORINT = '/api/secure/users/complete-profile'
+  const PROFILE_ENDPORINT = '/api/user/blog'
 
   function onInput () {
     blogUrl.value = blogUrl.value.replace(/[^a-zA-Z]/g, '')

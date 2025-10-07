@@ -35,19 +35,19 @@ public class BlogMainController {
         return ResponseEntity.ok(sideBarBlogInfoResponse);
     }
 
-    @GetMapping("/api/secure/blog/my-profile")
+    @GetMapping("/api/blog/profile")
     public ResponseEntity<?> getBlogProfileMy(Authentication authentication) {
         BlogProfileResponse blogProfileResponse = blogProfileService.getBlogProfile(authentication);
         return ResponseEntity.ok(blogProfileResponse);
     }
 
-    @PutMapping("/api/secure/blog/my-profile")
+    @PutMapping("/api/blog/profile")
     public ResponseEntity<?> updateBlogProfileMy(Authentication authentication, @RequestBody BlogProfileUpdateRequest request) {
         blogProfileService.updateBlogProfile(authentication, request);
         return ResponseEntity.ok("프로필 설정이 완료되었습니다.");
     }
 
-    @PostMapping("/api/secure/blog/profile-image")
+    @PostMapping("/api/blog/profile-image")
     public ResponseEntity<?> updateProfileImage(
             Authentication authentication, // 너의 UserPrincipal 타입에 맞게
             @RequestPart("profileImage") MultipartFile profileImage) {

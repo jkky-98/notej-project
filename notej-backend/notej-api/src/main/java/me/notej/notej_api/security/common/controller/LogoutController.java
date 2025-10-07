@@ -17,20 +17,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/secure/users")
 public class LogoutController {
 
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberRepository memberRepository;
 
-    @PostMapping("/logout")
+    @DeleteMapping("/api/logout")
     @Transactional
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         try {

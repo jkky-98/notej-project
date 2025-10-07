@@ -10,6 +10,12 @@ export const useBlogPostStore = defineStore('blogPost', {
     hasMore: true,
     error: null,
     thumbnailByteCache: {}, // 썸네일 바이트 데이터 캐시 (Blob URL 아님!)
+    filters: {
+      search: null,
+      categoryName: null,
+      tagName: null,
+      sortBy: 'latest',
+    },
   }),
 
   // Getter는 특별히 필요 없지만, 상태 직접 접근으로도 가능
@@ -30,8 +36,25 @@ export const useBlogPostStore = defineStore('blogPost', {
     },
 
     setFilters (filters) {
+      console.log('[Pinia:setFilters] 필터 업데이트 요청. 이전 필터:', this.filters);
+      // 새로운 필터 값으로 기존 필터를 업데이트
       this.filters = { ...this.filters, ...filters };
+      console.log('[Pinia:setFilters] 필터 업데이트 완료. 새 필터:', this.filters);
+
+      // 필터가 변경되었으므로 게시물 목록 및 관련 상태를 초기화합니다.
+      // 이렇게 해야 새로운 필터 기준으로 첫 페이지부터 다시 로드할 준비가 됩니다.
+      this.resetPosts(); // <-- 이 부분이 핵심! (PostList에서 resetState() 대신 이걸 호출)
     },
+
+    resetPosts () {
+      console.log('[Pinia:resetPosts] 포스트 목록 및 페이징 상태 초기화');
+      this.posts = [];
+      this.page = 1;
+      this.hasMore = true;
+      this.error = null;
+      this.thumbnailByteCache = {}; // 필요하다면 썸네일 캐시도 초기화
+    },
+
 
     async loadMorePosts (params = {}) {
       console.log('[Pinia:loadMorePosts] 호출됨');

@@ -16,7 +16,7 @@ public class PostImageController {
 
     private final PostImageService postImageService;
 
-    @PostMapping("/secure/editor/image")
+    @PostMapping("/editor/image")
     public ResponseEntity<EditorImageUploadResponse> uploadImage(
         Authentication authentication,
         @RequestPart(value = "image") MultipartFile imageFile
@@ -32,7 +32,7 @@ public class PostImageController {
         return postImageService.downloadImage(filename);
     }
 
-    @PostMapping("/secure/post/thumbnail")
+    @PostMapping("/posts/thumbnail")
     public ResponseEntity<PostThumbnailImageUploadResponse> uploadThumbnailImage(
             Authentication authentication,
             @RequestPart(value = "image") MultipartFile imageFile
@@ -41,7 +41,7 @@ public class PostImageController {
         return ResponseEntity.ok(res);
     }
 
-    @GetMapping("/secure/post/thumbnail")
+    @GetMapping("/posts/thumbnail")
     public byte[] getThumbnailImageInWrite(
             @RequestParam String filename
     ) {

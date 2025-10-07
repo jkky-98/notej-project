@@ -63,7 +63,20 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable) // Authorization: Basic 인증 막음(JWT 기반이라)
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/secure/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/blog/profile").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/blog/profile").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/blog/profile-image").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/logout").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/user").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/user/blog").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/editor/image").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/posts").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/posts/{id}").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/posts/{id}").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/comments").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/posts/thumbnail").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/posts/thumbnail").authenticated()
+                        
                         .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/login", "/error/**", "/logo/**", "/js/**", "/default-ui.css, /favicon.ico").permitAll()
                         .anyRequest().authenticated() // 나머지 경로는 모두 인가 필요

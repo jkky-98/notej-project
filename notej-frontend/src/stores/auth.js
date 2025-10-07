@@ -19,7 +19,7 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async fetchUser () {
       try {
-        const res = await api.get('/api/secure/users/me');
+        const res = await api.get('/api/user');
         this.user = res.data;
         this.isAuthenticated = true;
         console.log('🟢 fetchUser: 사용자 정보 성공적으로 불러옴:', res.data);
@@ -33,7 +33,7 @@ export const useAuthStore = defineStore('auth', {
     async logout () {
       try {
         console.log('로그아웃 시도')
-        await api.post('/api/secure/users/logout')
+        await api.delete('/api/logout')
         console.log('로그아웃 성공')
       } catch (err) {
         console.error('로그아웃 실패:', err)

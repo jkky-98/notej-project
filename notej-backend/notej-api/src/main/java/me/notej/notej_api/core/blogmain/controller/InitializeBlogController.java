@@ -12,12 +12,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/secure/users")
 public class InitializeBlogController {
 
     private final InitializeBlogService initializeBlogService;
 
-    @PostMapping("/complete-profile")
+    @PostMapping("/api/user/blog")
     public ResponseEntity<?> saveInitialBlog(
             Authentication authentication,
             @RequestBody CompleteProfileRequest request

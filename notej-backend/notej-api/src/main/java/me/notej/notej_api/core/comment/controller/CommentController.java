@@ -21,15 +21,15 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    @GetMapping("/comments/post/{postId}")
+    @GetMapping("/posts/{id}/comments")
     public ResponseEntity<List<CommentResponse>> getCommentsByPostId(
-            @PathVariable Long postId
+            @PathVariable Long id
     ) {
-        List<CommentResponse> comments = commentService.getCommentsByPostId(postId);
+        List<CommentResponse> comments = commentService.getCommentsByPostId(id);
         return ResponseEntity.ok(comments);
     }
 
-    @PostMapping("/secure/comments")
+    @PostMapping("/comments")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<CommentResponse> createComment(
         @Valid @RequestBody CommentRequest request,

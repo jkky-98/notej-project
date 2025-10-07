@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.notej.notej_api.core.blogmain.domain.Blog;
+import me.notej.notej_api.core.blogmain.repository.BlogRepository;
 import me.notej.notej_api.core.category.domain.Category;
 import me.notej.notej_api.core.category.dto.CategoryAllResponse;
 import me.notej.notej_api.core.category.dto.CategoryCreateRequest;
@@ -27,6 +28,7 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final MemberRepository memberRepository;
+    private final BlogRepository blogRepository;
 
     @Transactional(readOnly = true)
     public CategoryAllResponse getCategories(final String blogUrl) {
@@ -69,12 +71,11 @@ public class CategoryService {
     }
 
     @Transactional
-    public void createCategory(final Authentication authentication, final CategoryCreateRequest request) {
-        User user = (User) authentication.getPrincipal();
-        String memberUuid = user.getUsername();
+    public void createCategory(final String blogUrl, final CategoryCreateRequest request) {
 
-        Member member = memberRepository.findByMemberUuid(memberUuid).orElseThrow(() -> new EntityNotFoundException("USER_NOT_FOUND"));
+        Blog blog = blogRepository.findByUrl(blogUrl).orElseThrow(() -> new EntityNotFoundException("BLOG_NOT_FOUND"));
 
+        // 1. 부모 카테고리 찾기
         Category parent = null; // 기본적으로 parent는 null로 초기화
 
         // parentId가 요청에 있다면, 부모 카테고리 조회 및 설정
@@ -84,13 +85,13 @@ public class CategoryService {
         }
         // 2. 해당 부모를 가지는(혹은 최상위) 카테고리 중 가장 높은 seq 값을 찾아서 +1 하거나, 1로 설정
         //    parentId가 null이면 최상위 카테고리 중, null이 아니면 해당 parentId를 가진 카테고리 중 가장 높은 seq 찾기
-        Integer maxSeq = categoryRepository.findMaxSeqByParentId(member.getBlog().getId(), request.parentId());
+        Integer maxSeq = categoryRepository.findMaxSeqByParentId(blog.getId(), request.parentId());
 
         int newSeq = (maxSeq != null) ? maxSeq + 1 : 1; // maxSeq가 없으면 1, 있으면 +1
 
         // 3. Category 엔티티 생성 및 저장
         Category newCategory = Category.builder()
-                .blog(member.getBlog())
+                .blog(blog)
                 .name(request.name())
                 .seq(newSeq) // 계산된 seq 값 사용
                 .parent(parent)
@@ -101,7 +102,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public void updateCategories(List<CategoryUpdateRequest> requests) { // List로 받기
+    public void updateCategories(List<CategoryUpdateRequest> requests, final String blogUrl) { // List로 받기
         for (CategoryUpdateRequest request : requests) { // 리스트 순회하면서 각각 업데이트
             Long categoryId = request.categoryId();
 

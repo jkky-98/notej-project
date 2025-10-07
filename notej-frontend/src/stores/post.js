@@ -89,7 +89,7 @@ export const usePostStore = defineStore('post', {
 
       let response;
       try {
-        response = await api.get(`/api/secure/post/${postId}`);
+        response = await api.get(`/api/posts/${postId}/edit`);
         // 데이터 배치
         this.post.id = response.data.id;
         this.post.title = response.data.title;
@@ -120,10 +120,10 @@ export const usePostStore = defineStore('post', {
         console.log('게시글 삽입 or 업데이트 요청 데이터', postData);
         if (postData.id) {
           // 수정 (PUT 요청)
-          response = await api.put(`/api/secure/post/${postData.id}`, postData);
+          response = await api.put(`/api/posts/${postData.id}`, postData);
         } else {
           // 새 글 작성 (POST 요청)
-          response = await api.post('/api/secure/post', postData);
+          response = await api.post('/api/posts', postData);
         }
 
         this.currentPost = response.data;
@@ -158,7 +158,7 @@ export const usePostStore = defineStore('post', {
       this.error = null;
 
       try {
-        const response = await api.get('/api/secure/categories');
+        const response = await api.get('/api/me/categories');
         console.log('가져온 카테고리 데이터 : {}', response.data);
         this.categories = response.data.categoryAll;
         console.log('Pinia stores에 저장된 categories:', this.categories); // 잘 저장되었는지 확인
@@ -177,7 +177,7 @@ export const usePostStore = defineStore('post', {
       this.error = null;
 
       try {
-        const response = await api.post('/api/secure/editor/image', formData, {
+        const response = await api.post('/api/editor/image', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -197,7 +197,7 @@ export const usePostStore = defineStore('post', {
       this.isLoading = true;
       this.error = null;
       try {
-        const response = await api.post('/api/secure/post/thumbnail', formData, {
+        const response = await api.post('/api/posts/thumbnail', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -230,7 +230,7 @@ export const usePostStore = defineStore('post', {
 
       this.error = null;
       try {
-        const response = await api.get(`/api/secure/post/thumbnail`, {
+        const response = await api.get(`/api/posts/thumbnail`, {
           params: {
             filename: this.thumbnailUrl,
           },

@@ -75,7 +75,7 @@ export const useBlogStore = defineStore('blog', {
     async fetchBlogCategories (blogUrlName) {
       this.loading = true
       try {
-        const res = await api.get(`/api/blog/${blogUrlName}/categories`)
+        const res = await api.get(`/api/${blogUrlName}/categories`)
         this.categories = res.data.categoryAll || this.categories
         console.log(this.categories)
       } catch (e) {
@@ -121,7 +121,7 @@ export const useBlogStore = defineStore('blog', {
 
     async fetchMyProfile () {
       try {
-        const res = await api.get('/api/secure/blog/my-profile')
+        const res = await api.get('/api/blog/profile')
         console.log('프로필 데이터 GET : ' , res.data)
         // myProfile 상태가 없다면 state에 추가해야 함!
         this.myProfile = res.data
@@ -134,7 +134,7 @@ export const useBlogStore = defineStore('blog', {
 
     async updateMyProfile (profileData) {
       try {
-        const res = await api.put('/api/secure/blog/my-profile', profileData)
+        const res = await api.put('/api/blog/profile', profileData)
         // 업데이트된 정보로 상태 갱신
         this.myProfile = res.data
         return res.data
@@ -148,7 +148,7 @@ export const useBlogStore = defineStore('blog', {
       try {
         console.log('카테고리 추가 요청 데이터 seq :', categoryData.seq); // 요청 전 데이터 확인
         // 카테고리 추가 API 호출
-        const res = await api.post('/api/secure/blog/categories', {
+        const res = await api.post(`/api/${blogUrlName}/categories`, {
           name: categoryData.name,
           seq: categoryData.seq,
           parentId: categoryData.parentId || null,
@@ -172,7 +172,7 @@ export const useBlogStore = defineStore('blog', {
         }
         console.log('업데이트 카테고리 데이터 : ', orderedCategories);
         // 백엔드 API 호출
-        const res = await api.put('/api/secure/blog/categories', orderedCategories);
+        const res = await api.put('/api/${blogUrlName}/categories', orderedCategories);
 
         // 서버에서 순서 업데이트 성공 후, 최신 카테고리 목록을 다시 불러와 Pinia 상태를 최신화
         await this.fetchBlogCategories(blogUrlName);
@@ -187,7 +187,7 @@ export const useBlogStore = defineStore('blog', {
     // stores/blog.js에 추가
     async updateProfileImage (formData) {
       try {
-        const res = await api.post('/api/secure/blog/profile-image', formData, {
+        const res = await api.post('/api/blog/profile-image', formData, {
           headers: {
             'Content-Type': 'multipart/form-data', // 파일 업로드 시 필수
           },

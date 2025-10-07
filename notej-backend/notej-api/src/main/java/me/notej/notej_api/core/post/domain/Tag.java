@@ -20,7 +20,7 @@ public class Tag {
     @Column(name = "tag_id")
     private Long id;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 20, unique = true)
     private String name;
 
     @OneToMany(mappedBy = "tag")

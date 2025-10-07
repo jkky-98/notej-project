@@ -77,7 +77,7 @@ export const usePostViewStore = defineStore('postView', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await api.get(`/api/post/${postId}`); // API 엔드포인트 확인!
+        const response = await api.get(`/api/posts/${postId}`); // API 엔드포인트 확인!
         this.post = response.data;
         // 게시글 로드 성공 후 썸네일 바이트 데이터 불러오기
         if (this.post?.thumbnailUrl) {
@@ -116,7 +116,7 @@ export const usePostViewStore = defineStore('postView', {
       this.loading = true;
       this.error = null;
       try {
-        await api.delete(`/api/secure/post/${postId}`); // API 엔드포인트 확인!
+        await api.delete(`/api/posts/${postId}`); // API 엔드포인트 확인!
         console.log(`게시글 ${postId} 삭제 성공`);
         // 삭제 후 상태 초기화
         this.resetPostState();
@@ -178,7 +178,7 @@ export const usePostViewStore = defineStore('postView', {
       this.commentsError = null
 
       try {
-        const response = await api.get(`/api/comments/post/${postId}`)
+        const response = await api.get(`/api/posts/${postId}/comments`)
         this.comments = response.data
       } catch (error) {
         console.error('댓글을 불러오는 중 오류가 발생했습니다:', error)
@@ -194,7 +194,7 @@ export const usePostViewStore = defineStore('postView', {
       this.submittingComment = true
       console.log('댓글에 대한 게시글 id : ', postId);
       try {
-        const response = await api.post('/api/secure/comments', {
+        const response = await api.post('/api/comments', {
           postId,
           content: this.commentContent,
           parentId: this.replyTo,
@@ -260,7 +260,7 @@ export const usePostViewStore = defineStore('postView', {
         this.relatedPostsError = null;
 
         // API 호출 (백엔드에서 현재 포스트 포함 5개 제한 처리)
-        const response = await api.get(`/api/posts/related?categoryId=${categoryId}&currentPostId=${postId}`);
+        const response = await api.get(`/api/posts/${postId}/related?categoryId=${categoryId}`);
         console.log('백엔드 데이터(관련 포스트 최대 5개) ', response.data)
         this.relatedPosts = response.data;
       } catch (error) {
